@@ -1,0 +1,23 @@
+#  General
+APP_NAME = 'Spelling Trainer'
+APP_DESC = 'This is the app to drill correct spelling in you.'
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
+TITLE_FONT_SIZE = 30
+FONT_SIZE = 18
+USER_CONFIG = 'config'
+NEW_USER_GREETING = 'Welcome to the spelling trainer! Please, create a new user'
+GREETING_MAIN = 'Welcome back, {}! {}'
+GREETING_EMOJI = ['😎', '🥰', '🤩', '😺', '🙂', '🥹', '☺️', '🤓', '😸']
+DESCRIPTION_MAIN = "This app will help you to practice spelling. The words for practice are cleverly generated to " \
+                   "test your skills. You can manually add words to your vocabulary and practice them separately."
+CHANGE_USER = 'Choose another existing user to continue'
+AVATARS = ['bear.png', 'bunny.png', 'deer.png', 'dog.png', 'dog2.png', 'elephant.png', 'fox.png', 'hamster.png',
+           'hamster2.png', 'horse.png', 'kitty.png', 'monkey.png', 'panda.png', 'piggy.png', 'racoon.png', 'zebra.png']
+REFERENCE_SCREEN_RESOLUTION = '1280x800'
+ATTEMPTS_TO_LEARN_WORD = 10
+
+#  Mac OS
+MAC_OS_VOICES = ['Alex', 'Daniel', 'Karen', 'Kate', 'Samantha', 'Serena']
+MAC_SAVE_FILE_PATH = '~/Library/Application Support/SpellingTrainer/savefile'
+MAC_FONT = 'SF Pro'
