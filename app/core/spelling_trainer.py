@@ -1,18 +1,19 @@
 from tkinter import *
-from tkinter import font
+
+from customtkinter import CTk, CTkFont
 
 from app import config
 from app.core import user
-from app.core.new_user_view import NewUserPage
 from app.core.main_page_view import MainPage
+from app.core.new_user_view import NewUserPage
 
 
-class SpellingTrainerApp(Tk):
+class SpellingTrainerApp(CTk):
     def __init__(self, *args, **kwargs):
-        Tk.__init__(self, *args, **kwargs)
+        CTk.__init__(self, *args, **kwargs)
         self.title(config.APP_NAME)
-        self.title_font = font.Font(family=config.MAC_FONT, size=config.TITLE_FONT_SIZE, weight="bold")
-        self.font = font.Font(family=config.MAC_FONT, size=config.FONT_SIZE)
+        self.title_font = CTkFont(family=None, size=config.TITLE_FONT_SIZE, weight="bold")
+        self.font = CTkFont(family=None, size=config.FONT_SIZE)
         self.geometry(f'{config.WINDOW_WIDTH}x{config.WINDOW_HEIGHT}+{self.center_x()}+{self.center_y()}')
 
         mainframe = Frame(self)
