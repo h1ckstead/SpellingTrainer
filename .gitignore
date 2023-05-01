@@ -1,6 +1,11 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
+# Distribution / packaging
+build/
+dist/
+*.spec
+
 # Environments
 venv/
 

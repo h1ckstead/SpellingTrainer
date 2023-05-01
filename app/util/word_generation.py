@@ -22,8 +22,8 @@ def next_word(current_user):
         word = misspelled_list[random.randrange(0, len(current_user.misspelled_dict) - 1)]
         print('misspelled_dict')
     elif 'commonly_misspelled' in choice_source:
-        word = current_user.commonly_misspelled_lst[random.randrange(0, len(current_user.commonly_misspelled_lst)-1)]
-        current_user.commonly_misspelled_lst.remove(word)
+        word = current_user.words_list[random.randrange(0, len(current_user.words_list) - 1)]
+        current_user.words_list.remove(word)
         print('commonly_misspelled')
     elif 'common_english' in choice_source:
         word = current_user.common_english_words_lst[random.randrange(0, len(current_user.common_english_words_lst)-1)]
