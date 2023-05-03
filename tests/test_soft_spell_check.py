@@ -2,9 +2,10 @@ import unittest
 from app.core.user import User
 
 
+# TODO: Add checks for spelling in different capitalization
 class TestWordLearned(unittest.TestCase):
     def setUp(self):
-        self.user = User('TestUserSpellcheck', 'bear.png')
+        self.user = User('TestUserSpellcheck', 'bear.png', strict_spelling=False)
         self.user.vocabulary = {
             'Appetite': {
                 'times_to_spell': 0,
@@ -21,15 +22,14 @@ class TestWordLearned(unittest.TestCase):
         }
 
     def test_word_learned(self):
-        word_dict = {'Appetite': {'times_to_spell': 0, 'definition': {'Noun': ['a feeling of craving something']}}}
-        self.user.check_word_learned('Appetite', word_dict)
+        self.user.check_word_learned('Appetite', dict({'Appetite': self.user.vocabulary['Appetite']}))
         self.assertNotIn('Appetite', self.user.vocabulary.keys())
         self.assertIn('Appetite', self.user.learned_words)
 
 
-class TestSpellcheck(unittest.TestCase):
+class TestSoftSpellcheck(unittest.TestCase):
     def setUp(self):
-        self.user = User('TestUserSpellcheck', 'bear.png')
+        self.user = User('TestUserSpellcheck', 'bear.png', strict_spelling=False)
         self.user.vocabulary = {
             'Appetite': {
                 'times_to_spell': 9,
@@ -47,14 +47,24 @@ class TestSpellcheck(unittest.TestCase):
         self.word_dict = {'Believable': {'definition': {'Adjective': ['capable of being believed']}}}
         self.word_dict2 = {'Appetite': {'times_to_spell': 9,
                                         'definition': {'Noun': ['a feeling of craving something']}}}
+        self.word_dict_alt = {
+            'Colour': {
+                'AmE': 'Color',
+                'spelling': 'AmE',
+                'definition': {
+                    'Noun': ['a visual attribute of things that results from the light they emit'
+                             ' or transmit or reflect']
+                }
+            }
+        }
 
     def test_user_word_empty(self):
         self.assertIsNone(self.user.spell_check(self.word_dict, ''))
 
-    def test_spelled_ok_word_not_in_misspelled_dict(self):
+    def test_spelled_ok_word_not_in_vocabulary(self):
         self.user.spell_check(self.word_dict, 'Believable')
         self.assertIn('Believable', self.user.learned_words.keys())
-        #  check word is popt from original dict
+        # TODO: check word is popped from original dict
 
     def test_spelled_ok_word_in_misspelled_dict(self):
         self.user.spell_check(self.word_dict2, 'Appetite')
@@ -70,10 +80,18 @@ class TestSpellcheck(unittest.TestCase):
         self.user.spell_check(word_dict, 'Advertisemend')
         self.assertEqual(self.user.vocabulary['Advertisement']['times_to_spell'], 2)
 
+    def test_spelled_ok_british(self):
+        self.user.spell_check(self.word_dict_alt, 'Colour')
+        self.assertIn('Colour', self.user.learned_words.keys())
+
+    def test_spelled_ok_american(self):
+        self.user.spell_check(self.word_dict_alt, 'Color')
+        self.assertIn('Colour', self.user.learned_words.keys())
+
 
 class TestAttempts(unittest.TestCase):
     def setUp(self):
-        self.user = User('TestUserAttempts', 'bear.png')
+        self.user = User('TestUserAttempts', 'bear.png', strict_spelling=False)
         self.word_dict = {'Believable': {'definition': {'Adjective': ['capable of being believed']}}}
 
     def test_user_word_empty(self):
