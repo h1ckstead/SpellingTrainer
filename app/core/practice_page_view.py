@@ -3,6 +3,7 @@ from tkinter import *
 from PIL import Image
 from PyDictionary import PyDictionary
 from customtkinter import CTkFrame, CTkButton, CTkLabel, CTkImage, CTkEntry
+from tkinter import StringVar
 
 from app import config
 from app.core.user_page_view import UserPage
@@ -38,14 +39,14 @@ class PracticePage(CTkFrame):
                                                                          self.word_dict),
                                               entry.delete(0, 'end'),
                                               self.new_word(),
-                                              self.after(1000, lambda: speech.read_aloud(self.word_dict))])
+                                              self.after(1000, lambda: self.read_aloud(self.word_dict))])
         CTkButton(self, text='Check',
                   command=lambda: [self.show_validation_label(current_user.spell_check(self.word_dict,
                                                                                        entry.get()),
                                                               self.word_dict),
                                    entry.delete(0, 'end'),
                                    self.new_word(),
-                                   self.after(1000, lambda: speech.read_aloud(self.word_dict))]).grid(row=3, column=3)
+                                   self.after(1000, lambda: self.read_aloud(self.word_dict))]).grid(row=3, column=3)
         self.grid_rowconfigure(4, weight=1)
         self.finish_btn().grid(row=5, column=4, padx=10, pady=(0, 10))
 
@@ -55,7 +56,7 @@ class PracticePage(CTkFrame):
     def play_word_btn(self):
         speaker_img = CTkImage(Image.open('assets/speaker.png'))
         return CTkButton(self, text='', image=speaker_img, width=35, height=35,
-                         command=lambda: speech.read_aloud(self.word_dict))
+                         command=lambda: self.read_aloud(self.word_dict))
 
     def show_def_btn(self):
         return CTkButton(self, text='Show definition', height=35, command=lambda: self.show_definition(self.word_dict))
@@ -80,6 +81,21 @@ class PracticePage(CTkFrame):
 
     def new_word(self):
         self.word_dict = self.current_user.generate_next_word()
+
+    def update_and_show_spelling_text(self, clear=False):
+        spelling = StringVar()
+        if clear:
+            spelling.set('')
+        else:
+            spelling.set(value=f'{self.word_dict[list(self.word_dict.keys())[0]]["spelling"]}')
+        Label(self, textvariable=spelling, width=20, height=5).grid(row=1, column=1, columnspan=2)
+
+    def read_aloud(self, word_dict):
+        if 'spelling' in word_dict[list(self.word_dict.keys())[0]].keys():
+            self.update_and_show_spelling_text()
+        else:
+            self.update_and_show_spelling_text(clear=True)
+        speech.read_aloud(word_dict)
 
     @staticmethod
     def get_definition(word):

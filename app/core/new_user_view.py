@@ -2,7 +2,7 @@ from tkinter import Canvas
 from tkinter import messagebox
 
 from PIL import ImageTk, Image
-from customtkinter import CTkFrame, CTkButton, CTkLabel, CTkEntry
+from customtkinter import CTkFrame, CTkButton, CTkLabel, CTkEntry, CTkSwitch
 
 from app import config
 from app.core import spelling_trainer
@@ -29,8 +29,11 @@ class NewUserPage(CTkFrame):
         entry_field = self.user_input()
         CTkLabel(self, text='Choose avatar: ').pack()
         self.display_avatars()
+        switch = CTkSwitch(self, text='Strict spelling', onvalue="True", offvalue="False")
+        switch.pack()
         CTkButton(self, text='Create', command=lambda: self.create_user(entry_field.get(),
-                                                                        self.selected_avatar)).pack(pady=10)
+                                                                        self.selected_avatar,
+                                                                        switch.get())).pack(pady=10)
         self.back_btn().pack(pady=10)
         CTkButton(self, text='Exit', command=self.controller.destroy).pack()
 
@@ -40,6 +43,7 @@ class NewUserPage(CTkFrame):
 
     @staticmethod
     def avatars():
+        # TODO: Custom TkInter
         avatars_dict = dict()
         for avatar_name in config.AVATARS:
             im = Image.open(f'assets/avatars/{avatar_name}')
@@ -80,11 +84,11 @@ class NewUserPage(CTkFrame):
         user_entry.pack()
         return user_entry
 
-    def create_user(self, username, avatar):
+    def create_user(self, username, avatar, strict_spelling):
         if username == '':
             messagebox.showerror(title='Enter username', message='Username cannot be empty!')
         else:
-            new_user = user.User(username, avatar)
+            new_user = user.User(username, avatar, strict_spelling)
             PracticePage(parent=self.parent, controller=self.controller, current_user=new_user).tkraise()
 
     def back_btn(self):
