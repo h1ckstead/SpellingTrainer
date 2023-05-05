@@ -9,6 +9,7 @@ from app.core.choose_different_user_view import ChooseDifferentUserPage
 from app.core.new_user_view import NewUserPage
 from app.core.practice_page_view import PracticePage
 from app.core.user_page_view import UserPage
+from app.core.user_settings_view import UserSettingsPage
 
 
 class MainPage(CTkFrame):
@@ -24,6 +25,7 @@ class MainPage(CTkFrame):
         self.description().grid(row=1, column=0, pady=20, columnspan=3)
         self.continue_btn().grid(row=2, column=0, padx=5)
         self.see_stats_btn().grid(row=2, column=1, padx=5, sticky='w')
+        self.user_settings_btn().grid(row=2, column=2)
         self.horizontal_line().grid(row=3, column=0, columnspan=3, pady=20, padx=10)
         self.choose_diff_usr_btn().grid(row=4, column=0)
         self.new_user_btn().grid(row=4, column=1, sticky='w')
@@ -67,6 +69,12 @@ class MainPage(CTkFrame):
                          command=lambda: NewUserPage(parent=self.parent,
                                                      controller=self.controller,
                                                      saved_data=self.saved_data).tkraise())
+
+    def user_settings_btn(self):
+        return CTkButton(self, text='Settings', width=160, height=35,
+                         command=lambda: UserSettingsPage(parent=self.parent,
+                                                          controller=self.controller,
+                                                          current_user=self.saved_data[self.last_user]).tkraise())
 
     def exit_btn(self):
         return CTkButton(self, text='Exit', width=160, height=35, command=self.controller.destroy)
