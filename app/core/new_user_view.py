@@ -1,8 +1,7 @@
-from tkinter import Canvas
 from tkinter import messagebox
 
 from PIL import ImageTk, Image
-from customtkinter import CTkFrame, CTkButton, CTkLabel, CTkEntry, CTkSwitch
+from customtkinter import CTkFrame, CTkButton, CTkLabel, CTkEntry, CTkSwitch, CTkCanvas
 
 from app import config
 from app.core import spelling_trainer
@@ -18,11 +17,11 @@ class NewUserPage(CTkFrame):
         self.controller = controller
         self.parent = parent
         self.saved_data = saved_data
-        self.grid(row=0, column=0, sticky="nsew")
-        self.canvas = Canvas(self, width=240, height=200)
         self.avatars = self.avatars()
         self.selected_avatar = None
         self.selected_image_circle = None
+
+        self.grid(row=0, column=0, sticky="nsew")
 
         self.greeting().pack(side="top", fill="x", pady=10)
         CTkLabel(self, text='Enter Username: ').pack()
@@ -52,7 +51,7 @@ class NewUserPage(CTkFrame):
         return avatars_dict
 
     def display_avatars(self):
-        canvas = Canvas(self, width=243, height=243)
+        canvas = CTkCanvas(self, width=243, height=243)
         canvas.pack()
         coordinates = [{'x': 3, 'y': 3}, {'x': 63, 'y': 3}, {'x': 123, 'y': 3}, {'x': 183, 'y': 3},
                        {'x': 3, 'y': 63}, {'x': 63, 'y': 63}, {'x': 123, 'y': 63}, {'x': 183, 'y': 63},
