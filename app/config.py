@@ -10,7 +10,7 @@ NEW_USER_GREETING = 'Welcome to the spelling trainer!\nPlease, create a new user
 GREETING_MAIN = 'Welcome back, {}! {}'
 GREETING_EMOJI = ['😎', '🥰', '🤩', '😺', '🙂', '🥹', '☺️', '🤓', '😸']
 DESCRIPTION_MAIN = "This app will help you to practice spelling. The words for practice are cleverly generated to " \
-                   "test your skills. You can manually add words to your vocabulary and practice them separately."
+                   "test.py your skills. You can manually add words to your vocabulary and practice them separately."
 CHANGE_USER = 'Choose another existing user to continue'
 AVATARS = ['bear.png', 'bunny.png', 'deer.png', 'dog.png', 'dog2.png', 'elephant.png', 'fox.png', 'hamster.png',
            'hamster2.png', 'horse.png', 'kitty.png', 'monkey.png', 'panda.png', 'piggy.png', 'racoon.png', 'zebra.png']

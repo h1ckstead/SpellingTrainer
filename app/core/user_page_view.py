@@ -2,6 +2,7 @@ from tkinter import *
 
 from PIL import Image
 from customtkinter import CTkFrame, CTkLabel, CTkImage, CTkProgressBar, CTkEntry, CTkButton
+from app.core.user_vocabulary_view import UserVocabularyPage
 
 from app import config
 
@@ -37,12 +38,12 @@ class UserPage(CTkFrame):
         self.short_line(progress_color="red").grid(row=3, column=2, padx=15)
         self.stats_description("Incorrectly").grid(row=4, column=2)
 
-        self.stats_int(len(self.current_user.learned_words)).grid(row=2, column=3)
+        self.stats_int(len(self.current_user.dictionaries.learned_words)).grid(row=2, column=3)
         self.short_line(progress_color="green").grid(row=3, column=3, padx=15)
         self.stats_description("Learned words").grid(row=4, column=3)
 
         # Words to learn
-        self.stats_int(len(self.current_user.vocabulary.keys())).grid(row=2, column=4)
+        self.stats_int(len(self.current_user.dictionaries.vocabulary.keys())).grid(row=2, column=4)
         self.short_line(progress_color="yellow").grid(row=3, column=4, padx=15)
         self.stats_description("Words to learn").grid(row=4, column=4)
 
@@ -67,10 +68,13 @@ class UserPage(CTkFrame):
 
         # Section with manual word adding
         self.description("Manually add words to learn").grid(row=10, column=2)
-        word = self.user_input().grid(row=11, column=0, columnspan=2, pady=15)
+        word = self.user_input()
         CTkButton(self, text="Add", command=lambda: [self.add_word_to_vocabulary(word.get()),
                                                      word.delete(0, 'end')]).grid(row=11, column=2, pady=15, sticky="W")
-        CTkButton(self, text="Show my vocabulary", width=250).grid(row=12, column=0, columnspan=2, padx=20)
+        CTkButton(self, text="Show my vocabulary", width=250,
+                  command=lambda: UserVocabularyPage(parent=self.parent, controller=self.controller,
+                                                     current_user=current_user)).grid(row=12, column=0,
+                                                                                      columnspan=2, padx=20)
         self.grid_rowconfigure(13, weight=1)
         CTkButton(self, text='Exit', command=self.controller.destroy).grid(row=14, column=4, pady=(0, 10))
 
@@ -103,6 +107,7 @@ class UserPage(CTkFrame):
 
     def user_input(self):
         user_entry = CTkEntry(self, width=250)
+        user_entry.grid(row=11, column=0, columnspan=2, pady=15)
         return user_entry
 
     def show_personal_vocabulary(self):
