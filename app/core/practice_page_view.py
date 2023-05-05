@@ -1,12 +1,14 @@
 from tkinter import *
+from tkinter import StringVar
 
 from PIL import Image
 from PyDictionary import PyDictionary
 from customtkinter import CTkFrame, CTkButton, CTkLabel, CTkImage, CTkEntry
-from tkinter import StringVar
 
 from app import config
+from app.core.spell_checker import SpellChecker
 from app.core.user_page_view import UserPage
+from app.core.word_generator import WordGenerator
 from app.util import speech
 
 
@@ -20,7 +22,9 @@ class PracticePage(CTkFrame):
         self.current_user = current_user
         self.session_attempts_correct = 0
         self.session_attempts_incorrect = 0
-        self.word_dict = current_user.generate_next_word()
+        self.word_generator = WordGenerator(current_user)
+        self.spell_checker = SpellChecker(current_user)
+        self.word_dict = self.word_generator.generate_next_word()
         self.grid(row=0, column=0, sticky="nsew")
 
         #  Header
@@ -34,14 +38,14 @@ class PracticePage(CTkFrame):
         entry = CTkEntry(self, width=250)
         entry.grid(row=3, column=0, columnspan=2, pady=15)
         entry.focus_set()
-        entry.bind('<Return>', lambda event: [self.show_validation_label(current_user.spell_check(self.word_dict,
+        entry.bind('<Return>', lambda event: [self.show_validation_label(self.spell_checker.spell_check(self.word_dict,
                                                                                                   entry.get()),
                                                                          self.word_dict),
                                               entry.delete(0, 'end'),
                                               self.new_word(),
                                               self.after(1000, lambda: self.read_aloud(self.word_dict))])
         CTkButton(self, text='Check',
-                  command=lambda: [self.show_validation_label(current_user.spell_check(self.word_dict,
+                  command=lambda: [self.show_validation_label(self.spell_checker.spell_check(self.word_dict,
                                                                                        entry.get()),
                                                               self.word_dict),
                                    entry.delete(0, 'end'),
@@ -80,7 +84,7 @@ class PracticePage(CTkFrame):
                                                    saved_data=self.current_user.load_save())])
 
     def new_word(self):
-        self.word_dict = self.current_user.generate_next_word()
+        self.word_dict = self.word_generator.generate_next_word()
 
     def update_and_show_spelling_text(self, clear=False):
         spelling = StringVar()

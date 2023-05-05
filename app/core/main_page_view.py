@@ -52,7 +52,7 @@ class MainPage(CTkFrame):
                                                   session_attempts_correct=0, session_attempts_incorrect=0).tkraise())
 
     def horizontal_line(self):
-        progressbar = CTkProgressBar(self, width=config.WINDOW_WIDTH - 20)
+        progressbar = CTkProgressBar(self, height=3, width=config.WINDOW_WIDTH - 20)
         progressbar.set(1)
         return progressbar
 
