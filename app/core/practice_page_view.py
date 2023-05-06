@@ -24,7 +24,7 @@ class PracticePage(CTkFrame):
         self.session_attempts_incorrect = 0
         self.word_generator = WordGenerator(current_user)
         self.spell_checker = SpellChecker(current_user)
-        self.word_dict = self.word_generator.generate_next_word()
+        self.word_dict = self.word_generator.generate_word()
         self.grid(row=0, column=0, sticky="nsew")
 
         #  Header
@@ -84,7 +84,7 @@ class PracticePage(CTkFrame):
                                                    saved_data=self.current_user.load_save())])
 
     def new_word(self):
-        self.word_dict = self.word_generator.generate_next_word()
+        self.word_dict = self.word_generator.generate_word()
 
     def update_and_show_spelling_text(self, clear=False):
         spelling = StringVar()
