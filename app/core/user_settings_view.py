@@ -54,6 +54,23 @@ class UserSettingsPage(CTkFrame):
     def open_avatar_selection(self):
         popup = CTkToplevel(self.parent)
         popup.title("Avatar Selection")
+        # popup.geometry("243x")
+
+        # Calculate the center of the parent window
+        parent_center_x = self.winfo_rootx() + self.winfo_width() // 2
+        parent_center_y = self.winfo_rooty() + self.winfo_height() // 2
+
+        # Calculate the top-left corner of the CTkToplevel window
+        popup_width = 245
+        popup_height = 306
+        popup_x = parent_center_x - popup_width // 2
+        popup_y = parent_center_y - popup_height // 2
+
+        # Set the CTkToplevel window's geometry to center it on the parent window
+        popup.geometry(f"{popup_width}x{popup_height}+{popup_x}+{popup_y}")
+
+        popup.transient(self)
+        popup.grab_set()
 
         canvas = CTkCanvas(popup, width=243, height=243)
         canvas.grid()
