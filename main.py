@@ -8,8 +8,8 @@ if __name__ == '__main__':
     handler = RotatingFileHandler(filename='SpellingTrainer.log', maxBytes=10 * 1024 * 1024, backupCount=5)
 
     # configure logging
-    logging.basicConfig(filename='SpellingTrainer.log', level=logging.INFO,
-                        format='%(asctime)s:%(levelname)s:%(message)s', handlers=[handler])
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s: [%(levelname)s] %(message)s',
+                        handlers=[handler, logging.StreamHandler()])
 
     # create an instance of the SpellingTrainerApp class
     logging.info('Starting application')
