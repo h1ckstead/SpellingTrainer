@@ -2,7 +2,7 @@ import pickle
 
 from spellchecker import SpellChecker
 
-import config
+from core import config
 
 
 class Dictionaries:
@@ -17,7 +17,7 @@ class Dictionaries:
         with open(f'assets/{name}', mode='rb') as document:
             return pickle.load(document)
 
-    def add_word(self, word):
+    def add_word_to_vocab_manually(self, word):
         status = 'OK'
         dictionaries = [self.commonly_misspelled, self.common_english_words,
                         self.vocabulary, self.learned_words]
@@ -29,9 +29,20 @@ class Dictionaries:
             self.vocabulary.update({word: word_dict})  # TODO: set times to spell to 10!
             dictionary.pop(word)
         else:
-            word_dict = {word: {"times_to_spell": config.ATTEMPTS_TO_LEARN_WORD}}
+            word_dict = {word: {"Times_to_spell": config.TIMES_TO_SPELL_IF_INCORRECT}}
             self.vocabulary.update(word_dict)
         return status
+
+    def add_word_to_vocab(self, word, word_dict, status, session):
+        session.increment_new_words()
+        if status == "Correct":
+            word_dict.update({'Times_to_spell': config.TIMES_TO_SPELL_IF_CORRECT})
+            self.vocabulary.update({word: word_dict})
+        elif status == "Incorrect":
+            word_dict.update({'Times_to_spell': config.TIMES_TO_SPELL_IF_INCORRECT})
+            self.vocabulary.update({word: word_dict})
+        else:
+            raise ValueError("Invalid status value. Must be either 'Correct' or 'Incorrect'")
 
     def delete_words(self, words):
         for word in words:
@@ -51,3 +62,14 @@ class Dictionaries:
             if user_word in dictionary.keys():
                 return True, dictionary
         return None, None
+
+    def increment_times_to_spell(self, word):
+        self.vocabulary[word]["Times_to_spell"] += 1
+
+    def decrement_times_to_spell(self, word):
+        self.vocabulary[word]["Times_to_spell"] -= 1
+
+    def mark_word_as_learned(self, word, word_dict, session):
+        self.vocabulary.pop(word)
+        self.learned_words.update(word_dict)
+        session.increment_learned_words()

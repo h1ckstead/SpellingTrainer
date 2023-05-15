@@ -47,7 +47,7 @@ class WordGenerator:
         """
         random_words = RandomWords()
         while True:
-            word = random_words.random_word(min_letter_count=4)
+            word = random_words.random_word(min_letter_count=4).title()
             if not self.is_duplicate(word.title()):
                 word_dict = {word: {"Definition": None}}  # Think about loading definition in the background
                 return word_dict

@@ -1,97 +1,102 @@
-import config
+import logging
+from core.vocab_builder import VocabBuilder
 
 
 class SpellChecker:
     def __init__(self, user):
         self.user = user
+        self.vocab_builder = VocabBuilder(user)
 
-    def spell_check(self, word_dict, user_word):
+    def spell_check(self, word_dict, user_word, session):
+        """
+        Main function for spell checking.
+
+        :param word_dict: dict containing a word and its definition
+        :param user_word: str a word user has typed
+        :return: str status "Correct" or "Incorrect"
+        """
         word, user_word = self.prepare_data(word_dict, user_word)
-        if user_word == '':
-            status = None
-        elif self.user.strict_spelling and "spelling" in word_dict[word].keys():
-            status = self.strict_spellcheck(word, word_dict, user_word)
+        logging.debug(f'Reference word: {word}, User word: {user_word}')
+        if self.user.strict_spelling and "Spelling" in word_dict[word].keys():
+            status = self.strict_spellcheck(word, word_dict, user_word, session)
         else:
-            status = self.soft_spellcheck(word, user_word, word_dict)
+            status = self.soft_spellcheck(word, word_dict, user_word, session)
         return status
 
     @staticmethod
     def prepare_data(word_dict, user_word):
+        """
+        Prepares words for comparing by formatting user input and retrieving
+        the reference word from word_dict.
+
+        :param word_dict: dict containing a word and its definition
+        :param user_word: str a word user has typed
+        :return: str reference word, str capitalized user word
+        """
         word = list(word_dict.keys())[0]
-        user_word.title()
+        user_word = user_word.title()
         return word, user_word
 
-    def strict_spellcheck(self, word, word_dict, user_word):
-        if word_dict[word]["spelling"] == "BrE" and user_word == word:
-            status = 'correct'
-            self.check_if_word_in_vocabulary(word, word_dict, status)
-        elif word_dict[word]["spelling"] == "AmE" and user_word == word_dict[word]["AmE"]:
-            status = 'correct'
-            self.check_if_word_in_vocabulary(word, word_dict, status)
+    def strict_spellcheck(self, word, word_dict, user_word, session):
+        """
+        Based on the spelling prompt "BrE/AmE" compares if user word
+        matches the appropriate spelling.
+
+        :param word: str reference word
+        :param word_dict: dict containing reference word, definition,
+        AmE version of the word and Spelling which was asked from the user
+        :param user_word: str a word user has typed
+        :return: str status "Correct" or "Incorrect"
+        """
+        if word_dict[word]["Spelling"] == "BrE" and user_word == word:
+            status = 'Correct'
+            self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
+        elif word_dict[word]["Spelling"] == "AmE" and user_word == word_dict[word]["AmE"]:
+            status = 'Correct'
+            self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
         else:
-            status = 'incorrect'
-            self.check_if_word_in_vocabulary(word, word_dict, status)
+            status = 'Incorrect'
+            self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
         return status
 
-    def soft_spellcheck(self, word, user_word, word_dict):
+    def soft_spellcheck(self, word, word_dict, user_word, session):
+        """
+        Soft spellcheck performed for users who have their "strict_spelling"
+        attribute set to False. For words with alternative spelling such as
+        colour/color both spellings will be considered correct.
+
+        :param word: str reference word
+        :param word_dict: dict containing a word and its definition,
+        may also contain alternative spelling for some words
+        :param user_word: str a word user has typed
+        :return: str status "Correct" or "Incorrect"
+        """
         if 'AmE' in word_dict[word].keys():
-            status = self.soft_spellcheck_alt_spelling(word, user_word, word_dict)
+            status = self.soft_spellcheck_alt_spelling(word, user_word, word_dict, session)
         else:
             if user_word == word:
-                status = 'correct'
-                self.check_if_word_in_vocabulary(word, word_dict, status)
+                status = 'Correct'
+                self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
             else:
-                status = 'incorrect'
-                self.check_if_word_in_vocabulary(word, word_dict, status)
+                status = 'Incorrect'
+                self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
         return status
 
-    def soft_spellcheck_alt_spelling(self, word, user_word, word_dict):
-        words = [word, word_dict[word]['AmE']]
-        if user_word in words:
-            status = 'correct'
-            self.check_if_word_in_vocabulary(word, word_dict, status)
-        else:
-            status = 'incorrect'
-            self.check_if_word_in_vocabulary(word, word_dict, status)
-        return status
-
-    def check_if_word_in_vocabulary(self, word, word_dict, status):
-        if status == 'correct':
-            if word in self.user.dictionaries.vocabulary.keys():
-                self.user.dictionaries.vocabulary[word]["times_to_spell"] -= 1
-                self.user.attempts_correct += 1
-                self.check_word_learned(word, word_dict)
-            else:
-                self.user.dictionaries.learned_words.update(word_dict)
-                self.pop_word_from_dictionary(word)
-                self.user.attempts_correct += 1
-        elif status == 'incorrect':
-            if word in self.user.dictionaries.vocabulary.keys():
-                self.user.dictionaries.vocabulary[word]["times_to_spell"] += 1
-                self.user.attempts_incorrect += 1
-            else:
-                word_dict[word].update({"times_to_spell": config.ATTEMPTS_TO_LEARN_WORD})
-                self.user.dictionaries.vocabulary.update(word_dict)
-                self.pop_word_from_dictionary(word)
-                self.user.attempts_incorrect += 1
-        else:
-            raise Exception("Unknown status")
-
-    def pop_word_from_dictionary(self, word):
-        if word in self.user.dictionaries.commonly_misspelled.keys():
-            self.user.dictionaries.commonly_misspelled.pop(word)
-        elif word in self.user.dictionaries.common_english_words.keys():
-            self.user.dictionaries.common_english_words.pop(word)
-
-    def check_word_learned(self, word, word_dict):
+    def soft_spellcheck_alt_spelling(self, word, word_dict, user_word, session):
         """
-        Checks if number of attempts is 0 which means the word is considered
-        to be learned. Removes learned word from misspelled_dict and puts it
-        into vocabulary_lst
-        :param word: str
-        :param word_dict: dict
+        Checks if user word matches any of the acceptable spellings.
+
+        :param word: str reference word
+        :param word_dict: dict containing a word, its definition
+        and alternative spelling
+        :param user_word: str a word user has typed
         :return:
         """
-        if self.user.dictionaries.vocabulary[word]["times_to_spell"] == 0:
-            self.user.dictionaries.vocabulary.pop(word)
-            self.user.dictionaries.learned_words.update(word_dict)
+        words = [word, word_dict[word]['AmE']]
+        if user_word in words:
+            status = 'Correct'
+            self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
+        else:
+            status = 'Incorrect'
+            self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
+        return status

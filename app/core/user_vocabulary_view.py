@@ -157,7 +157,7 @@ class UserVocabularyPage(CTkFrame):
                     self.add_word(misspelled, spellcheck=False)
                 else:
                     self.add_word(word, spellcheck=False)
-        status = self.current_user.dictionaries.add_word(word)
+        status = self.current_user.dictionaries.add_word_to_vocab_manually(word)
         if status == 'already_exists':
             messagebox.showerror(message=f'The word "{word}" is already in your vocabulary')
         else:
