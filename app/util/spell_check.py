@@ -1,4 +1,4 @@
-import config
+from core import config
 
 
 def spell_check(current_user, word, user_word):

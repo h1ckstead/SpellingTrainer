@@ -118,6 +118,13 @@ class TestWordGenerator(unittest.TestCase):
         word_dict = self.word_generator.generate_word()
         self.assertIn(list(word_dict.keys())[0], self.user.dictionaries.vocabulary)
 
+    @patch("app.core.word_generator.WordGenerator.pick_dictionary", return_value='random')
+    def test_random_word(self, pick_dictionary):
+        word_dict = self.word_generator.generate_word()
+        word = list(word_dict.keys())[0]
+        self.assertTrue(len(word) >= 4)
+        self.assertTrue(word.istitle())
+
 
 class TestWordGeneratorStrictSpelling(unittest.TestCase):
     def setUp(self):
