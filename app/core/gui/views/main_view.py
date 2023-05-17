@@ -1,4 +1,5 @@
 import logging
+import tkinter as tk
 
 from core import strings
 from core.gui.blocks.welcome_block import WelcomeBlock
@@ -44,8 +45,8 @@ class MainPage(BaseView):
         self.welcome_block.grid(row=0, column=0, columnspan=3, pady=(40, 20))
         self.change_user_btn.grid(row=1, column=0, padx=(17, 0))
         self.user_profile_btn.grid(row=1, column=1, columnspan=2, padx=(0, 72))
-        self.pencil_icon.grid(row=2, column=2, sticky="e", padx=(0, 80))
-        self.horizontal_line.grid(row=2, column=0, columnspan=3, sticky="s", pady=(0, 3))
+        self.pencil_icon.grid(row=2, column=2, sticky=tk.E, padx=(0, 80))
+        self.horizontal_line.grid(row=2, column=0, columnspan=3, sticky=tk.S, pady=(0, 3))
         self.close_button.grid(row=3, column=1, columnspan=2, padx=(0, 72), pady=(20, 0))
         self.report_bug_btn.grid(row=4, column=0, columnspan=3, pady=(50, 0))
 

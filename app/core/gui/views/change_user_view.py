@@ -9,6 +9,7 @@ from core.gui.views.base_view import BaseView
 from core.gui.views.practice_view import PracticePage
 from core.gui.views.user_registration_view import UserRegistrationPage
 from core.session import Session
+import tkinter as tk
 
 
 class ChangeUserPage(BaseView):
@@ -35,8 +36,8 @@ class ChangeUserPage(BaseView):
 
         self.title_text.grid(row=0, column=0, columnspan=3, pady=(20, 20))
         self.content_block.grid(row=1, column=0, columnspan=3, pady=(0, 51))
-        self.pencil_icon.grid(row=2, column=2, sticky="se", padx=(0, 80))
-        self.horizontal_line.grid(row=2, column=0, columnspan=3, sticky="s", pady=(37, 3))
+        self.pencil_icon.grid(row=2, column=2, sticky=tk.SE, padx=(0, 80))
+        self.horizontal_line.grid(row=2, column=0, columnspan=3, sticky=tk.S, pady=(37, 3))
         self.back_btn.grid(row=3, column=0, pady=(20, 0))
         self.close_button.grid(row=3, column=2, columnspan=2, padx=(0, 63), pady=(20, 0))
         self.report_bug_btn.grid(row=4, column=0, columnspan=3, pady=(50, 0))

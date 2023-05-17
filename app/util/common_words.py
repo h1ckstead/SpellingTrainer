@@ -5,6 +5,6 @@ def commonly_misspelled_lst():
 
 
 def common_english_words_lst():
-    with open('assets/common_english_words.txt') as document:
+    with open('assets/old_common_english_words.txt') as document:
         common_english_words = document.read().splitlines()
     return common_english_words

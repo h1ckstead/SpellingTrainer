@@ -1,3 +1,4 @@
+import tkinter as tk
 import webbrowser
 
 from PIL import Image
@@ -12,7 +13,7 @@ class BaseView(CTkFrame):
         CTkFrame.__init__(self, parent)
         self.controller = controller
         self.parent = parent
-        self.grid(row=0, column=0, sticky="nsew")
+        self.grid(row=0, column=0, sticky=tk.NSEW)
 
         self.close_button = Button(self, text=strings.CLOSE, command=lambda: self.controller.destroy())
         self.pencil_icon = CTkLabel(self, text="", image=CTkImage(Image.open("assets/pencil.png"), size=(20, 20)))
@@ -21,7 +22,7 @@ class BaseView(CTkFrame):
     @property
     def report_bug_btn(self):
         bug = CTkImage(Image.open('assets/bug-solid.png'), size=(10, 10))
-        button = CTkButton(self, text=strings.BUG_REPORT, image=bug, compound="left",
+        button = CTkButton(self, text=strings.BUG_REPORT, image=bug, compound=tk.LEFT,
                            command=lambda: webbrowser.open("mailto:lazarevavictoria@gmail.com"))
         button.configure(width=90, height=20, font=CTkFont(None, 8), fg_color="transparent", hover_color="#212121")
         return button

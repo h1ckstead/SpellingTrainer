@@ -1,4 +1,6 @@
 import logging
+
+from core.constants import CORRECT, INCORRECT, BRITISH, AMERICAN, SPELLING
 from core.vocab_builder import VocabBuilder
 
 
@@ -17,7 +19,7 @@ class SpellChecker:
         """
         word, user_word = self.prepare_data(word_dict, user_word)
         logging.debug(f'Reference word: {word}, User word: {user_word}')
-        if self.user.strict_spelling and "Spelling" in word_dict[word].keys():
+        if self.user.strict_spelling and SPELLING in word_dict[word].keys():
             status = self.strict_spellcheck(word, word_dict, user_word, session)
         else:
             status = self.soft_spellcheck(word, word_dict, user_word, session)
@@ -48,14 +50,14 @@ class SpellChecker:
         :param user_word: str a word user has typed
         :return: str status "Correct" or "Incorrect"
         """
-        if word_dict[word]["Spelling"] == "BrE" and user_word == word:
-            status = 'Correct'
+        if word_dict[word][SPELLING] == BRITISH and user_word == word:
+            status = CORRECT
             self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
-        elif word_dict[word]["Spelling"] == "AmE" and user_word == word_dict[word]["AmE"]:
-            status = 'Correct'
+        elif word_dict[word][SPELLING] == AMERICAN and user_word == word_dict[word][AMERICAN]:
+            status = CORRECT
             self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
         else:
-            status = 'Incorrect'
+            status = INCORRECT
             self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
         return status
 
@@ -71,14 +73,14 @@ class SpellChecker:
         :param user_word: str a word user has typed
         :return: str status "Correct" or "Incorrect"
         """
-        if 'AmE' in word_dict[word].keys():
+        if AMERICAN in word_dict[word].keys():
             status = self.soft_spellcheck_alt_spelling(word, user_word, word_dict, session)
         else:
             if user_word == word:
-                status = 'Correct'
+                status = CORRECT
                 self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
             else:
-                status = 'Incorrect'
+                status = INCORRECT
                 self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
         return status
 
@@ -92,11 +94,11 @@ class SpellChecker:
         :param user_word: str a word user has typed
         :return:
         """
-        words = [word, word_dict[word]['AmE']]
+        words = [word, word_dict[word][AMERICAN]]
         if user_word in words:
-            status = 'Correct'
+            status = CORRECT
             self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
         else:
-            status = 'Incorrect'
+            status = INCORRECT
             self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
         return status

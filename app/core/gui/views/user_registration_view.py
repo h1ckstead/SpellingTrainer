@@ -1,4 +1,5 @@
 import logging
+import tkinter as tk
 
 from PIL import Image
 from customtkinter import CTkImage
@@ -23,8 +24,8 @@ class UserRegistrationPage(BaseView):
         self.registration_block = RegistrationEditBlock(self, self.controller)
         self.back_btn = Button(self, strings.BACK_BUTTON_TEXT, command=lambda: previous_page.tkraise())
         new_user_img = CTkImage(Image.open("assets/new_user.png"), size=(15, 15))
-        self.save_btn = CTAButton(self, text=strings.CREATE_USER, state="disabled", image=new_user_img,
-                                  compound="left",
+        self.save_btn = CTAButton(self, text=strings.CREATE_USER, state=tk.DISABLED, image=new_user_img,
+                                  compound=tk.LEFT,
                                   command=lambda: [self.create_user(),
                                                    PracticePage(parent=self.parent, controller=self.controller,
                                                                 current_user=self.current_user,
@@ -37,7 +38,7 @@ class UserRegistrationPage(BaseView):
         self.registration_block.grid(row=0, column=0, columnspan=3, pady=(15, 0))
         self.back_btn.grid(row=1, column=0, pady=(20, 0))
         self.save_btn.grid(row=1, column=2, columnspan=2, pady=(20, 0))
-        self.report_bug_btn.grid(row=4, column=0, columnspan=3, pady=(28, 0))
+        self.report_bug_btn.grid(row=4, column=0, columnspan=3, pady=(30, 0))
 
     def create_user(self):
         username = self.registration_block.get_username()

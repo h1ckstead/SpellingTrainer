@@ -18,6 +18,7 @@ class User:
         self.attempts_correct = 0
         self.attempts_incorrect = 0
         self.volume = 0.5
+        self.only_from_vocabulary = False
         self.save_progress()
 
     @property
@@ -55,6 +56,10 @@ class User:
 
     def set_volume(self, value):
         self.volume = value
+        self.save_progress()
+
+    def toggle_only_from_vocabulary(self, state):
+        self.only_from_vocabulary = state
         self.save_progress()
 
     @staticmethod

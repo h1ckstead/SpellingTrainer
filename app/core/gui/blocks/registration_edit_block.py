@@ -1,4 +1,5 @@
 import logging
+import tkinter as tk
 from tkinter import Canvas, Label, StringVar
 
 from PIL import Image, ImageTk
@@ -24,7 +25,6 @@ class RegistrationEditBlock(BaseFrame):
             self.title_text = strings.EDIT_PROFILE_TITLE
             self.username = self.current_user.name
             self.selected_avatar = self.current_user.avatar
-            # self.select_avatar(self.current_user.avatar)
         else:
             self.title_text = strings.REGISTRATION_TITLE
             self.username = None
@@ -52,13 +52,13 @@ class RegistrationEditBlock(BaseFrame):
 
     def display_widgets(self):
         self.title.grid(row=0, column=0, pady=(10, 0), ipady=2)
-        self.username_field_title.grid(row=1, column=0, padx=(40, 0), sticky="w")
+        self.username_field_title.grid(row=1, column=0, padx=(40, 0), sticky=tk.W)
         self.username_field.grid(row=2, column=0, pady=(0, 15))
-        self.avatars_title.grid(row=3, column=0, padx=(40, 0), sticky="w")
+        self.avatars_title.grid(row=3, column=0, padx=(40, 0), sticky=tk.W)
         self.canvas.grid(row=4, column=0, padx=40, pady=(0, 15))
         if not self.username:
-            self.strict_spelling_switch.grid(row=5, column=0, padx=(40, 0), sticky="w")
-            self.strict_spelling_hint.grid(row=6, column=0, padx=(32, 0), pady=(0, 15), sticky="w")
+            self.strict_spelling_switch.grid(row=5, column=0, padx=(40, 0), sticky=tk.W)
+            self.strict_spelling_hint.grid(row=6, column=0, padx=(32, 0), pady=(0, 15), sticky=tk.W)
 
     def get_username(self):
         return self.username_field.get()
@@ -88,7 +88,7 @@ class RegistrationEditBlock(BaseFrame):
                        {'x': 3, 'y': 183}, {'x': 63, 'y': 183}, {'x': 123, 'y': 183}, {'x': 183, 'y': 183}]
         for i, avatar_name in enumerate(self.avatars):
             place = coordinates[i]
-            self.canvas.create_image((place['x'], place['y']), anchor="nw",
+            self.canvas.create_image((place['x'], place['y']), anchor=tk.NW,
                                      image=self.avatars[avatar_name]['img_object'],
                                      tags=avatar_name)
             self.avatars[avatar_name].update({'position': place})
@@ -113,5 +113,5 @@ class RegistrationEditBlock(BaseFrame):
         if current_user:
             state = parent.strict_spelling.get()
             current_user.toggle_strict_spelling(state)
-        else:
-            pass  # TODO: Why do I need else, is this function used?
+        # else:
+        #     pass  # TODO: Why do I need else, is this function used?
