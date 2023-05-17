@@ -23,4 +23,3 @@ STATS_INT_SIZE = 32
 # Mac OS
 MAC_OS_VOICES = ['Daniel', 'Karen', 'Kate', 'Samantha', 'Serena']
 MAC_SAVE_FILE_PATH = '~/Library/Application Support/SpellingTrainer/savefile'
-MAC_FONT = 'SF Pro'

@@ -71,6 +71,8 @@ class WordGenerator:
 
         :return: str containing dictionary name
         """
+        if self.user.only_from_vocabulary:
+            return 'vocabulary'
         if len(self.user.dictionaries.vocabulary) > 30:
             choice_source = random.choices(['vocabulary', 'commonly_misspelled',
                                             'common_english', 'random_words'],

@@ -1,4 +1,5 @@
 import random
+import tkinter as tk
 
 from PIL import Image
 from customtkinter import CTkFrame, CTkLabel, CTkImage, CTkFont
@@ -30,8 +31,8 @@ class WelcomeBlock(BaseFrame):
                                                                              size=config.HEADER_FONT_SIZE))
             body_frame = CTkFrame(self)
             tip_icon = CTkImage(Image.open("assets/idea.png"), size=(15, 15))
-            block_body = CTkLabel(body_frame, text=self.tip_of_the_day(), image=tip_icon, padx=5, compound="left",
-                                  wraplength=450, justify="left")
+            block_body = CTkLabel(body_frame, text=self.tip_of_the_day(), image=tip_icon, padx=5, compound=tk.LEFT,
+                                  wraplength=450, justify=tk.LEFT)
             block_body.pack(pady=10)
 
             self.grid_columnconfigure(0, weight=1)
@@ -46,9 +47,9 @@ class WelcomeBlock(BaseFrame):
             self.title_text = strings.WELCOME_PAGE_TITLE
             self.title = CTkLabel(self, text=self.title_text, font=self.controller.title_font)
             self.cta_button = CTAButton(self, font=CTkFont(family="Arial", size=config.FONT_SIZE),
-                                        image=self.button_image(), compound="left", text=strings.START_LEARNING,
+                                        image=self.button_image(), compound=tk.LEFT, text=strings.START_LEARNING,
                                         command=lambda: self.next_page.tkraise())
-            self.block_body = CTkLabel(self, text=strings.WELCOME_PAGE_TEXT, wraplength=400, justify="left")
+            self.block_body = CTkLabel(self, text=strings.WELCOME_PAGE_TEXT, wraplength=400, justify=tk.LEFT)
 
             self.title.grid(row=0, column=0, columnspan=3, padx=15, pady=15)
             self.block_body.grid(row=1, column=0, columnspan=3)

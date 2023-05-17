@@ -2,13 +2,13 @@ import pickle
 
 from spellchecker import SpellChecker
 
-from core import config
+from core import config, constants
 
 
 class Dictionaries:
     def __init__(self):
-        self.commonly_misspelled = self.load_dictionary("commonly_misspelled")
-        self.common_english_words = self.load_dictionary("common_english_words")
+        self.commonly_misspelled = self.load_dictionary(constants.COMMONLY_MISSPELLED)
+        self.common_english_words = self.load_dictionary(constants.COMMON_ENGLISH_WORDS)
         self.vocabulary = {}
         self.learned_words = {}
 
@@ -17,32 +17,52 @@ class Dictionaries:
         with open(f'assets/{name}', mode='rb') as document:
             return pickle.load(document)
 
-    def add_word_to_vocab_manually(self, word):
-        status = 'OK'
+    def add_word_to_vocab_manually(self, word, alternative_spelling=None):
+        status = constants.OK
         dictionaries = [self.commonly_misspelled, self.common_english_words,
                         self.vocabulary, self.learned_words]
-        word_exists, dictionary = self.check_word_in_dicts(word, dictionaries)
-        if word_exists and dictionary is self.vocabulary:
-            status = 'already_exists'
-        elif word_exists:
-            word_dict = dictionary[word]
-            self.vocabulary.update({word: word_dict})  # TODO: set times to spell to 10!
-            dictionary.pop(word)
+        word_exists, word_dictionary = self.check_word_in_dicts(word, dictionaries)
+        if word_exists and word_dictionary is self.vocabulary:
+            return constants.ALREADY_EXISTS
+        if alternative_spelling:
+            alt_word_exists, alt_dictionary = self.check_word_in_dicts(alternative_spelling, dictionaries)
+            if alt_word_exists and alt_dictionary is self.vocabulary:
+                self.vocabulary.update({word: {constants.AMERICAN: alternative_spelling,
+                                               constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}})
+                self.vocabulary.pop(alternative_spelling)
+            elif alt_word_exists:
+                self.vocabulary.update({word: {constants.AMERICAN: alternative_spelling,
+                                               constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}})
+                alt_dictionary.pop(alternative_spelling)
+            elif word_exists:
+                self.vocabulary.update({word: {constants.AMERICAN: alternative_spelling,
+                                               constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}})
+                word_dictionary.pop(word)
+            else:
+                self.vocabulary.update({word: {constants.AMERICAN: alternative_spelling,
+                                               constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}})
         else:
-            word_dict = {word: {"Times_to_spell": config.TIMES_TO_SPELL_IF_INCORRECT}}
-            self.vocabulary.update(word_dict)
+            if word_exists:
+                word_dict = word_dictionary[word]
+                word_dict.update({constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT})
+                self.vocabulary.update({word: word_dict})
+                word_dictionary.pop(word)
+            else:
+                word_dict = {word: {constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}}
+                self.vocabulary.update(word_dict)
         return status
 
     def add_word_to_vocab(self, word, word_dict, status, session):
         session.increment_new_words()
-        if status == "Correct":
-            word_dict.update({'Times_to_spell': config.TIMES_TO_SPELL_IF_CORRECT})
+        if status == constants.CORRECT:
+            word_dict.update({constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_CORRECT})
             self.vocabulary.update({word: word_dict})
-        elif status == "Incorrect":
-            word_dict.update({'Times_to_spell': config.TIMES_TO_SPELL_IF_INCORRECT})
+        elif status == constants.INCORRECT:
+            word_dict.update({constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT})
             self.vocabulary.update({word: word_dict})
         else:
-            raise ValueError("Invalid status value. Must be either 'Correct' or 'Incorrect'")
+            raise ValueError(f"Invalid status value. Must be either \"{constants.CORRECT}\" or "
+                             f"\"{constants.INCORRECT}\"")
 
     def delete_words(self, words):
         for word in words:
@@ -64,10 +84,10 @@ class Dictionaries:
         return None, None
 
     def increment_times_to_spell(self, word):
-        self.vocabulary[word]["Times_to_spell"] += 1
+        self.vocabulary[word][constants.TIMES_TO_SPELL] += 1
 
     def decrement_times_to_spell(self, word):
-        self.vocabulary[word]["Times_to_spell"] -= 1
+        self.vocabulary[word][constants.TIMES_TO_SPELL] -= 1
 
     def mark_word_as_learned(self, word, word_dict, session):
         self.vocabulary.pop(word)

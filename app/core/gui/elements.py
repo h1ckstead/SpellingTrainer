@@ -6,7 +6,6 @@ import tkinter as tk
 from tktooltip import ToolTip
 
 import time
-import tkinter as tk
 from typing import Callable, Union
 
 
@@ -132,4 +131,3 @@ class CustomToolTip(ToolTip):
         if isinstance(self.msg, tk.StringVar):
             self.msg.set(self.msg.get())
             self.msg.config(highlightbackground=self.bordercolor, highlightthickness=1)
-

@@ -6,6 +6,7 @@ from customtkinter import CTkLabel, CTkImage, CTkFont, StringVar
 from core import config, strings
 from core.gui.elements import Button, CTAButton, HintLabel, GreyLine, StrictSpellingSwitch, StaticsLabel, ThickLine
 from core.gui.views.base_view import BaseView, BaseFrame
+from core.gui.views.vocabulary_view import VocabularyPage
 
 
 class ProfilePage(BaseView):
@@ -23,7 +24,10 @@ class ProfilePage(BaseView):
         self.user_block = UserBlock(self, self.controller, self.current_user)
         self.overall_statistics_block = StatisticsBlock(self, self.controller, current_user=self.current_user)
         self.session_statistics_block = StatisticsBlock(self, self.controller, session=self.session)
-        self.show_vocab_btn = CTAButton(self, text=strings.SHOW_VOCAB, width=215)
+        self.show_vocab_btn = CTAButton(self, text=strings.SHOW_VOCAB, width=215,
+                                        command=lambda: VocabularyPage(parent=self.parent, controller=self.controller,
+                                                                       previous_page=self,
+                                                                       current_user=self.current_user).tkraise())
         self.back_to_main_btn = Button(self, text=strings.BACK_TO_MAIN_BTN_TEXT,
                                        command=lambda: self.main_page.tkraise())
         self.back_to_learning = CTAButton(self, text=strings.BACK_TO_LEARNING,
