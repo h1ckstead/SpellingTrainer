@@ -7,11 +7,12 @@ from customtkinter import CTkFrame, CTkLabel, CTkImage, CTkFont
 from core import strings, config
 from core.gui.elements import CTAButton
 from core.gui.views.base_view import BaseFrame
+from util import helpers
 
 
 class WelcomeBlock(BaseFrame):
     def __init__(self, parent, controller, last_user=None, saved_data=None, next_page=None):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH-300, height=config.WINDOW_HEIGHT-250)
+        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 300, height=config.WINDOW_HEIGHT - 250)
         self.parent = parent
         self.controller = controller
         self.last_user = last_user
@@ -27,10 +28,10 @@ class WelcomeBlock(BaseFrame):
                                         command=lambda: self.next_page.tkraise())
             self.avatar = self.load_user_avatar(self.saved_data[self.last_user])
             self.avatar_label = CTkLabel(self, text="", image=self.avatar)
-            self.username = CTkLabel(self, text=self.last_user, font=CTkFont(family="Arial",  weight="bold",
+            self.username = CTkLabel(self, text=self.last_user, font=CTkFont(family="Arial", weight="bold",
                                                                              size=config.HEADER_FONT_SIZE))
             body_frame = CTkFrame(self)
-            tip_icon = CTkImage(Image.open("assets/idea.png"), size=(15, 15))
+            tip_icon = CTkImage(Image.open(helpers.get_path('assets/idea.png')), size=(15, 15))
             block_body = CTkLabel(body_frame, text=self.tip_of_the_day(), image=tip_icon, padx=5, compound=tk.LEFT,
                                   wraplength=450, justify=tk.LEFT)
             block_body.pack(pady=10)
@@ -67,11 +68,11 @@ class WelcomeBlock(BaseFrame):
 
     @staticmethod
     def button_image():
-        return CTkImage(Image.open("assets/learn.png"), size=(20, 20))
+        return CTkImage(Image.open(helpers.get_path('assets/learn.png')), size=(20, 20))
 
     def load_user_avatar(self, user):
         try:
-            return CTkImage(Image.open(f'assets/avatars/{user.avatar}'), size=(100, 100))
+            return CTkImage(Image.open(helpers.get_path(f'assets/avatars/{user.avatar}')), size=(100, 100))
         except FileNotFoundError:
             user.avatar = user.pick_random_avatar()
             return self.load_user_avatar(user)

@@ -11,6 +11,7 @@ from core.gui.views.base_view import BaseView
 from core.gui.views.practice_view import PracticePage
 from core.session import Session
 from core.user import User
+from util import helpers
 
 
 class UserRegistrationPage(BaseView):
@@ -22,8 +23,8 @@ class UserRegistrationPage(BaseView):
         self.current_user = None
 
         self.registration_block = RegistrationEditBlock(self, self.controller)
-        self.back_btn = Button(self, strings.BACK_BUTTON_TEXT, command=lambda: previous_page.tkraise())
-        new_user_img = CTkImage(Image.open("assets/new_user.png"), size=(15, 15))
+        self.back_btn = Button(self, strings.BACK_BUTTON_TEXT, command=lambda: self.previous_page.tkraise())
+        new_user_img = CTkImage(Image.open(helpers.get_path('assets/new_user.png')), size=(15, 15))
         self.save_btn = CTAButton(self, text=strings.CREATE_USER, state=tk.DISABLED, image=new_user_img,
                                   compound=tk.LEFT,
                                   command=lambda: [self.create_user(),
@@ -52,4 +53,4 @@ class UserRegistrationPage(BaseView):
         import util.load_savefile as load_savefile
 
         saved_data = load_savefile.load_save()
-        return MainPage(self, self.controller, saved_data)
+        return MainPage(parent=self.parent, controller=self.controller, saved_data=saved_data)

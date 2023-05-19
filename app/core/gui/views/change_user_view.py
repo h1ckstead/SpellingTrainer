@@ -1,3 +1,4 @@
+import tkinter as tk
 from tkinter import StringVar, Label
 
 from PIL import Image
@@ -9,7 +10,7 @@ from core.gui.views.base_view import BaseView
 from core.gui.views.practice_view import PracticePage
 from core.gui.views.user_registration_view import UserRegistrationPage
 from core.session import Session
-import tkinter as tk
+from util import helpers
 
 
 class ChangeUserPage(BaseView):
@@ -86,4 +87,4 @@ class ContentBlock(CTkFrame):
 
     @staticmethod
     def button_image():
-        return CTkImage(Image.open("assets/learn.png"), size=(20, 20))
+        return CTkImage(Image.open(helpers.get_path('assets/learn.png')), size=(20, 20))

@@ -10,6 +10,7 @@ from customtkinter import CTkFrame, CTkComboBox, CTkFont, CTkImage, CTkLabel, CT
 from core import config, strings, constants
 from core.gui.elements import Button, CTAButton, GreyLine, EntryField, HintLabel
 from core.gui.views.base_view import BaseView, BaseFrame
+from util import helpers
 
 
 class VocabularyPage(BaseView):
@@ -17,9 +18,10 @@ class VocabularyPage(BaseView):
         super().__init__(parent, controller)
         self.parent = parent
         self.controller = controller
-        self.previous_page = previous_page
+        self.previous_page = previous_page  # Profile Page
         self.current_user = current_user
-        self.avatar = PhotoImage(Image.open(f"assets/avatars/{self.current_user.avatar}"), size=(60, 60))
+        self.avatar = PhotoImage(Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}")),
+                                 size=(60, 60))
 
         # Create widgets and content blocks
         self.title_text = Label(self, text=strings.VOCABULARY,
@@ -68,10 +70,12 @@ class VocabularyBlock(BaseFrame):
         self.select_all_var = BooleanVar()
         self.times_to_spell = CTkLabel(self, text=strings.TIMES_TO_SPELL, font=CTkFont("Arial", 11, weight="bold"),
                                        height=15)
-        self.prev_button = CTkButton(self, text="", image=CTkImage(Image.open("assets/prev.png"), size=(15, 15)),
+        self.prev_button = CTkButton(self, text="",
+                                     image=CTkImage(Image.open(helpers.get_path('assets/prev.png')), size=(15, 15)),
                                      command=self.go_to_previous_page, width=40)
         self.page_label = CTkLabel(self, text="")
-        self.next_button = CTkButton(self, text="", image=CTkImage(Image.open("assets/next.png"), size=(15, 15)),
+        self.next_button = CTkButton(self, text="",
+                                     image=CTkImage(Image.open(helpers.get_path('assets/next.png')), size=(15, 15)),
                                      command=self.go_to_next_page, width=40)
         self.delete_button = CTkButton(self, text=strings.DELETE, state=tk.DISABLED, fg_color="#565b5e",
                                        command=self.delete_words)
@@ -391,6 +395,7 @@ class AddWordsBlock(BaseFrame):
             self.entry_field.delete(0, 'end')
             self.current_user.save_progress()
             self.parent.vocabulary_block.load_vocabulary()
+            self.update_practice_page()
             success_message.after(3000, lambda: success_message.destroy())
 
     def show_success_message(self, word):
@@ -456,10 +461,14 @@ class AddWordsBlock(BaseFrame):
         else:
             self.current_user.save_progress()
             self.parent.vocabulary_block.load_vocabulary()
+            self.update_practice_page()
             success_message = self.show_success_message(word)
             success_message.grid(row=0, column=0, columnspan=2, rowspan=2)
             self.dialog.destroy()
             success_message.after(3000, lambda: success_message.destroy())
+
+    def update_practice_page(self):
+        self.parent.previous_page.previous_page.spelling_trainer_block.turn_on_play_btn()
 
 
 class AboutBlock(BaseFrame):
@@ -472,11 +481,12 @@ class AboutBlock(BaseFrame):
         self.text = CTkLabel(self, text=strings.VOCAB_TUTORIAL_TEXT, wraplength=140, justify=tk.LEFT,
                              font=CTkFont(family="Arial", size=12))
         self.line = self.create_vertical_line()
-        self.only_vocab_switch = CTkSwitch(self, text=strings.ONLY_VOCAB_SWITCH, onvalue="True", offvalue="False",
+        self.only_vocab_switch = CTkSwitch(self, text=strings.ONLY_VOCAB_SWITCH, onvalue=True, offvalue=False,
                                            font=CTkFont(family="Arial", underline=True),
                                            command=lambda: self.parent.current_user.toggle_only_from_vocabulary(
                                                self.only_vocab_switch.get()
                                            ))
+        self.configure_vocab_switch()
         self.only_vocab_hint = HintLabel(self, text=strings.ONLY_VOCAB_HINT, image=False, wraplength=150)
 
         # Display widgets and content blocks on the page
@@ -489,6 +499,10 @@ class AboutBlock(BaseFrame):
         self.line.grid(row=0, column=1, rowspan=2)
         self.only_vocab_switch.grid(row=0, column=2, pady=(10, 0), sticky=tk.N)
         self.only_vocab_hint.grid(row=0, column=2, rowspan=2, pady=(0, 40))
+
+    def configure_vocab_switch(self):
+        switch_var = BooleanVar(value=self.parent.current_user.only_from_vocabulary)
+        self.only_vocab_switch.configure(variable=switch_var)
 
     def create_vertical_line(self):
         line = CTkProgressBar(self, orientation=tk.VERTICAL, height=config.WINDOW_HEIGHT - 470, width=2,

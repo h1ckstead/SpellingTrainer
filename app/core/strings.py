@@ -94,7 +94,7 @@ SORTING_OPTIONS = [AZ, ZA, TIMES_TO_SPELL_DESC, TIMES_TO_SPELL_ASC]
 DOUBLE_SPELLING_BTN = "Add a word with double spelling"
 DOUBLE_SPELLING_HINT = "If you want to add different spelling of the same word (British and American) " \
                        "to train with \"Strict spelling\" setting use the button below."
-ONLY_VOCAB_HINT = "Use this setting if you want to practice spelling only the words from your vocabulary."
+ONLY_VOCAB_HINT = "Use this setting if you want to practice spelling the words only from your vocabulary."
 VOCAB_TUTORIAL_TEXT = "Your vocabulary consists of words you manually add, as well as words automatically " \
                       "included based on your learning sessions. You are asked to spell words from your vocabulary " \
                       "more often than others."

@@ -3,39 +3,73 @@ import random
 
 from random_words import RandomWords
 
+from core.constants import BrE, AmE, DEFINITIONS, SPELLING
+
 
 class WordGenerator:
-    def __init__(self, user):
+    def __init__(self, user, callback):
         self.user = user
+        self.callback = callback
+
+    # def generate_word(self):
+    #     """
+    #     Retrieves one random word for practice from one of the existing dictionaries or
+    #     generates a random word.
+    #
+    #     :return: dictionary containing a word and its definition
+    #     """
+    #     if self.user.only_from_vocabulary:
+    #         choice_source = 'users_vocabulary'
+    #     else:
+    #         choice_source = self.pick_dictionary()
+    #     logging.info(f"Randomly picking a word from {choice_source}")
+    #     if choice_source == 'users_vocabulary':
+    #         users_vocabulary_list = list(self.user.dictionaries.vocabulary.keys())
+    #         word = users_vocabulary_list[random.randrange(0, len(users_vocabulary_list))]
+    #         word_dict = {word: self.user.dictionaries.vocabulary[word]}
+    #         if self.user.strict_spelling and AmE in word_dict[word].keys():
+    #             word_dict = self.pick_which_spelling(word, word_dict)
+    #     elif choice_source == 'commonly_misspelled':
+    #         commonly_misspelled_list = list(self.user.dictionaries.commonly_misspelled.keys())
+    #         word = commonly_misspelled_list[random.randrange(0, len(commonly_misspelled_list))]
+    #         word_dict = {word: self.user.dictionaries.commonly_misspelled[word]}
+    #         if self.user.strict_spelling and AmE in word_dict[word].keys():
+    #             word_dict = self.pick_which_spelling(word, word_dict)
+    #     elif choice_source == 'common_english':
+    #         common_english_words_list = list(self.user.dictionaries.common_english_words.keys())
+    #         word = common_english_words_list[random.randrange(0, len(common_english_words_list))]
+    #         word_dict = {word: self.user.dictionaries.common_english_words[word]}
+    #         if self.user.strict_spelling and AmE in word_dict[word].keys():
+    #             word_dict = self.pick_which_spelling(word, word_dict)
+    #     else:
+    #         word_dict = self.generate_random_word()
+    #     logging.info(word_dict)
+    #     return word_dict
 
     def generate_word(self):
-        """
-        Retrieves one random word for practice from one of the existing dictionaries or
-        generates a random word.
-
-        :return: dictionary containing a word and its definition
-        """
-        choice_source = self.pick_dictionary()
-        if choice_source == 'users_vocabulary':
-            users_vocabulary_list = list(self.user.dictionaries.vocabulary.keys())
-            word = users_vocabulary_list[random.randrange(0, len(users_vocabulary_list) - 1)]
-            word_dict = {word: self.user.dictionaries.vocabulary[word]}
-            if self.user.strict_spelling and 'AmE' in word_dict[word].keys():
-                word_dict = self.pick_which_spelling(word, word_dict)
-        elif choice_source == 'commonly_misspelled':
-            commonly_misspelled_list = list(self.user.dictionaries.commonly_misspelled.keys())
-            word = commonly_misspelled_list[random.randrange(0, len(commonly_misspelled_list) - 1)]
-            word_dict = {word: self.user.dictionaries.commonly_misspelled[word]}
-            if self.user.strict_spelling and 'AmE' in word_dict[word].keys():
-                word_dict = self.pick_which_spelling(word, word_dict)
-        elif choice_source == 'common_english':
-            common_english_words_list = list(self.user.dictionaries.common_english_words.keys())
-            word = common_english_words_list[random.randrange(0, len(common_english_words_list) - 1)]
-            word_dict = {word: self.user.dictionaries.common_english_words[word]}
-            if self.user.strict_spelling and 'AmE' in word_dict[word].keys():
-                word_dict = self.pick_which_spelling(word, word_dict)
+        word_dict = "empty_vocab"
+        word = ""
+        if self.user.only_from_vocabulary:
+            choice_source = 'users_vocabulary'
         else:
-            word_dict = self.generate_random_word()
+            choice_source = self.pick_dictionary()
+        logging.info(f"Randomly picking a word from {choice_source}")
+        if choice_source == 'users_vocabulary':
+            try:
+                word = random.choice(list(self.user.dictionaries.vocabulary.keys()))
+                word_dict = {word: self.user.dictionaries.vocabulary[word]}
+            except IndexError:
+                self.callback()
+        elif choice_source == 'commonly_misspelled':
+            word = random.choice(list(self.user.dictionaries.commonly_misspelled.keys()))
+            word_dict = {word: self.user.dictionaries.commonly_misspelled[word]}
+        elif choice_source == 'common_english':
+            word = random.choice(list(self.user.dictionaries.common_english_words.keys()))
+            word_dict = {word: self.user.dictionaries.common_english_words[word]}
+        else:
+            word, word_dict = self.generate_random_word()
+        if self.user.strict_spelling and word_dict.get(word, {}).get(AmE):
+            word_dict = self.pick_which_spelling(word, word_dict)
         logging.info(word_dict)
         return word_dict
 
@@ -49,8 +83,8 @@ class WordGenerator:
         while True:
             word = random_words.random_word(min_letter_count=4).title()
             if not self.is_duplicate(word.title()):
-                word_dict = {word: {"Definition": None}}  # Think about loading definition in the background
-                return word_dict
+                word_dict = {word: {DEFINITIONS: None}}  # TODO: Think about loading definition in the background
+                return word, word_dict
 
     def is_duplicate(self, word):
         """
@@ -73,15 +107,23 @@ class WordGenerator:
         """
         if self.user.only_from_vocabulary:
             return 'vocabulary'
+        choice_sources = self.get_non_empty_dicts()
         if len(self.user.dictionaries.vocabulary) > 30:
-            choice_source = random.choices(['vocabulary', 'commonly_misspelled',
-                                            'common_english', 'random_words'],
+            choice_source = random.choices(['vocabulary', 'random_words'] + choice_sources,
                                            weights=[4, 3, 2, 1], k=1)
         else:
-            choice_source = random.choices(['commonly_misspelled', 'common_english', 'random_words'],
+            choice_source = random.choices(['random_words'] + choice_sources,
                                            weights=[4, 3, 1], k=1)
         logging.info(f'Word choice source: {choice_source}')
         return choice_source[0]
+
+    def get_non_empty_dicts(self):
+        choice_sources = []
+        if len(self.user.dictionaries.commonly_misspelled) > 0:
+            choice_sources.append('commonly_misspelled')
+        if len(self.user.dictionaries.common_english_words) > 0:
+            choice_sources.append('common_english')
+        return choice_sources
 
     @staticmethod
     def pick_which_spelling(word, word_dict):
@@ -93,11 +135,11 @@ class WordGenerator:
         :param word_dict: dict containing definitions and American spelling
         :return: original dict with added key Spelling
         """
-        word_choice = random.choice([word, word_dict[word]['AmE']])
+        word_choice = random.choice([word, word_dict[word][AmE]])
         if word_choice in word_dict.keys():
-            word_dict[word].update({'Spelling': 'BrE'})
+            word_dict[word].update({SPELLING: BrE})
         else:
-            word_dict[word].update({'Spelling': 'AmE'})
+            word_dict[word].update({SPELLING: AmE})
             logging.debug(word_dict)
         logging.debug(word_dict)
         return word_dict

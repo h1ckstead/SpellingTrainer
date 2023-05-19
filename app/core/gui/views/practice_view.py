@@ -1,10 +1,10 @@
 import logging
 import tkinter as tk
-from tkinter import Text, Label
+from tkinter import Text, Label, BooleanVar
 
 from PIL import Image
 from PIL.ImageTk import PhotoImage
-from customtkinter import CTkFrame, CTkLabel, CTkImage, CTkSlider, CTkFont, CTkScrollbar
+from customtkinter import CTkFrame, CTkLabel, CTkImage, CTkSlider, CTkFont, CTkScrollbar, CTkToplevel, CTkSwitch
 
 from core import config, strings, constants
 from core.gui.elements import Button, CTAButton, HintLabel, EntryField, GreyLine, CustomToolTip
@@ -12,6 +12,7 @@ from core.gui.views.base_view import BaseView, BaseFrame
 from core.gui.views.profile_view import ProfilePage
 from core.spell_checker import SpellChecker
 from core.word_generator import WordGenerator
+from util import helpers
 from util import speech
 
 
@@ -21,7 +22,7 @@ class PracticePage(BaseView):
         self.parent = parent
         self.controller = controller
         self.current_user = current_user
-        self.previous_page = previous_page
+        self.previous_page = previous_page  # Main Page
         self.session = session
         self.avatar = self.load_avatar()
 
@@ -33,12 +34,12 @@ class PracticePage(BaseView):
         self.definition_block = DefinitionBlock(self, self.controller)
         self.back_to_main_btn = Button(self, text=strings.BACK_TO_MAIN_BTN_TEXT,
                                        command=lambda: self.previous_page.tkraise())
-        self.finish_button = CTAButton(self, text=strings.FINISH, command=lambda: ProfilePage(self.parent,
-                                                                                              self.controller,
-                                                                                              self.current_user,
-                                                                                              self.previous_page,
-                                                                                              self, self.session
-                                                                                              ).tkraise())
+        self.finish_button = CTAButton(self, text=strings.FINISH,
+                                       command=lambda: ProfilePage(parent=self.parent, controller=self.controller,
+                                                                   current_user=self.current_user,
+                                                                   main_page=self.previous_page,
+                                                                   previous_page=self,
+                                                                   session=self.session).tkraise())
 
         # Display widgets and content blocks on the page
         self.grid_columnconfigure(0, weight=1)
@@ -59,7 +60,7 @@ class PracticePage(BaseView):
         self.spelling_trainer_block.add_input_change_listener(self.definition_block.hide_definition)
 
     def load_avatar(self):
-        return PhotoImage(Image.open(f"assets/avatars/{self.current_user.avatar}"), size=(15, 15))
+        return PhotoImage(Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}")), size=(15, 15))
 
     def change_current_user(self, new_user):
         # Needed for change user feature
@@ -74,9 +75,10 @@ class SpellingTrainerBlock(BaseFrame):
         self.parent = parent
         self.controller = controller
         self.current_user = current_user
-        self.word_generator = WordGenerator(current_user)
+        self.word_generator = WordGenerator(current_user, self.handle_empty_vocabulary)
         self.spell_checker = SpellChecker(current_user)
         self.session = session
+        self.dialog = None
 
         # Attributes for event listeners
         self.word_dict = None
@@ -104,14 +106,20 @@ class SpellingTrainerBlock(BaseFrame):
         self.spellcheck_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=(0, 26), sticky=tk.W)
 
     def create_spelling_hint(self):
-        attention_img = CTkImage(Image.open('assets/attention.png'), size=(13, 13))
+        attention_img = CTkImage(Image.open(helpers.get_path('assets/attention.png')), size=(13, 13))
         return CTkLabel(self, text="American spelling", text_color="#bd9029", image=attention_img, compound=tk.LEFT,
                         padx=5, font=CTkFont(family="Arial", size=13, underline=True))
 
     def create_play_sound_btn(self):
-        speaker_img = CTkImage(Image.open('assets/speaker.png'))
-        return CTAButton(self, text='', width=30, height=30, image=speaker_img,
-                         command=self.say_word)
+        speaker_img = CTkImage(Image.open(helpers.get_path('assets/speaker.png')))
+        button = CTAButton(self, text='', width=30, height=30, image=speaker_img)
+        if self.current_user.only_from_vocabulary and self.word_dict is None:
+            self.is_play_btn_on = False
+            button.configure(command=self.empty_vocab_message)
+        else:
+            self.is_play_btn_on = True
+            button.configure(command=self.say_word)
+        return button
 
     def create_volume_slider(self):
         volume_slider = CTkSlider(self)
@@ -164,9 +172,9 @@ class SpellingTrainerBlock(BaseFrame):
             self.on_input_change(self.word_dict, self.word_entry.get(), status)
 
     def update_session_stats(self, status):
-        if status == 'Correct':
+        if status == constants.CORRECT:
             self.session.increment_attempts_correct()
-        elif status == 'Incorrect':
+        elif status == constants.INCORRECT:
             self.session.increment_attempts_incorrect()
         else:
             logging.debug(
@@ -176,7 +184,7 @@ class SpellingTrainerBlock(BaseFrame):
         if status == constants.CORRECT:
             validation_msg = self.show_green_message()
         elif status == constants.INCORRECT:
-            validation_msg = self.show_red_message_and_correction()
+            validation_msg = self.show_red_message()
         elif status == constants.NO_WORD_DICT:
             validation_msg = self.show_empty_word_string_message()
         else:
@@ -194,15 +202,16 @@ class SpellingTrainerBlock(BaseFrame):
         validation_container = CTkFrame(self)
         validation_msg = CTkLabel(validation_container, text=strings.CORRECT, text_color="#02732d",
                                   font=CTkFont(weight="bold"), compound=tk.LEFT, padx=6,
-                                  image=CTkImage(Image.open('assets/correct.png'), size=(15, 15)))
+                                  image=CTkImage(Image.open(helpers.get_path('assets/correct.png')), size=(15, 15)))
         validation_msg.pack(padx=4, pady=4)
         return validation_container
 
-    def show_red_message_and_correction(self):
+    def show_red_message(self):
         validation_container = CTkFrame(self)
         validation_msg = CTkLabel(validation_container, text=strings.INCORRECT, text_color="#f24726",
-                                  font=CTkFont(weight="bold"), image=CTkImage(Image.open('assets/incorrect.png'),
-                                                                              size=(15, 15)), compound=tk.LEFT, padx=6)
+                                  font=CTkFont(weight="bold"),
+                                  image=CTkImage(Image.open(helpers.get_path('assets/incorrect.png')),
+                                                 size=(15, 15)), compound=tk.LEFT, padx=6)
         validation_msg.pack(padx=4, pady=4)
         return validation_container
 
@@ -220,12 +229,69 @@ class SpellingTrainerBlock(BaseFrame):
         self.word_dict = self.word_generator.generate_word()
         word = list(self.word_dict.keys())[0]
         if constants.SPELLING in self.word_dict[word].keys():
-            if self.word_dict[word][constants.SPELLING] == constants.AMERICAN:
+            if self.word_dict[word][constants.SPELLING] == constants.AmE:
                 self.spellcheck_hint.configure(text=strings.AMERICAN_SPELLING)
-            elif self.word_dict[word][constants.SPELLING] == constants.BRITISH:
+            elif self.word_dict[word][constants.SPELLING] == constants.BrE:
                 self.spellcheck_hint.configure(text=strings.BRITISH_SPELLING)
             self.spelling_hint.grid(row=1)
         self.on_new_word(self.word_dict)
+
+    def handle_empty_vocabulary(self):
+        self.empty_vocab_message()
+        self.turn_off_play_btn()
+
+    def turn_off_play_btn(self):
+        self.is_play_btn_on = False
+        self.play_word_btn.configure(command=self.empty_vocab_message)
+
+    def turn_on_play_btn(self):
+        if not self.is_play_btn_on:
+            self.play_word_btn.configure(command=self.say_word)
+            self.is_play_btn_on = True
+
+    def empty_vocab_message(self):
+        if self.dialog is None or not self.dialog.winfo_exists():
+            self.dialog = CTkToplevel(self)
+            self.dialog.resizable(False, False)
+            self.dialog.attributes("-topmost", True)
+            self.dialog.transient(self)
+            self.dialog.title("Vocabulary Empty")
+            self.center_dialog()
+
+            def configure_vocab_switch():
+                switch_var = BooleanVar(value=self.current_user.only_from_vocabulary)
+                only_vocab_switch.configure(variable=switch_var)
+
+            header = CTkLabel(self.dialog, text="Your vocabulary is empty!",
+                              font=CTkFont(family="Arial", size=config.HEADER_FONT_SIZE, weight="bold"))
+            message = CTkLabel(self.dialog, text="To continue practicing add more words to your vocabulary or "
+                                                 "switch off \"Vocabulary only\" to practice spelling random words",
+                               wraplength=220, justify="left")
+            only_vocab_switch = CTkSwitch(self.dialog, text=strings.ONLY_VOCAB_SWITCH, onvalue=True, offvalue=False,
+                                          font=CTkFont(family="Arial", underline=True),
+                                          command=lambda: [self.current_user.toggle_only_from_vocabulary(
+                                            only_vocab_switch.get()), self.turn_on_play_btn(), self.dialog.destroy()]
+                                          )
+            configure_vocab_switch()
+            button = CTAButton(self.dialog, text="Ok", command=self.dialog.destroy, width=60, height=30)
+
+            header.pack(pady=10)
+            message.pack()
+            only_vocab_switch.pack(pady=10)
+            button.pack()
+        else:
+            self.dialog.focus()
+
+    def center_dialog(self):
+        parent_x = self.parent.winfo_rootx()
+        parent_y = self.parent.winfo_rooty()
+        parent_width = self.parent.winfo_width()
+        parent_height = self.parent.winfo_height()
+        dialog_width = 270
+        dialog_height = 200
+        x = parent_x + (parent_width - dialog_width) // 2
+        y = parent_y + (parent_height - dialog_height) // 2
+        self.dialog.geometry(f"{dialog_width}x{dialog_height}+{x}+{y}")
 
 
 class SessionHistoryBlock(BaseFrame):
@@ -264,7 +330,7 @@ class SessionHistoryBlock(BaseFrame):
                 enumerate(zip(self.status_labels, self.correction_labels, self.times_to_spell_labels), start=1):
             status_label.grid(row=i, column=0, sticky=tk.W, padx=10)
             correction_label.grid(row=i, column=1, sticky=tk.W)
-            times_to_spell_label.grid(row=i, column=2, sticky=tk.W)
+            times_to_spell_label.grid(row=i, column=1, columnspan=2, padx=(0, 15), sticky=tk.E)
             self.grid_columnconfigure(0, minsize=100)
             self.grid_columnconfigure(1, minsize=478)
             self.grid_columnconfigure(2, minsize=40)
@@ -273,8 +339,11 @@ class SessionHistoryBlock(BaseFrame):
         self.statuses.append(status)
         self.corrections.append(list(word_dict.keys())[0])
         self.user_input.append(user_word.title())
-        self.times_to_spell.append(
-            self.parent.current_user.dictionaries.vocabulary[list(word_dict.keys())[0]][constants.TIMES_TO_SPELL])
+        try:
+            self.times_to_spell.append(
+                self.parent.current_user.dictionaries.vocabulary[list(word_dict.keys())[0]][constants.TIMES_TO_SPELL])
+        except KeyError:
+            self.times_to_spell.append("Learned")
         self.statuses = self.statuses[-5:]  # Limit the list size to 5
 
         # Update the displayed rows
@@ -309,7 +378,8 @@ class DefinitionBlock(BaseFrame):
         self.definition_hint = HintLabel(self, text=strings.DEFINITION_HINT, wraplength=120, padx=10)
         self.definition_header = CTkLabel(self, text=strings.DEFINITION_HEADER, font=CTkFont(weight="bold"))
         self.horizontal_line = GreyLine(self, width=260)
-        self.pencil_icon = CTkLabel(self, text="", image=CTkImage(Image.open("assets/pencil.png"), size=(20, 20)))
+        self.pencil_icon = CTkLabel(self, text="",
+                                    image=CTkImage(Image.open(helpers.get_path('assets/pencil.png')), size=(20, 20)))
         self.definition_field = self.create_definition_field()
 
         # Display widgets and content blocks on the page

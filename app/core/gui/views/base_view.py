@@ -6,6 +6,7 @@ from customtkinter import CTkLabel, CTkImage, CTkFrame, CTkFont, CTkButton
 
 from core import strings, config
 from core.gui.elements import Button, GreyLine
+from util import helpers
 
 
 class BaseView(CTkFrame):
@@ -16,12 +17,13 @@ class BaseView(CTkFrame):
         self.grid(row=0, column=0, sticky=tk.NSEW)
 
         self.close_button = Button(self, text=strings.CLOSE, command=lambda: self.controller.destroy())
-        self.pencil_icon = CTkLabel(self, text="", image=CTkImage(Image.open("assets/pencil.png"), size=(20, 20)))
+        self.pencil_icon = CTkLabel(self, text="",
+                                    image=CTkImage(Image.open(helpers.get_path('assets/pencil.png')), size=(20, 20)))
         self.horizontal_line = GreyLine(self, width=600)
 
     @property
     def report_bug_btn(self):
-        bug = CTkImage(Image.open('assets/bug-solid.png'), size=(10, 10))
+        bug = CTkImage(Image.open(helpers.get_path('assets/bug-solid.png')), size=(10, 10))
         button = CTkButton(self, text=strings.BUG_REPORT, image=bug, compound=tk.LEFT,
                            command=lambda: webbrowser.open("mailto:lazarevavictoria@gmail.com"))
         button.configure(width=90, height=20, font=CTkFont(None, 8), fg_color="transparent", hover_color="#212121")
