@@ -15,18 +15,31 @@ class Dictionaries:
 
     @staticmethod
     def load_dictionary(name):
+        """
+        Loads appropriate binary file containing dict of words.
+
+        :param name: str filename
+        :return: dict
+        """
         with open(helpers.get_path(f'assets/{name}'), mode='rb') as document:
             return pickle.load(document)
 
     def add_word_to_vocab_manually(self, word, alternative_spelling=None):
+        """
+        Function for handling manual word adding to vocabulary. It checks if the word or
+        its alternative spelling already exists in one of the dictionaries and moves it
+        to vocabulary.
+
+        :param word: str
+        :param alternative_spelling: str
+        :return: str status
+        """
         status = constants.OK
-        dictionaries = [self.commonly_misspelled, self.common_english_words,
-                        self.vocabulary, self.learned_words]
-        word_exists, word_dictionary = self.check_word_in_dicts(word, dictionaries)
-        if word_exists and word_dictionary is self.vocabulary:
+        word_exists, word_dictionary = self.check_word_in_dicts(word)
+        if word_exists and word_dictionary is self.vocabulary and not alternative_spelling:
             return constants.ALREADY_EXISTS
         if alternative_spelling:
-            alt_word_exists, alt_dictionary = self.check_word_in_dicts(alternative_spelling, dictionaries)
+            alt_word_exists, alt_dictionary = self.check_word_in_dicts(alternative_spelling)
             if alt_word_exists and alt_dictionary is self.vocabulary:
                 self.vocabulary.update({word: {constants.AmE: alternative_spelling,
                                                constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}})
@@ -54,6 +67,15 @@ class Dictionaries:
         return status
 
     def add_word_to_vocab(self, word, word_dict, status, session):
+        """
+        Adds word to vocabulary with value "times_to_spell" based on status.
+
+        :param word: str
+        :param word_dict: dict
+        :param status: str
+        :param session: Session object
+        :return:
+        """
         session.increment_new_words()
         if status == constants.CORRECT:
             word_dict[word].update({constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_CORRECT})
@@ -66,31 +88,70 @@ class Dictionaries:
                              f"\"{constants.INCORRECT}\"")
 
     def delete_words(self, words):
+        """
+        Deletes words from vocabulary and adds them to learned words.
+
+        :param words: list of str
+        :return:
+        """
         for word in words:
             self.learned_words.update({word: self.vocabulary[word]})
             self.vocabulary.pop(word)
 
     @staticmethod
     def check_spelling(user_word):
+        """
+        Spellchecks users word and returns possible correction.
+
+        :param user_word: string
+        :return: str or None
+        """
         spell_checker = SpellChecker()
         misspelled = list(spell_checker.unknown([user_word]))
         if len(misspelled) > 0:
             return spell_checker.correction(misspelled[0])
 
-    @staticmethod
-    def check_word_in_dicts(user_word, dictionaries):
+    def check_word_in_dicts(self, user_word):
+        """
+        Checks if word already exists in one of the dicts.
+
+        :param user_word: str
+        :return: bool, dict or None, None
+        """
+        dictionaries = [self.commonly_misspelled, self.common_english_words, self.vocabulary, self.learned_words]
         for dictionary in dictionaries:
             if user_word in dictionary.keys():
                 return True, dictionary
         return None, None
 
     def increment_times_to_spell(self, word):
+        """
+        Increments "times_to_spell" parameter of the word.
+
+        :param word: str
+        :return:
+        """
         self.vocabulary[word][constants.TIMES_TO_SPELL] += 1
 
     def decrement_times_to_spell(self, word):
+        """
+        Decrements "times_to_spell" parameter of the word.
+
+        :param word: str
+        :return:
+        """
         self.vocabulary[word][constants.TIMES_TO_SPELL] -= 1
 
     def mark_word_as_learned(self, word, word_dict, session):
+        """
+        Removes word dict from vocabulary and adds it to learned_words dict.
+        Increments Session learned words attribute for statistics.
+
+        :param word: str
+        :param word_dict: dict containing the word and its params
+        :param session: Session object
+        :return:
+        """
         self.vocabulary.pop(word)
         self.learned_words.update(word_dict)
         session.increment_learned_words()
