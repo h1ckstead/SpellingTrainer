@@ -1,12 +1,13 @@
-from PIL import ImageTk, Image
-from customtkinter import CTkButton, CTkEntry, CTkSwitch, CTkLabel, CTkFont, CTkImage, CTkProgressBar
-from core import strings, config
-from tkinter import Label
 import tkinter as tk
+from tkinter import Label
+from typing import Callable, Union
+
+from PIL import ImageTk, Image
+from customtkinter import CTkButton, CTkEntry, CTkSwitch, CTkLabel, CTkFont, CTkProgressBar
 from tktooltip import ToolTip
 
-import time
-from typing import Callable, Union
+from core import strings, config
+from util import helpers
 
 
 class Button(CTkButton):
@@ -15,7 +16,7 @@ class Button(CTkButton):
         self.configure(border_width=1, border_color="white", fg_color="transparent", hover_color="#212121")
         # self.hover_bg_color = "#d3d3d3"
         # self.bind("<Enter>", self.on_enter)
-        #self.bind("<Leave>", self.on_leave)
+        # self.bind("<Leave>", self.on_leave)
 
     # def on_enter(self, event):
     #     self.config(bg=self.hover_bg_color)
@@ -28,7 +29,7 @@ class CTAButton(CTkButton):
     def __init__(self, parent, text, width=160, height=35, command=None, state="normal", **kwargs):
         super().__init__(parent, text=text, width=width, height=height, command=command, **kwargs)
         if state == "disabled":
-            self.configure(fg_color="#565b5e", state="disabled")
+            self.configure(fg_color="#565b5e", state=tk.DISABLED)
 
 
 # class BackButton(CTkButton):
@@ -50,7 +51,7 @@ class EntryField(CTkEntry):
 
 class StrictSpellingSwitch(CTkSwitch):
     def __init__(self, parent, **kwargs):
-        super().__init__(parent, text=strings.STRICT_SPELLING, onvalue="True", offvalue="False", **kwargs)
+        super().__init__(parent, text=strings.STRICT_SPELLING, onvalue=True, offvalue=False, **kwargs)
         self.configure(font=CTkFont(family="Arial", underline=True))
 
 
@@ -60,7 +61,7 @@ class HintLabel(Label):
                          font=CTkFont(family="Arial", size=config.HINT_FONT_SIZE),
                          wraplength=wraplength, justify="left", **kwargs)
         if image:
-            original_image = Image.open("assets/info.png")
+            original_image = Image.open(helpers.get_path('assets/info.png'))
             resized_image = original_image.resize((10, 10), Image.ANTIALIAS)
             image = ImageTk.PhotoImage(resized_image)
             self.image = image  # Keep the reference from Python's garbage collector
@@ -84,7 +85,8 @@ class GreyLine(CTkProgressBar):
 class StaticsLabel(CTkLabel):
     def __init__(self, parent, text, text_color=None):
         super().__init__(parent, text=text, text_color=text_color,
-                         font=CTkFont(family=None, size=config.STATISTICS_FONT_SIZE, weight="bold"))  # TODO: Experiment with size
+                         font=CTkFont(family=None, size=config.STATISTICS_FONT_SIZE,
+                                      weight="bold"))  # TODO: Experiment with size
 
 
 class ThickLine(CTkProgressBar):
@@ -96,17 +98,17 @@ class ThickLine(CTkProgressBar):
 
 class CustomToolTip(ToolTip):
     def __init__(
-        self,
-        widget: tk.Widget,
-        msg: Union[str, Callable] = None,
-        delay: float = 0.0,
-        follow: bool = True,
-        refresh: float = 1.0,
-        x_offset: int = +10,
-        y_offset: int = +10,
-        parent_kwargs: dict = {"bg": "black", "padx": 1, "pady": 1},
-        bordercolor: str = "black",
-        **message_kwargs,
+            self,
+            widget: tk.Widget,
+            msg: Union[str, Callable] = None,
+            delay: float = 0.0,
+            follow: bool = True,
+            refresh: float = 1.0,
+            x_offset: int = +10,
+            y_offset: int = +10,
+            parent_kwargs: dict = {"bg": "black", "padx": 1, "pady": 1},
+            bordercolor: str = "black",
+            **message_kwargs,
     ):
         # Call the super constructor to initialize the ToolTip
         super().__init__(

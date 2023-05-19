@@ -46,9 +46,9 @@ class RegistrationEditBlock(BaseFrame):
     def on_entry_change(self, *args):
         stripped_text = self.entry_var.get().strip()
         if stripped_text:
-            self.parent.save_btn.configure(state="normal", fg_color="#246ba3")
+            self.parent.save_btn.configure(state=tk.NORMAL, fg_color="#246ba3")
         else:
-            self.parent.save_btn.configure(state="disabled", fg_color="#565b5e")
+            self.parent.save_btn.configure(state=tk.DISABLED, fg_color="#565b5e")
 
     def display_widgets(self):
         self.title.grid(row=0, column=0, pady=(10, 0), ipady=2)
@@ -76,7 +76,7 @@ class RegistrationEditBlock(BaseFrame):
     def _create_avatars():
         avatars_dict = {}
         for avatar_name in helpers.get_avatars_list():
-            image = Image.open(f'assets/avatars/{avatar_name}')
+            image = Image.open(helpers.get_path(f'assets/avatars/{avatar_name}'))
             photo_image = ImageTk.PhotoImage(image)
             avatars_dict[avatar_name] = {'img_object': photo_image}
         return avatars_dict
@@ -104,7 +104,7 @@ class RegistrationEditBlock(BaseFrame):
             self.selected_avatar = None
         position_x = self.avatars[image_name]['position']['x'] + 3
         position_y = self.avatars[image_name]['position']['y'] + 3
-        self.selected_image_circle = self.canvas.create_oval(position_x, position_y, position_x+54, position_y+54,
+        self.selected_image_circle = self.canvas.create_oval(position_x, position_y, position_x + 54, position_y + 54,
                                                              width=3, outline='white')
         self.selected_avatar = image_name
 

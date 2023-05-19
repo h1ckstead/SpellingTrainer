@@ -9,7 +9,7 @@ class VocabBuilder:
         if status == CORRECT:
             if word in self.user.dictionaries.vocabulary.keys():
                 if self.user.dictionaries.vocabulary[word][TIMES_TO_SPELL] == 1:
-                    self.user.dictionaries.mark_word_as_learned(session)
+                    self.user.dictionaries.mark_word_as_learned(word, word_dict, session)
                 else:
                     self.user.dictionaries.decrement_times_to_spell(word)
             else:

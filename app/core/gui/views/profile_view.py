@@ -1,12 +1,13 @@
-from tkinter import Label
+from tkinter import Label, BooleanVar
 
 from PIL import Image
-from customtkinter import CTkLabel, CTkImage, CTkFont, StringVar
+from customtkinter import CTkLabel, CTkImage, CTkFont
 
 from core import config, strings
 from core.gui.elements import Button, CTAButton, HintLabel, GreyLine, StrictSpellingSwitch, StaticsLabel, ThickLine
 from core.gui.views.base_view import BaseView, BaseFrame
 from core.gui.views.vocabulary_view import VocabularyPage
+from util import helpers
 
 
 class ProfilePage(BaseView):
@@ -16,7 +17,7 @@ class ProfilePage(BaseView):
         self.controller = controller
         self.current_user = current_user
         self.main_page = main_page
-        self.previous_page = previous_page
+        self.previous_page = previous_page  # Practice Page
         self.session = session
 
         # Create widgets and content blocks
@@ -31,9 +32,10 @@ class ProfilePage(BaseView):
         self.back_to_main_btn = Button(self, text=strings.BACK_TO_MAIN_BTN_TEXT,
                                        command=lambda: self.main_page.tkraise())
         self.back_to_learning = CTAButton(self, text=strings.BACK_TO_LEARNING,
-                                          command=lambda: self.previous_page.tkraise())
+                                          command=self.update_previous_and_raise)
         self.line = GreyLine(self, width=650)
-        self.pencil_icon = CTkLabel(self, text="", image=CTkImage(Image.open("assets/pencil.png"), size=(30, 30)))
+        self.pencil_icon = CTkLabel(self, text="",
+                                    image=CTkImage(Image.open(helpers.get_path('assets/pencil.png')), size=(30, 30)))
 
         self.title_text.grid(row=0, column=2, columnspan=4, padx=(0, 210), pady=20)
         self.user_block.grid(row=1, column=0, rowspan=3, columnspan=2, padx=20, sticky="n")
@@ -47,6 +49,12 @@ class ProfilePage(BaseView):
         self.back_to_learning.grid(row=6, column=3, sticky="e")
         self.report_bug_btn.grid(row=7, column=0, columnspan=4, padx=(42, 0), pady=(71, 0))
 
+    def update_previous_and_raise(self):
+        if not self.previous_page.spelling_trainer_block.is_play_btn_on and not self.current_user.only_from_vocabulary:
+            self.previous_page.spelling_trainer_block.new_word()
+            self.previous_page.spelling_trainer_block.turn_on_play_btn()
+        self.previous_page.tkraise()
+
 
 class UserBlock(BaseFrame):
     def __init__(self, parent, controller, current_user):
@@ -56,10 +64,13 @@ class UserBlock(BaseFrame):
         self.current_user = current_user
 
         self.avatar = CTkLabel(self, text="",
-                               image=CTkImage(Image.open(f"assets/avatars/{self.current_user.avatar}"), size=(60, 60)))
+                               image=CTkImage(
+                                   Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}")),
+                                   size=(60, 60)))
         self.username = CTkLabel(self, text=self.current_user.name, font=CTkFont(None, config.HEADER_FONT_SIZE,
                                                                                  weight="bold"))
-        self.edit_btn = Button(self, text="Edit profile", image=CTkImage(Image.open(f"assets/edit.png"), size=(15, 15)),
+        self.edit_btn = Button(self, text="Edit profile",
+                               image=CTkImage(Image.open(helpers.get_path('assets/edit.png')), size=(15, 15)),
                                width=30, height=25, corner_radius=10, compound="left",
                                command=lambda: self.edit_page().tkraise())
         self.horizontal_line = GreyLine(self, width=180)
@@ -83,12 +94,13 @@ class UserBlock(BaseFrame):
                                current_user=self.current_user)
 
     def configure_strict_spelling_switch(self):
-        switch_var = StringVar(value=self.current_user.strict_spelling)
+        switch_var = BooleanVar(value=self.current_user.strict_spelling)
         self.strict_spelling_switch.configure(variable=switch_var)
 
     def update_profile(self):
         self.avatar.configure(text="",
-                              image=CTkImage(Image.open(f"assets/avatars/{self.current_user.avatar}"), size=(60, 60)))
+                              image=CTkImage(Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}")),
+                                             size=(60, 60)))
         self.username.configure(text=self.current_user.name)
 
 
