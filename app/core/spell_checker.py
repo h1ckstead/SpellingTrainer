@@ -13,6 +13,7 @@ class SpellChecker:
         """
         Main function for spell checking.
 
+        :param session: Session object
         :param word_dict: dict containing a word and its definition
         :param user_word: str a word user has typed
         :return: str status "Correct" or "Incorrect"
@@ -44,6 +45,7 @@ class SpellChecker:
         Based on the spelling prompt "BrE/AmE" compares if user word
         matches the appropriate spelling.
 
+        :param session: Session object
         :param word: str reference word
         :param word_dict: dict containing reference word, definition,
         AmE version of the word and Spelling which was asked from the user
@@ -67,6 +69,7 @@ class SpellChecker:
         attribute set to False. For words with alternative spelling such as
         colour/color both spellings will be considered correct.
 
+        :param session: Session object
         :param word: str reference word
         :param word_dict: dict containing a word and its definition,
         may also contain alternative spelling for some words
@@ -88,6 +91,7 @@ class SpellChecker:
         """
         Checks if user word matches any of the acceptable spellings.
 
+        :param session: Session object
         :param word: str reference word
         :param word_dict: dict containing a word, its definition
         and alternative spelling

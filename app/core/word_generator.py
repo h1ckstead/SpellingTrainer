@@ -47,14 +47,17 @@ class WordGenerator:
     #     return word_dict
 
     def generate_word(self):
+        """
+        Retrieves one random word for practice from one of the existing dictionaries or
+        generates a random word.
+
+        :return: dictionary containing a word and its definition
+        """
         word_dict = "empty_vocab"
         word = ""
-        if self.user.only_from_vocabulary:
-            choice_source = 'users_vocabulary'
-        else:
-            choice_source = self.pick_dictionary()
+        choice_source = self.pick_dictionary()
         logging.info(f"Randomly picking a word from {choice_source}")
-        if choice_source == 'users_vocabulary':
+        if choice_source == 'vocabulary':
             try:
                 word = random.choice(list(self.user.dictionaries.vocabulary.keys()))
                 word_dict = {word: self.user.dictionaries.vocabulary[word]}
@@ -118,6 +121,12 @@ class WordGenerator:
         return choice_source[0]
 
     def get_non_empty_dicts(self):
+        """
+        Checks if commonly_misspelled or common_english still have
+        words. If so, they are added to choice_sources.
+
+        :return: list of strings
+        """
         choice_sources = []
         if len(self.user.dictionaries.commonly_misspelled) > 0:
             choice_sources.append('commonly_misspelled')
