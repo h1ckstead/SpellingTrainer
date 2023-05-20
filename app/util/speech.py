@@ -7,6 +7,9 @@ import threading
 
 import pyttsx3
 
+from core.config import MAC_OS_VOICES
+
+
 # def read_aloud(word_dict):
 #     word = list(word_dict.keys())[0]
 #     voice = MAC_OS_VOICES[random.randint(0, len(MAC_OS_VOICES) - 1)]
@@ -47,7 +50,8 @@ def say_in_thread(word, volume, voice, engine):
 
 
 def get_random_macos_voice():
-    cmd = "say -v '?' | grep 'en[_-]' | awk -F '[ .]' '{print $1}'"
-    cmd_out = subprocess.run(cmd, capture_output=True, shell=True, text=True)
-    str_out = cmd_out.stdout.strip().splitlines()
-    return random.choice(str_out)
+    # cmd = "say -v '?' | grep 'en[_-]' | awk -F '[ .]' '{print $1}'"
+    # cmd_out = subprocess.run(cmd, capture_output=True, shell=True, text=True)
+    # str_out = cmd_out.stdout.strip().splitlines()
+    # return random.choice(str_out)
+    return random.choice(MAC_OS_VOICES)

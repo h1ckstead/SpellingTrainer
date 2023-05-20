@@ -314,17 +314,26 @@ class VocabularyBlock(BaseFrame):
                 words_to_delete.append(word)
                 checkbox_vars_to_delete.append(checkbox_var)  # Store the checkbox variable to delete
 
-        for word in words_to_delete:
-            del self.user_vocabulary_copy[word]
+        response = self.show_delete_conformation(words_to_delete)
+        if response == tk.YES:
+            for word in words_to_delete:
+                del self.user_vocabulary_copy[word]
 
-        # Remove the associated checkbox variables
-        for checkbox_var in checkbox_vars_to_delete:
-            self.checkbox_vars.remove(checkbox_var)
+            # Remove the associated checkbox variables
+            for checkbox_var in checkbox_vars_to_delete:
+                self.checkbox_vars.remove(checkbox_var)
 
-        self.current_user.dictionaries.vocabulary = self.user_vocabulary_copy
-        self.current_user.save_progress()
-        self.load_vocabulary()  # Refresh the list
-        self.update_delete_button_state()
+            self.current_user.dictionaries.vocabulary = self.user_vocabulary_copy
+            self.current_user.save_progress()
+            self.load_vocabulary()  # Refresh the list
+            self.update_delete_button_state()
+
+    @staticmethod
+    def show_delete_conformation(words_to_delete):
+        response = messagebox.askyesno(title="Are you sure?",
+                                       message=f"Are you sure you want to delete {len(words_to_delete)} words?\n"
+                                               " This action cannot be undone")
+        return response
 
 
 class AddWordsBlock(BaseFrame):
