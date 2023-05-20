@@ -22,4 +22,4 @@ class VocabBuilder:
                 self.user.dictionaries.add_word_to_vocab(word, word_dict, status, session)
             self.user.increment_attempts_incorrect()
         else:
-            raise ValueError("Invalid status value. Must be either 'Correct' or 'Incorrect'")
+            raise ValueError(f"Invalid status value. Must be either {CORRECT} or {INCORRECT}")
