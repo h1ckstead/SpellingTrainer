@@ -24,7 +24,7 @@ class UserRegistrationPage(BaseView):
 
         self.registration_block = RegistrationEditBlock(self, self.controller)
         self.back_btn = Button(self, strings.BACK_BUTTON_TEXT, command=lambda: self.previous_page.tkraise())
-        new_user_img = CTkImage(Image.open(helpers.get_path('assets/new_user.png')), size=(15, 15))
+        new_user_img = CTkImage(Image.open(helpers.get_path('assets/new_user.png')), size=(20, 20))
         self.save_btn = CTAButton(self, text=strings.CREATE_USER, state=tk.DISABLED, image=new_user_img,
                                   compound=tk.LEFT,
                                   command=lambda: [self.create_user(),

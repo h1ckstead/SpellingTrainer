@@ -7,7 +7,7 @@ from PIL.ImageTk import PhotoImage
 from customtkinter import CTkFrame, CTkLabel, CTkImage, CTkSlider, CTkFont, CTkScrollbar, CTkToplevel, CTkSwitch
 
 from core import config, strings, constants
-from core.gui.elements import Button, CTAButton, HintLabel, EntryField, GreyLine, CustomToolTip
+from core.gui.elements import Button, CTAButton, HintLabel, EntryField, GreyLine, CustomToolTip, PlayButton
 from core.gui.views.base_view import BaseView, BaseFrame
 from core.gui.views.profile_view import ProfilePage
 from core.spell_checker import SpellChecker
@@ -98,27 +98,27 @@ class SpellingTrainerBlock(BaseFrame):
                                                          self.new_word(), self.after(1000, self.say_word)])
 
         # Display widgets and content blocks on the page
-        self.play_word_btn.grid(row=0, column=0, padx=10, pady=(10, 5), sticky=tk.W)
+        self.play_word_btn.grid(row=0, column=0, padx=10, pady=(10, 0), sticky=tk.W)
         self.volume_slider.grid(row=0, column=1, columnspan=3, padx=(0, 40), sticky=tk.W)
         self.grid_rowconfigure(1, minsize=29)  # placeholder for Br/Am spelling hint
         self.word_entry.grid(row=2, column=0, columnspan=3, padx=(10, 43), sticky=tk.W)
         self.spellcheck_hint.grid(row=3, column=0, columnspan=3, padx=4, pady=(0, 10), sticky=tk.W)
-        self.spellcheck_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=(0, 26), sticky=tk.W)
+        self.spellcheck_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=(0, 21), sticky=tk.W)
+        # self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(10, 0), sticky=tk.W)
 
     def create_spelling_hint(self):
-        attention_img = CTkImage(Image.open(helpers.get_path('assets/attention.png')), size=(13, 13))
-        return CTkLabel(self, text="American spelling", text_color="#bd9029", image=attention_img, compound=tk.LEFT,
+        attention_img = CTkImage(Image.open(helpers.get_path('assets/attention.png')), size=(15, 15))
+        return CTkLabel(self, text="American spelling", text_color="#f8c543", image=attention_img, compound=tk.LEFT,
                         padx=5, font=CTkFont(family="Arial", size=13, underline=True))
 
     def create_play_sound_btn(self):
-        speaker_img = CTkImage(Image.open(helpers.get_path('assets/speaker.png')))
-        button = CTAButton(self, text='', width=30, height=30, image=speaker_img)
+        button = PlayButton(self)
         if self.current_user.only_from_vocabulary and self.word_dict is None:
             self.is_play_btn_on = False
-            button.configure(command=self.empty_vocab_message)
+            button.bind("<Button-1>", lambda event: self.empty_vocab_message())
         else:
             self.is_play_btn_on = True
-            button.configure(command=self.say_word)
+            button.bind("<Button-1>", lambda event: self.say_word())
         return button
 
     def create_volume_slider(self):
@@ -200,7 +200,7 @@ class SpellingTrainerBlock(BaseFrame):
 
     def show_green_message(self):
         validation_container = CTkFrame(self)
-        validation_msg = CTkLabel(validation_container, text=strings.CORRECT, text_color="#02732d",
+        validation_msg = CTkLabel(validation_container, text=strings.CORRECT, text_color=config.GREEN,
                                   font=CTkFont(weight="bold"), compound=tk.LEFT, padx=6,
                                   image=CTkImage(Image.open(helpers.get_path('assets/correct.png')), size=(15, 15)))
         validation_msg.pack(padx=4, pady=4)
@@ -208,7 +208,7 @@ class SpellingTrainerBlock(BaseFrame):
 
     def show_red_message(self):
         validation_container = CTkFrame(self)
-        validation_msg = CTkLabel(validation_container, text=strings.INCORRECT, text_color="#f24726",
+        validation_msg = CTkLabel(validation_container, text=strings.INCORRECT, text_color=config.RED,
                                   font=CTkFont(weight="bold"),
                                   image=CTkImage(Image.open(helpers.get_path('assets/incorrect.png')),
                                                  size=(15, 15)), compound=tk.LEFT, padx=6)
@@ -230,10 +230,10 @@ class SpellingTrainerBlock(BaseFrame):
         word = list(self.word_dict.keys())[0]
         if constants.SPELLING in self.word_dict[word].keys():
             if self.word_dict[word][constants.SPELLING] == constants.AmE:
-                self.spellcheck_hint.configure(text=strings.AMERICAN_SPELLING)
+                self.spelling_hint.configure(text=strings.AMERICAN_SPELLING)
             elif self.word_dict[word][constants.SPELLING] == constants.BrE:
-                self.spellcheck_hint.configure(text=strings.BRITISH_SPELLING)
-            self.spelling_hint.grid(row=1)
+                self.spelling_hint.configure(text=strings.BRITISH_SPELLING)
+            self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(10, 0), sticky=tk.W)
         self.on_new_word(self.word_dict)
 
     def handle_empty_vocabulary(self):
@@ -351,11 +351,11 @@ class SessionHistoryBlock(BaseFrame):
                                                                      self.times_to_spell_labels)):
             if i < len(self.statuses):
                 if self.statuses[-(i + 1)] == constants.CORRECT:
-                    status.configure(text=self.statuses[-(i + 1)], text_color="#02732d")
+                    status.configure(text=self.statuses[-(i + 1)], text_color=config.GREEN)
                     correction.configure(text=self.corrections[-(i + 1)])
                     times_to_spell.configure(text=self.times_to_spell[-(i + 1)])
                 else:
-                    status.configure(text=self.statuses[-(i + 1)], text_color="#f24726")
+                    status.configure(text=self.statuses[-(i + 1)], text_color=config.RED)
                     word = self.corrections[-(i + 1)]
                     user_word = self.user_input[-(i + 1)]
                     correction.configure(text=f"{word}. You wrote {user_word}")

@@ -3,7 +3,7 @@ from tkinter import Label
 from typing import Callable, Union
 
 from PIL import ImageTk, Image
-from customtkinter import CTkButton, CTkEntry, CTkSwitch, CTkLabel, CTkFont, CTkProgressBar
+from customtkinter import CTkButton, CTkEntry, CTkSwitch, CTkLabel, CTkFont, CTkProgressBar, CTkImage
 from tktooltip import ToolTip
 
 from core import strings, config
@@ -32,10 +32,21 @@ class CTAButton(CTkButton):
             self.configure(fg_color="#565b5e", state=tk.DISABLED)
 
 
-# class BackButton(CTkButton):
-#     def __init__(self, parent, text, previous_page):
-#         super().__init__(parent, text=text, command=lambda: previous_page.tkraise())
-#         self.configure(width=160, height=35)
+class PlayButton(CTkLabel):
+    def __init__(self, parent, **kwargs):
+        CTkLabel.__init__(self, parent, **kwargs)
+        self.normal = CTkImage(Image.open(helpers.get_path("assets", "play.png")), size=(40, 40))
+        self.hovered = CTkImage(Image.open(helpers.get_path("assets", "play-dark.png")), size=(40, 40))
+
+        self.configure(image=self.normal, text="")
+        self.bind("<Enter>", self.on_enter)  # Bind hover enter event
+        self.bind("<Leave>", self.on_leave)  # Bind hover leave event
+
+    def on_enter(self, event):
+        self.configure(image=self.hovered)
+
+    def on_leave(self, event):
+        self.configure(image=self.normal)
 
 
 class EntryField(CTkEntry):
@@ -62,7 +73,7 @@ class HintLabel(Label):
                          wraplength=wraplength, justify="left", **kwargs)
         if image:
             original_image = Image.open(helpers.get_path('assets/info.png'))
-            resized_image = original_image.resize((10, 10), Image.ANTIALIAS)
+            resized_image = original_image.resize((5, 10), Image.ANTIALIAS)
             image = ImageTk.PhotoImage(resized_image)
             self.image = image  # Keep the reference from Python's garbage collector
             self.config(image=self.image, compound="left", padx=6)
