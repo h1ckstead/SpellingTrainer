@@ -31,7 +31,7 @@ class WelcomeBlock(BaseFrame):
             self.username = CTkLabel(self, text=self.last_user, font=CTkFont(family="Arial", weight="bold",
                                                                              size=config.HEADER_FONT_SIZE))
             body_frame = CTkFrame(self)
-            tip_icon = CTkImage(Image.open(helpers.get_path('assets/idea.png')), size=(15, 15))
+            tip_icon = CTkImage(Image.open(helpers.get_path('assets/idea.png')), size=(20, 20))
             block_body = CTkLabel(body_frame, text=self.tip_of_the_day(), image=tip_icon, padx=5, compound=tk.LEFT,
                                   wraplength=450, justify=tk.LEFT)
             block_body.pack(pady=10)
