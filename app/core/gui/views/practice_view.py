@@ -2,7 +2,7 @@ import logging
 import tkinter as tk
 from tkinter import Text, Label, BooleanVar
 
-from PIL import Image
+from PIL import Image, ImageTk
 from PIL.ImageTk import PhotoImage
 from customtkinter import CTkFrame, CTkLabel, CTkImage, CTkSlider, CTkFont, CTkScrollbar, CTkToplevel, CTkSwitch
 
@@ -60,7 +60,9 @@ class PracticePage(BaseView):
         self.spelling_trainer_block.add_input_change_listener(self.definition_block.hide_definition)
 
     def load_avatar(self):
-        return PhotoImage(Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}")), size=(15, 15))
+        image = Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}"))
+        image = image.resize((60, 60), Image.ANTIALIAS)
+        return PhotoImage(image)
 
     def change_current_user(self, new_user):
         # Needed for change user feature
