@@ -7,6 +7,8 @@ import util.load_savefile as load_savefile
 from core import config
 from core.gui.views.main_view import MainPage
 from core.gui.views.welcome_view import WelcomePage
+from util import helpers
+import platform
 
 
 class SpellingTrainerApp(CTk):
@@ -14,6 +16,8 @@ class SpellingTrainerApp(CTk):
         CTk.__init__(self, *args, **kwargs)
         # self.iconbitmap("path_to_your_icon.ico") <-- Icon
         logging.debug("Initializing top level window")
+        if platform.system() == 'Windows':
+            self.iconbitmap(helpers.get_path("assets", "favicon.ico"))
         self.title(config.APP_NAME)
         self.title_font = CTkFont(family="Arial", size=config.TITLE_FONT_SIZE, weight="bold")
         self.font = CTkFont(family="Arial", size=config.FONT_SIZE)
