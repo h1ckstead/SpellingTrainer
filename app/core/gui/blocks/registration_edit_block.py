@@ -77,6 +77,7 @@ class RegistrationEditBlock(BaseFrame):
         avatars_dict = {}
         for avatar_name in helpers.get_avatars_list():
             image = Image.open(helpers.get_path(f'assets/avatars/{avatar_name}'))
+            image = image.resize((55, 55), Image.ANTIALIAS)
             photo_image = ImageTk.PhotoImage(image)
             avatars_dict[avatar_name] = {'img_object': photo_image}
         return avatars_dict
@@ -102,8 +103,8 @@ class RegistrationEditBlock(BaseFrame):
         if self.selected_image_circle is not None:
             self.canvas.delete(self.selected_image_circle)
             self.selected_avatar = None
-        position_x = self.avatars[image_name]['position']['x'] + 3
-        position_y = self.avatars[image_name]['position']['y'] + 3
+        position_x = self.avatars[image_name]['position']['x']
+        position_y = self.avatars[image_name]['position']['y']
         self.selected_image_circle = self.canvas.create_oval(position_x, position_y, position_x + 54, position_y + 54,
                                                              width=3, outline='white')
         self.selected_avatar = image_name
