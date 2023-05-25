@@ -35,11 +35,13 @@ class UserRegistrationPage(BaseView):
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(2, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(4, weight=1)
 
         self.registration_block.grid(row=0, column=0, columnspan=3, pady=(15, 0))
-        self.back_btn.grid(row=1, column=0, pady=(20, 0))
-        self.save_btn.grid(row=1, column=2, columnspan=2, pady=(20, 0))
-        self.report_bug_btn.grid(row=4, column=0, columnspan=3, pady=(30, 0))
+        self.back_btn.grid(row=2, column=0, pady=(20, 0))
+        self.save_btn.grid(row=2, column=2, columnspan=2, pady=(20, 0))
+        self.report_bug_btn.grid(row=5, column=0, columnspan=3, pady=(0, 5))
 
     def create_user(self):
         username = self.registration_block.get_username()
@@ -50,7 +52,6 @@ class UserRegistrationPage(BaseView):
 
     def main_page(self):
         from core.gui.views.main_view import MainPage
-        import util.load_savefile as load_savefile
 
-        saved_data = load_savefile.load_save()
+        saved_data = helpers.load_save()
         return MainPage(parent=self.parent, controller=self.controller, saved_data=saved_data)

@@ -2,7 +2,7 @@ import tkinter as tk
 from _tkinter import TclError
 from tkinter import StringVar, Label, BooleanVar, messagebox
 
-from PIL import Image
+from PIL import Image, ImageTk
 from PIL.ImageTk import PhotoImage
 from customtkinter import CTkFrame, CTkComboBox, CTkFont, CTkImage, CTkLabel, CTkCheckBox, CTkButton, CTkSwitch, \
     CTkProgressBar, CTkToplevel
@@ -20,12 +20,16 @@ class VocabularyPage(BaseView):
         self.controller = controller
         self.previous_page = previous_page  # Profile Page
         self.current_user = current_user
-        self.avatar = PhotoImage(Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}")),
-                                 size=(60, 60))
+        # self.avatar = PhotoImage(Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}")),
+        #                          size=(60, 60))
+
+        avatar_image = Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}"))
+        avatar_image = avatar_image.resize((60, 60), Image.ANTIALIAS)
+        self.avatar = ImageTk.PhotoImage(avatar_image)
 
         # Create widgets and content blocks
-        self.title_text = Label(self, text=strings.VOCABULARY,
-                                image=self.avatar,
+        self.title_text = Label(self, text=strings.VOCABULARY, background="#333333", foreground="#FFFFFF",
+                                image=self.avatar, padx=10,
                                 compound=tk.LEFT,
                                 font=self.controller.title_font)
         self.vocabulary_block = VocabularyBlock(self, controller=self.controller, current_user=self.current_user)
@@ -35,15 +39,18 @@ class VocabularyPage(BaseView):
         self.back_btn = CTAButton(self, text=strings.BACK_BUTTON_TEXT, command=lambda: self.previous_page.tkraise())
 
         # Display widgets and content blocks on the page
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(4, weight=1)
 
-        self.title_text.grid(row=0, column=0, columnspan=2, pady=(20, 15))
-        self.vocabulary_block.grid(row=1, column=0, rowspan=3)
-        self.add_words_block.grid(row=1, column=1, sticky=tk.N)
-        self.about_block.grid(row=2, column=1)
-        self.back_btn.grid(row=3, column=1, sticky=tk.E)
-        self.report_bug_btn.grid(row=4, column=0, columnspan=5, pady=(29, 0))
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(3, weight=1)
+
+        self.grid_rowconfigure(4, weight=1)
+
+        self.title_text.grid(row=0, column=0, columnspan=4, pady=(20, 15))
+        self.vocabulary_block.grid(row=1, column=1, rowspan=3, padx=10)
+        self.add_words_block.grid(row=1, column=2, sticky=tk.N)
+        self.about_block.grid(row=2, column=2)
+        self.back_btn.grid(row=3, column=2, sticky=tk.E)
+        self.report_bug_btn.grid(row=5, column=0, columnspan=4, pady=(0, 5))
 
 
 class VocabularyBlock(BaseFrame):
@@ -61,10 +68,12 @@ class VocabularyBlock(BaseFrame):
         self.checkbox_vars = []
         self.empty_msg = None
 
-        self.search_field = EntryField(self, placeholder_text=strings.SEARCH_PLACEHOLDER, width=170)
+        self.search_field = EntryField(self, placeholder_text=strings.SEARCH_PLACEHOLDER, width=170, validate=True,
+                                       max_chars=50)
         self.search_field.bind("<KeyRelease>", lambda event: self.on_entry_change())
         self.clear_btn = CTAButton(self, text=strings.CLEAR_BTN, width=50, height=28, state=tk.DISABLED,
-                                   command=lambda: [self.search_field.delete(0, 'end'), self.load_vocabulary(),
+                                   command=lambda: [self.search_field.delete(0, 'end'), self.enable_prev_next_buttons(),
+                                                    self.load_vocabulary(),
                                                     self.on_entry_change()])
         self.line = GreyLine(self, width=270)
         self.select_all_var = BooleanVar()
@@ -155,7 +164,7 @@ class VocabularyBlock(BaseFrame):
 
     def show_word_not_found(self, search_text):
         self.create_empty_rows()
-        self.empty_msg = CTkLabel(self, text=strings.NOT_FOUND.format(search_text))
+        self.empty_msg = CTkLabel(self, text=strings.NOT_FOUND.format(search_text), wraplength=250)
         self.empty_msg.grid(row=4, column=0, columnspan=2, rowspan=7)
         self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
         self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
@@ -225,7 +234,7 @@ class VocabularyBlock(BaseFrame):
                         placeholder_label = CTkLabel(self, text="0", text_color="#2b2b2b", height=18)
                         placeholder_label.grid(row=i + len(current_page_data) + 4, column=0, columnspan=2, pady=1,
                                                sticky=tk.EW)
-            self.page_label.configure(text=f"Page: {self.current_page}")
+            self.page_label.configure(text=f"Page: {self.current_page}/{self.total_pages}")
             self.display_master_checkbox()
 
     def update_select_all_checkbox(self, *args):
@@ -241,6 +250,10 @@ class VocabularyBlock(BaseFrame):
                                           variable=self.select_all_var,
                                           command=lambda: [self.toggle_select_all(), self.update_delete_button_state()])
         select_all_checkbox.grid(row=2, column=0, rowspan=2, padx=10, sticky=tk.W)
+
+    def enable_prev_next_buttons(self):
+        self.prev_button.configure(state=tk.NORMAL, fg_color="#246ba3")
+        self.next_button.configure(state=tk.NORMAL, fg_color="#246ba3")
 
     def clear_data_frame(self):
         self.checkboxes = []
@@ -338,7 +351,7 @@ class VocabularyBlock(BaseFrame):
 
 class AddWordsBlock(BaseFrame):
     def __init__(self, parent, controller, current_user):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 480, height=config.WINDOW_HEIGHT - 350)
+        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 350, height=config.WINDOW_HEIGHT - 350)
         self.parent = parent
         self.controller = controller
         self.current_user = current_user
@@ -347,15 +360,15 @@ class AddWordsBlock(BaseFrame):
 
         self.title = CTkLabel(self, text=strings.ADD_WORDS_HEADER, font=CTkFont("Arial", config.HEADER_FONT_SIZE,
                                                                                 weight="bold"))
-        self.hint = CTkLabel(self, text=strings.ADD_WORDS_HINT, wraplength=250, font=CTkFont("Arial", 12))
+        self.hint = CTkLabel(self, text=strings.ADD_WORDS_HINT, wraplength=350, font=CTkFont("Arial", 12))
         self.entry_field = EntryField(self, placeholder_text=strings.ADD_WORD, width=200)
         self.entry_field.bind("<KeyRelease>", lambda event: self.on_entry_change())
         self.add_btn = CTAButton(self, text=strings.ADD, width=50, height=28, state=tk.DISABLED, fg_color="#565b5e",
                                  command=lambda: self.add_word(self.entry_field.get().title()))
-        self.line = GreyLine(self, width=config.WINDOW_WIDTH - 500)
-        self.double_spelling = CTAButton(self, text=strings.DOUBLE_SPELLING_BTN, height=25,
+        self.line = GreyLine(self, width=400)
+        self.double_spelling = CTAButton(self, text=strings.DOUBLE_SPELLING_BTN, height=30,
                                          command=self.add_word_double_spelling)
-        self.double_spelling_hint = CTkLabel(self, text=strings.DOUBLE_SPELLING_HINT, wraplength=250,
+        self.double_spelling_hint = CTkLabel(self, text=strings.DOUBLE_SPELLING_HINT, wraplength=350,
                                              font=CTkFont("Arial", 12))
 
         # Display widgets and content blocks on the page
@@ -364,8 +377,8 @@ class AddWordsBlock(BaseFrame):
 
         self.title.grid(row=0, column=0, columnspan=2, pady=10)
         self.hint.grid(row=1, column=0, columnspan=2, pady=(0, 10))
-        self.entry_field.grid(row=2, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
-        self.add_btn.grid(row=2, column=0, columnspan=2, padx=(0, 40), sticky=tk.E)
+        self.entry_field.grid(row=2, column=0, columnspan=2, padx=(25, 0), sticky=tk.W)
+        self.add_btn.grid(row=2, column=1, columnspan=2, padx=10, sticky=tk.W)
         self.line.grid(row=3, column=0, columnspan=2, pady=10)
         self.double_spelling_hint.grid(row=4, column=0, columnspan=2)
         self.double_spelling.grid(row=5, column=0, columnspan=2, pady=(15, 0))
@@ -408,10 +421,11 @@ class AddWordsBlock(BaseFrame):
             success_message.after(3000, lambda: success_message.destroy())
 
     def show_success_message(self, word):
-        container = CTkFrame(self, width=250, height=45, border_width=3, border_color="#02732d")
-        validation_msg = CTkLabel(container, wraplength=200,
+        container = CTkFrame(self, width=400, height=50, border_width=2, border_color=config.GREEN, fg_color="white")
+        # container.grid_propagate(False)
+        validation_msg = CTkLabel(container, wraplength=350, width=400, height=50,
                                   text=f'The word "{word}" has been added to your vocabulary',
-                                  text_color="#02732d")
+                                  text_color="black")
         validation_msg.pack(padx=10, pady=10)
         return container
 
@@ -482,12 +496,12 @@ class AddWordsBlock(BaseFrame):
 
 class AboutBlock(BaseFrame):
     def __init__(self, parent, controller):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 480, height=config.WINDOW_HEIGHT - 450)
+        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 350, height=config.WINDOW_HEIGHT - 450)
         self.parent = parent
         self.controller = controller
         self.grid_propagate(False)
 
-        self.text = CTkLabel(self, text=strings.VOCAB_TUTORIAL_TEXT, wraplength=140, justify=tk.LEFT,
+        self.text = CTkLabel(self, text=strings.VOCAB_TUTORIAL_TEXT, wraplength=150, justify=tk.LEFT,
                              font=CTkFont(family="Arial", size=12))
         self.line = self.create_vertical_line()
         self.only_vocab_switch = CTkSwitch(self, text=strings.ONLY_VOCAB_SWITCH, onvalue=True, offvalue=False,

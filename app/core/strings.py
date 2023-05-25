@@ -83,6 +83,7 @@ ADD = "Add"
 SORT_BY = "Sort by: "
 SELECT_ALL = "Select all"
 TIMES_TO_SPELL = "Times to spell"
+TIMES_TO_SPELL_TOOLTIP = "The number of times you need to spell a word correctly\n for it to be considered learned"
 EMPTY_VOCAB_HEADER = "You don't have any words in your vocabulary yet"
 EMPTY_VOCAB_TEXT = "Start practicing spelling and words will automatically appear here. You can also add them manually."
 NOT_FOUND = "The word \"{}\" was not found"
@@ -147,6 +148,3 @@ phonetics = "English spelling can be inconsistent, but understanding basic phone
 
 SPELLING_TIPS = [listen, parts, silent, mnemonic, practice, context, proofread, proofread2, motivation, motivation2,
                  keep, bug, read, syllables, phonetics]
-
-# Tooltips
-TIMES_TO_SPELL_TOOLTIP = "Number of correct spellings to learn a word"

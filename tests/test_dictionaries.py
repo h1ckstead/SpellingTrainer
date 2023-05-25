@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 from app.core.dictionaries import Dictionaries
 from app.core.session import Session
-from core.config import TIMES_TO_SPELL_IF_CORRECT, TIMES_TO_SPELL_IF_INCORRECT
-from core.constants import TIMES_TO_SPELL, CORRECT, INCORRECT, ALREADY_EXISTS, AmE
+from app.core.config import TIMES_TO_SPELL_IF_CORRECT, TIMES_TO_SPELL_IF_INCORRECT
+from app.core.constants import TIMES_TO_SPELL, CORRECT, INCORRECT, ALREADY_EXISTS, AmE
 
 
 class LoadDictionaryTest(unittest.TestCase):
@@ -18,6 +18,11 @@ class LoadDictionaryTest(unittest.TestCase):
         self.assertIsNotNone(dictionaries.common_english_words)
         self.assertDictEqual(dictionaries.vocabulary, {})
         self.assertDictEqual(dictionaries.learned_words, {})
+
+    def test_dictionary_length(self):
+        dictionaries = Dictionaries()
+        self.assertEqual(len(dictionaries.commonly_misspelled), 474)
+        self.assertEqual(len(dictionaries.common_english_words), 6207)
 
 
 class VocabularyTest(unittest.TestCase):

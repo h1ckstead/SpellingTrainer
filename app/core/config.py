@@ -1,3 +1,5 @@
+VERSION = "0.7.0"
+
 # General
 APP_NAME = 'Spelling Trainer'
 APP_DESC = 'This is the app to drill correct spelling in you.'
@@ -23,5 +25,5 @@ GREEN = "#6bbe66"
 RED = "#ff4141"
 
 # Mac OS
-MAC_OS_VOICES = ['Daniel', 'Karen', 'Kate', 'Samantha', 'Serena']
+MAC_OS_VOICES = ['Daniel', 'Karen', 'Samantha']
 MAC_SAVE_FILE_PATH = '~/Library/Application Support/SpellingTrainer/savefile'

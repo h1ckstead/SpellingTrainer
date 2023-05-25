@@ -31,7 +31,8 @@ class RegistrationEditBlock(BaseFrame):
             self.strict_spelling_switch = StrictSpellingSwitch(self)
             self.strict_spelling_hint = HintLabel(self, text=strings.STRICT_SPELLING_HINT, wraplength=250)
 
-        self.title = Label(self, text=self.title_text, font=self.controller.title_font, background="#2b2b2b")
+        self.title = Label(self, text=self.title_text, font=self.controller.title_font, background="#2b2b2b",
+                           foreground="#FFFFFF")
         self.username_field_title = CTkLabel(self, text=strings.USERNAME_FIELD_TITLE,
                                              font=CTkFont(family="Arial", size=config.HEADER_FONT_SIZE))
         self.entry_var = StringVar()
@@ -109,10 +110,10 @@ class RegistrationEditBlock(BaseFrame):
                                                              width=3, outline='white')
         self.selected_avatar = image_name
 
-    @staticmethod
-    def update_strict_spelling(parent, current_user=None):
-        if current_user:
-            state = parent.strict_spelling.get()
-            current_user.toggle_strict_spelling(state)
-        # else:
-        #     pass  # TODO: Why do I need else, is this function used?
+    # @staticmethod
+    # def update_strict_spelling(parent, current_user=None):
+    #     if current_user:
+    #         state = parent.strict_spelling.get()
+    #         current_user.toggle_strict_spelling(state)
+    #     # else:
+    #     #     pass  # TODO: Why do I need else, is this function used?
