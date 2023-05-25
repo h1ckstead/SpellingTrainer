@@ -25,7 +25,7 @@ class BaseView(CTkFrame):
     def report_bug_btn(self):
         bug = CTkImage(Image.open(helpers.get_path('assets/bug.png')), size=(13, 13))
         button = CTkButton(self, text=strings.BUG_REPORT, text_color="#abb0b6", image=bug, compound=tk.LEFT,
-                           command=lambda: webbrowser.open("mailto:lazarevavictoria@gmail.com"))
+                           command=lambda: webbrowser.open("mailto:spellingtrainer@proton.me"))
         button.configure(width=90, height=20, font=CTkFont(None, 8), fg_color="transparent", hover_color="#212121")
         return button
 

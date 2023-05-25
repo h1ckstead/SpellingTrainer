@@ -28,6 +28,7 @@ class PracticePage(BaseView):
 
         # Create widgets and content blocks
         self.title_text = Label(self, text=strings.PRACTICE_PAGE_TITLE, font=self.controller.title_font,
+                                background="#333333", foreground="#FFFFFF",
                                 image=self.avatar, compound=tk.LEFT, padx=10)
         self.spelling_trainer_block = SpellingTrainerBlock(self, self.controller, self.current_user, self.session)
         self.session_history_block = SessionHistoryBlock(self, self.controller)

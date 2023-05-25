@@ -2,7 +2,7 @@ import tkinter as tk
 from _tkinter import TclError
 from tkinter import StringVar, Label, BooleanVar, messagebox
 
-from PIL import Image
+from PIL import Image, ImageTk
 from PIL.ImageTk import PhotoImage
 from customtkinter import CTkFrame, CTkComboBox, CTkFont, CTkImage, CTkLabel, CTkCheckBox, CTkButton, CTkSwitch, \
     CTkProgressBar, CTkToplevel
@@ -20,11 +20,15 @@ class VocabularyPage(BaseView):
         self.controller = controller
         self.previous_page = previous_page  # Profile Page
         self.current_user = current_user
-        self.avatar = PhotoImage(Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}")),
-                                 size=(60, 60))
+        # self.avatar = PhotoImage(Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}")),
+        #                          size=(60, 60))
+
+        avatar_image = Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}"))
+        avatar_image = avatar_image.resize((60, 60), Image.ANTIALIAS)
+        self.avatar = ImageTk.PhotoImage(avatar_image)
 
         # Create widgets and content blocks
-        self.title_text = Label(self, text=strings.VOCABULARY,
+        self.title_text = Label(self, text=strings.VOCABULARY, background="#333333", foreground="#FFFFFF",
                                 image=self.avatar,
                                 compound=tk.LEFT,
                                 font=self.controller.title_font)

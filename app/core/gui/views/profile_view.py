@@ -22,7 +22,8 @@ class ProfilePage(BaseView):
         self.session = session
 
         # Create widgets and content blocks
-        self.title_text = Label(self, text=strings.PROFILE_PAGE_TITLE, font=self.controller.title_font)
+        self.title_text = Label(self, text=strings.PROFILE_PAGE_TITLE, font=self.controller.title_font,
+                                background="#333333", foreground="#FFFFFF")
         self.user_block = UserBlock(self, self.controller, self.current_user)
         self.overall_statistics_block = StatisticsBlock(self, self.controller, current_user=self.current_user)
         self.session_statistics_block = StatisticsBlock(self, self.controller, session=self.session)

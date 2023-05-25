@@ -70,7 +70,9 @@ class WordGenerator:
             word = random.choice(list(self.user.dictionaries.common_english_words.keys()))
             word_dict = {word: self.user.dictionaries.common_english_words[word]}
         else:
+            logging.info(f"Went to else line 73 in function generate_word")
             word, word_dict = self.generate_random_word()
+            logging.info(f"Went to else line 75 in function generate_word")
         if self.user.strict_spelling and word_dict.get(word, {}).get(AmE):
             word_dict = self.pick_which_spelling(word, word_dict)
         logging.info(word_dict)
@@ -83,10 +85,15 @@ class WordGenerator:
         :return: dict containing word and definition
         """
         random_words = RandomWords()
+        logging.info(f"Created RandomWords instance")
         while True:
+            logging.info(f"Inside while True loop")
             word = random_words.random_word(min_letter_count=4).title()
+            logging.info(f"Generated random word: {word}")
             if not self.is_duplicate(word.title()):
+                logging.info(f"Checking if duplicate")
                 word_dict = {word: {DEFINITIONS: None}}  # TODO: Think about loading definition in the background
+                logging.info(f"Got word dict to return: {word_dict}")
                 return word, word_dict
 
     def is_duplicate(self, word):
@@ -119,6 +126,25 @@ class WordGenerator:
                                            weights=[4, 3, 1], k=1)
         logging.info(f'Word choice source: {choice_source}')
         return choice_source[0]
+
+    # def pick_dictionary(self):
+    #     """
+    #     Randomly chooses a dictionary from which to pick the next word. Each dictionary
+    #     has its own weight so some are more likely to get chosen than others.
+    #
+    #     :return: str containing dictionary name
+    #     """
+    #     if self.user.only_from_vocabulary:
+    #         return 'vocabulary'
+    #     choice_sources = self.get_non_empty_dicts()
+    #     if len(self.user.dictionaries.vocabulary) > 30:
+    #         choice_source = random.choices(['vocabulary'] + choice_sources,
+    #                                        weights=[4, 3, 2], k=1)
+    #     else:
+    #         choice_source = random.choices(choice_sources,
+    #                                        weights=[4, 3], k=1)
+    #     logging.info(f'Word choice source: {choice_source}')
+    #     return choice_source[0]
 
     def get_non_empty_dicts(self):
         """

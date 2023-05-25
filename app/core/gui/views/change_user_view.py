@@ -22,7 +22,8 @@ class ChangeUserPage(BaseView):
         self.saved_data = saved_data
         self.current_user = self.get_current_user()
 
-        self.title_text = Label(self, text=strings.CHANGE_USER_TITLE, font=self.controller.title_font)
+        self.title_text = Label(self, text=strings.CHANGE_USER_TITLE, font=self.controller.title_font,
+                                background="#333333", foreground="#FFFFFF")
 
         # Practice page is initialized here and not in the content block to avoid hover bug on Entry field
         self.practice_page = PracticePage(parent=self.parent, controller=self.controller,
