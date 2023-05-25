@@ -29,7 +29,7 @@ class VocabularyPage(BaseView):
 
         # Create widgets and content blocks
         self.title_text = Label(self, text=strings.VOCABULARY, background="#333333", foreground="#FFFFFF",
-                                image=self.avatar,
+                                image=self.avatar, padx=10,
                                 compound=tk.LEFT,
                                 font=self.controller.title_font)
         self.vocabulary_block = VocabularyBlock(self, controller=self.controller, current_user=self.current_user)
@@ -39,15 +39,18 @@ class VocabularyPage(BaseView):
         self.back_btn = CTAButton(self, text=strings.BACK_BUTTON_TEXT, command=lambda: self.previous_page.tkraise())
 
         # Display widgets and content blocks on the page
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(4, weight=1)
 
-        self.title_text.grid(row=0, column=0, columnspan=2, pady=(20, 15))
-        self.vocabulary_block.grid(row=1, column=0, rowspan=3)
-        self.add_words_block.grid(row=1, column=1, sticky=tk.N)
-        self.about_block.grid(row=2, column=1)
-        self.back_btn.grid(row=3, column=1, sticky=tk.E)
-        self.report_bug_btn.grid(row=4, column=0, columnspan=5, pady=(29, 0))
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(3, weight=1)
+
+        self.grid_rowconfigure(4, weight=1)
+
+        self.title_text.grid(row=0, column=0, columnspan=4, pady=(20, 15))
+        self.vocabulary_block.grid(row=1, column=1, rowspan=3, padx=10)
+        self.add_words_block.grid(row=1, column=2, sticky=tk.N)
+        self.about_block.grid(row=2, column=2)
+        self.back_btn.grid(row=3, column=2, sticky=tk.E)
+        self.report_bug_btn.grid(row=5, column=0, columnspan=4, pady=(0, 5))
 
 
 class VocabularyBlock(BaseFrame):
@@ -342,7 +345,7 @@ class VocabularyBlock(BaseFrame):
 
 class AddWordsBlock(BaseFrame):
     def __init__(self, parent, controller, current_user):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 480, height=config.WINDOW_HEIGHT - 350)
+        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 350, height=config.WINDOW_HEIGHT - 350)
         self.parent = parent
         self.controller = controller
         self.current_user = current_user
@@ -351,15 +354,15 @@ class AddWordsBlock(BaseFrame):
 
         self.title = CTkLabel(self, text=strings.ADD_WORDS_HEADER, font=CTkFont("Arial", config.HEADER_FONT_SIZE,
                                                                                 weight="bold"))
-        self.hint = CTkLabel(self, text=strings.ADD_WORDS_HINT, wraplength=250, font=CTkFont("Arial", 12))
+        self.hint = CTkLabel(self, text=strings.ADD_WORDS_HINT, wraplength=350, font=CTkFont("Arial", 12))
         self.entry_field = EntryField(self, placeholder_text=strings.ADD_WORD, width=200)
         self.entry_field.bind("<KeyRelease>", lambda event: self.on_entry_change())
         self.add_btn = CTAButton(self, text=strings.ADD, width=50, height=28, state=tk.DISABLED, fg_color="#565b5e",
                                  command=lambda: self.add_word(self.entry_field.get().title()))
-        self.line = GreyLine(self, width=config.WINDOW_WIDTH - 500)
-        self.double_spelling = CTAButton(self, text=strings.DOUBLE_SPELLING_BTN, height=25,
+        self.line = GreyLine(self, width=400)
+        self.double_spelling = CTAButton(self, text=strings.DOUBLE_SPELLING_BTN, height=30,
                                          command=self.add_word_double_spelling)
-        self.double_spelling_hint = CTkLabel(self, text=strings.DOUBLE_SPELLING_HINT, wraplength=250,
+        self.double_spelling_hint = CTkLabel(self, text=strings.DOUBLE_SPELLING_HINT, wraplength=350,
                                              font=CTkFont("Arial", 12))
 
         # Display widgets and content blocks on the page
@@ -368,8 +371,8 @@ class AddWordsBlock(BaseFrame):
 
         self.title.grid(row=0, column=0, columnspan=2, pady=10)
         self.hint.grid(row=1, column=0, columnspan=2, pady=(0, 10))
-        self.entry_field.grid(row=2, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
-        self.add_btn.grid(row=2, column=0, columnspan=2, padx=(0, 40), sticky=tk.E)
+        self.entry_field.grid(row=2, column=0, columnspan=2, padx=(25, 0), sticky=tk.W)
+        self.add_btn.grid(row=2, column=1, columnspan=2, padx=10, sticky=tk.W)
         self.line.grid(row=3, column=0, columnspan=2, pady=10)
         self.double_spelling_hint.grid(row=4, column=0, columnspan=2)
         self.double_spelling.grid(row=5, column=0, columnspan=2, pady=(15, 0))
@@ -486,12 +489,12 @@ class AddWordsBlock(BaseFrame):
 
 class AboutBlock(BaseFrame):
     def __init__(self, parent, controller):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 480, height=config.WINDOW_HEIGHT - 450)
+        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 350, height=config.WINDOW_HEIGHT - 450)
         self.parent = parent
         self.controller = controller
         self.grid_propagate(False)
 
-        self.text = CTkLabel(self, text=strings.VOCAB_TUTORIAL_TEXT, wraplength=140, justify=tk.LEFT,
+        self.text = CTkLabel(self, text=strings.VOCAB_TUTORIAL_TEXT, wraplength=150, justify=tk.LEFT,
                              font=CTkFont(family="Arial", size=12))
         self.line = self.create_vertical_line()
         self.only_vocab_switch = CTkSwitch(self, text=strings.ONLY_VOCAB_SWITCH, onvalue=True, offvalue=False,

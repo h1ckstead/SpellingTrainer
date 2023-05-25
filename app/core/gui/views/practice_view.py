@@ -325,7 +325,7 @@ class SessionHistoryBlock(BaseFrame):
         self.status_header.grid(row=0, column=0)
         self.header_text.grid(row=0, column=0, columnspan=3)
         self.times_to_spell_text.grid(row=0, column=1, columnspan=2, padx=(0, 15), sticky=tk.E)
-        self.filler_image.grid(row=0, column=3, rowspan=7, padx=(30, 0))
+        self.filler_image.grid(row=0, column=3, rowspan=7, sticky=tk.E)
 
         # Create empty rows initially
         for _ in range(6):

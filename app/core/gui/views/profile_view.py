@@ -47,7 +47,7 @@ class ProfilePage(BaseView):
         self.grid_rowconfigure(4, weight=1)
         self.grid_rowconfigure(7, weight=1)
 
-        self.title_text.grid(row=1, column=0, columnspan=6, pady=10)
+        self.title_text.grid(row=0, column=0, columnspan=6, pady=10)
         self.user_block.grid(row=2, column=1, rowspan=2, sticky=tk.N)
         self.overall_statistics_block.grid(row=2, column=2, columnspan=3, padx=10, sticky=tk.NSEW)
         self.session_statistics_block.grid(row=3, column=2, columnspan=3, padx=10, pady=(20, 0), sticky=tk.NSEW)
@@ -55,7 +55,7 @@ class ProfilePage(BaseView):
         self.horizontal_line.grid(row=5, column=0, columnspan=6, pady=30)
         self.back_to_main_btn.grid(row=6, column=1)
         self.close_button.grid(row=6, column=2, sticky=tk.W)
-        self.back_to_learning.grid(row=6, column=4, sticky=tk.E)
+        self.back_to_learning.grid(row=6, column=4, padx=(0, 15), sticky=tk.E)
         self.report_bug_btn.grid(row=8, column=0, columnspan=6, pady=(0, 5))
 
     def update_previous_and_raise(self):
