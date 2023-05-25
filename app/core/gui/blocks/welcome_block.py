@@ -12,7 +12,7 @@ from util import helpers
 
 class WelcomeBlock(BaseFrame):
     def __init__(self, parent, controller, last_user=None, saved_data=None, next_page=None):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 300, height=config.WINDOW_HEIGHT - 250)
+        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 100, height=config.WINDOW_HEIGHT - 250)
         self.parent = parent
         self.controller = controller
         self.last_user = last_user
@@ -33,8 +33,8 @@ class WelcomeBlock(BaseFrame):
             body_frame = CTkFrame(self)
             tip_icon = CTkImage(Image.open(helpers.get_path('assets/idea.png')), size=(20, 20))
             block_body = CTkLabel(body_frame, text=self.tip_of_the_day(), image=tip_icon, padx=5, compound=tk.LEFT,
-                                  wraplength=450, justify=tk.LEFT)
-            block_body.pack(pady=10)
+                                  wraplength=600, justify=tk.LEFT)
+            block_body.pack(pady=10, padx=5)
 
             self.grid_columnconfigure(0, weight=1)
             self.grid_columnconfigure(2, weight=1)

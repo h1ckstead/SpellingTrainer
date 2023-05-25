@@ -1,3 +1,5 @@
+VERSION = "0.7.0"
+
 # General
 APP_NAME = 'Spelling Trainer'
 APP_DESC = 'This is the app to drill correct spelling in you.'

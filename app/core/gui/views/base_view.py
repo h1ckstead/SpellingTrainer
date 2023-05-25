@@ -5,7 +5,7 @@ from PIL import Image
 from customtkinter import CTkLabel, CTkImage, CTkFrame, CTkFont, CTkButton
 
 from core import strings, config
-from core.gui.elements import Button, GreyLine
+from core.gui.elements import Button, GreyLine, HintLabel
 from util import helpers
 
 
@@ -19,7 +19,7 @@ class BaseView(CTkFrame):
         self.close_button = Button(self, text=strings.CLOSE, command=lambda: self.controller.destroy())
         self.pencil_icon = CTkLabel(self, text="",
                                     image=CTkImage(Image.open(helpers.get_path('assets/pencil.png')), size=(20, 20)))
-        self.horizontal_line = GreyLine(self, width=600)
+        self.horizontal_line = GreyLine(self, width=750)
 
     @property
     def report_bug_btn(self):

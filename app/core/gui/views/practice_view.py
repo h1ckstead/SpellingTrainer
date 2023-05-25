@@ -44,16 +44,19 @@ class PracticePage(BaseView):
 
         # Display widgets and content blocks on the page
         self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(4, weight=1)
+        self.grid_columnconfigure(5, weight=1)
 
-        self.title_text.grid(row=0, column=0, columnspan=5, pady=(20, 15))
-        self.spelling_trainer_block.grid(row=1, column=1, columnspan=2)
-        self.session_history_block.grid(row=2, column=2, columnspan=2, pady=(7, 20), sticky=tk.W)
-        self.definition_block.grid(row=1, column=2, columnspan=3, padx=(0, 90), sticky=tk.E)
-        self.back_to_main_btn.grid(row=3, column=1, columnspan=2, sticky=tk.W)
-        self.close_button.grid(row=3, column=2, sticky=tk.E)
-        self.finish_button.grid(row=3, column=3, sticky=tk.E)
-        self.report_bug_btn.grid(row=4, column=0, columnspan=5, pady=(48, 0))
+        self.grid_rowconfigure(3, weight=1)
+        self.grid_rowconfigure(5, weight=1)
+
+        self.title_text.grid(row=0, column=0, columnspan=6, pady=(10, 15))
+        self.spelling_trainer_block.grid(row=1, column=1, columnspan=2, sticky=tk.NW)
+        self.definition_block.grid(row=1, column=3, columnspan=2, sticky=tk.NE)
+        self.session_history_block.grid(row=2, column=2, columnspan=2, pady=(10, 20), sticky=tk.NSEW)
+        self.back_to_main_btn.grid(row=4, column=1, columnspan=2, sticky=tk.W)
+        self.close_button.grid(row=4, column=2, sticky=tk.E)
+        self.finish_button.grid(row=4, column=3, sticky=tk.E)
+        self.report_bug_btn.grid(row=6, column=0, columnspan=6, pady=(0, 5))
 
         # Create event listeners
         self.spelling_trainer_block.add_input_change_listener(self.session_history_block.update_user_input)
@@ -74,10 +77,11 @@ class PracticePage(BaseView):
 
 class SpellingTrainerBlock(BaseFrame):
     def __init__(self, parent, controller, current_user, session):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 500)
+        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 430)
         self.parent = parent
         self.controller = controller
         self.current_user = current_user
+        self.grid_propagate(False)
         self.word_generator = WordGenerator(current_user, self.handle_empty_vocabulary)
         self.spell_checker = SpellChecker(current_user)
         self.session = session
@@ -94,20 +98,20 @@ class SpellingTrainerBlock(BaseFrame):
         self.play_word_btn = self.create_play_sound_btn()
         self.volume_slider = self.create_volume_slider()
         self.spelling_hint = self.create_spelling_hint()
-        self.spellcheck_hint = HintLabel(self, text=strings.SPELLCHECK_HINT, wraplength=230)
+        self.spellcheck_hint = HintLabel(self, text=strings.SPELLCHECK_HINT, wraplength=250)
         self.word_entry = self.create_word_entry_field()
         self.spellcheck_btn = CTAButton(self, text=strings.CHECK, width=125, state=tk.DISABLED,
                                         command=lambda: [self.perform_spellcheck(), self.word_entry.delete(0, 'end'),
                                                          self.new_word(), self.after(1000, self.say_word)])
 
         # Display widgets and content blocks on the page
-        self.play_word_btn.grid(row=0, column=0, padx=10, pady=(10, 0), sticky=tk.W)
+        self.play_word_btn.grid(row=0, column=0, padx=20, pady=(10, 0), sticky=tk.W)
         self.volume_slider.grid(row=0, column=1, columnspan=3, padx=(0, 40), sticky=tk.W)
         self.grid_rowconfigure(1, minsize=29)  # placeholder for Br/Am spelling hint
-        self.word_entry.grid(row=2, column=0, columnspan=3, padx=(10, 43), sticky=tk.W)
-        self.spellcheck_hint.grid(row=3, column=0, columnspan=3, padx=4, pady=(0, 10), sticky=tk.W)
-        self.spellcheck_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=(0, 21), sticky=tk.W)
-        # self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(10, 0), sticky=tk.W)
+        self.word_entry.grid(row=2, column=0, columnspan=3, padx=20, sticky=tk.W)
+        self.spellcheck_hint.grid(row=3, column=0, columnspan=3, padx=10, pady=5, sticky=tk.W)
+        self.spellcheck_btn.grid(row=4, column=0, columnspan=2, padx=20, pady=15, sticky=tk.W)
+        # self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
 
     def create_spelling_hint(self):
         attention_img = CTkImage(Image.open(helpers.get_path('assets/attention.png')), size=(15, 15))
@@ -192,7 +196,7 @@ class SpellingTrainerBlock(BaseFrame):
             validation_msg = self.show_empty_word_string_message()
         else:
             validation_msg = CTkLabel(self, text=strings.UNKNOWN)
-        validation_msg.grid(row=4, column=2, padx=(0, 5), sticky=tk.NW)
+        validation_msg.grid(row=4, column=2, padx=(0, 5), sticky=tk.W)
         validation_msg.after(2000, lambda: validation_msg.destroy())
 
     def show_empty_word_string_message(self):
@@ -299,9 +303,10 @@ class SpellingTrainerBlock(BaseFrame):
 
 class SessionHistoryBlock(BaseFrame):
     def __init__(self, parent, controller):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 500)
+        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 50)
         self.parent = parent
         self.controller = controller
+        self.grid_propagate(False)
         self.statuses = []
         self.status_labels = []
         self.corrections = []
@@ -315,12 +320,15 @@ class SessionHistoryBlock(BaseFrame):
                                                                                     weight="bold"))
         self.times_to_spell_text = CTkLabel(self, text=strings.TIMES_TO_SPELL_HEADER)
         self.times_to_spell_tooltip = CustomToolTip(self.times_to_spell_text, msg=strings.TIMES_TO_SPELL)
-        self.status_header.grid(row=0, column=0, padx=(0, 39))
+        self.filler_image = CTkLabel(self, text="", image=self.cat_image())
+
+        self.status_header.grid(row=0, column=0)
         self.header_text.grid(row=0, column=0, columnspan=3)
         self.times_to_spell_text.grid(row=0, column=1, columnspan=2, padx=(0, 15), sticky=tk.E)
+        self.filler_image.grid(row=0, column=3, rowspan=7, padx=(30, 0))
 
         # Create empty rows initially
-        for _ in range(5):
+        for _ in range(6):
             status_label = CTkLabel(self, text="")
             correction_label = CTkLabel(self, text="")
             times_to_spell_label = CTkLabel(self, text="")
@@ -331,12 +339,16 @@ class SessionHistoryBlock(BaseFrame):
         # Display the rows
         for i, (status_label, correction_label, times_to_spell_label) in \
                 enumerate(zip(self.status_labels, self.correction_labels, self.times_to_spell_labels), start=1):
-            status_label.grid(row=i, column=0, sticky=tk.W, padx=10)
+            status_label.grid(row=i, column=0, sticky=tk.W, padx=20)
             correction_label.grid(row=i, column=1, sticky=tk.W)
             times_to_spell_label.grid(row=i, column=1, columnspan=2, padx=(0, 15), sticky=tk.E)
             self.grid_columnconfigure(0, minsize=100)
-            self.grid_columnconfigure(1, minsize=478)
-            self.grid_columnconfigure(2, minsize=40)
+            self.grid_columnconfigure(1, minsize=300)
+            self.grid_columnconfigure(2, minsize=100)
+
+    @staticmethod
+    def cat_image():
+        return CTkImage(Image.open(helpers.get_path(f'assets/cat.png')), size=(200, 200))
 
     def update_user_input(self, word_dict, user_word, status):
         self.statuses.append(status)
@@ -347,7 +359,7 @@ class SessionHistoryBlock(BaseFrame):
                 self.parent.current_user.dictionaries.vocabulary[list(word_dict.keys())[0]][constants.TIMES_TO_SPELL])
         except KeyError:
             self.times_to_spell.append("Learned")
-        self.statuses = self.statuses[-5:]  # Limit the list size to 5
+        self.statuses = self.statuses[-6:]  # Limit the list size to 5
 
         # Update the displayed rows
         for i, (status, correction, times_to_spell) in enumerate(zip(self.status_labels, self.correction_labels,
@@ -369,7 +381,7 @@ class SessionHistoryBlock(BaseFrame):
 
 class DefinitionBlock(BaseFrame):
     def __init__(self, parent, controller):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 491)
+        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 430)
         self.parent = parent
         self.controller = controller
         self.scroll = None
@@ -378,9 +390,9 @@ class DefinitionBlock(BaseFrame):
         # Create widgets and content blocks
         self.show_definition_btn = CTAButton(self, text=strings.SHOW_DEFINITION, command=self.show_definition,
                                              state=tk.DISABLED, width=120)
-        self.definition_hint = HintLabel(self, text=strings.DEFINITION_HINT, wraplength=120, padx=10)
+        self.definition_hint = HintLabel(self, text=strings.DEFINITION_HINT, wraplength=220, padx=10)
         self.definition_header = CTkLabel(self, text=strings.DEFINITION_HEADER, font=CTkFont(weight="bold"))
-        self.horizontal_line = GreyLine(self, width=260)
+        self.horizontal_line = GreyLine(self, width=345)
         self.pencil_icon = CTkLabel(self, text="",
                                     image=CTkImage(Image.open(helpers.get_path('assets/pencil.png')), size=(20, 20)))
         self.definition_field = self.create_definition_field()
@@ -396,7 +408,7 @@ class DefinitionBlock(BaseFrame):
         self.horizontal_line.grid(row=2, column=0, columnspan=3, padx=(10, 0), pady=(0, 10), sticky=tk.NW)
 
     def create_definition_field(self):
-        definition_field = Text(self, height=6, width=32, background="#333333", cursor='arrow', wrap="word",
+        definition_field = Text(self, height=6, width=42, background="#333333", cursor='arrow', wrap="word",
                                 borderwidth=0, relief="flat", font=(None, 12))
         definition_field.tag_config("bold", font=CTkFont(None, 12, "bold"))
         return definition_field

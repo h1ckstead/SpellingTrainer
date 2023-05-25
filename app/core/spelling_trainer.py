@@ -25,7 +25,7 @@ class SpellingTrainerApp(CTk):
         self.title_font = CTkFont(family="Arial", size=config.TITLE_FONT_SIZE, weight="bold")
         self.font = CTkFont(family="Arial", size=config.FONT_SIZE)
         self.geometry(f'{config.WINDOW_WIDTH}x{config.WINDOW_HEIGHT}+{self.center_x()}+{self.center_y()}')
-        self.resizable(False, False)
+        # self.resizable(False, False)
         customtkinter.set_appearance_mode("dark")
 
         self.create_menu()
@@ -59,20 +59,22 @@ class SpellingTrainerApp(CTk):
         file_menu.add_command(label="Report a bug", command=lambda: webbrowser.open("mailto:spellingtrainer@proton.me"))
         file_menu.add_command(label="Donate", command=self.open_donate_page)
         file_menu.add_command(label="About", command=self.show_info)
-
         menu_bar.add_cascade(label="Help", menu=file_menu)
 
         # Configure the root window to use the menu bar
         self.configure(menu=menu_bar)
 
-    def show_info(self):
+    @staticmethod
+    def show_info():
         messagebox.showinfo(message="Copyright (C) 2023 Victoria Lazareva.\n\n"
+                                    f"Version: {config.VERSION}\n\n"
                             "Spelling Trainer is free software\n\n"
                             "Credits:\n"
-                            "App logo by Vecteezy\n"
+                            "Logo by Vecteezy\n"
                             "Avatars by Freepik\n"
                             "Icons by Uxwing\n"
                             )
 
-    def open_donate_page(self):
+    @staticmethod
+    def open_donate_page():
         webbrowser.open('https://example.com/donate')
