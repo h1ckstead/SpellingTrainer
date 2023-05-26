@@ -37,7 +37,6 @@ class PlayButton(CTkLabel):
         CTkLabel.__init__(self, parent, **kwargs)
         self.normal = CTkImage(Image.open(helpers.get_path("assets", "play.png")), size=(40, 40))
         self.hovered = CTkImage(Image.open(helpers.get_path("assets", "play-dark.png")), size=(40, 40))
-        self.disabled = CTkImage(Image.open(helpers.get_path("assets", "play-disabled.png")), size=(40, 40))
 
         self.configure(image=self.normal, text="")
         self.bind("<Enter>", self.on_enter)  # Bind hover enter event
