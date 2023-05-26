@@ -11,41 +11,6 @@ class WordGenerator:
         self.user = user
         self.callback = callback
 
-    # def generate_word(self):
-    #     """
-    #     Retrieves one random word for practice from one of the existing dictionaries or
-    #     generates a random word.
-    #
-    #     :return: dictionary containing a word and its definition
-    #     """
-    #     if self.user.only_from_vocabulary:
-    #         choice_source = 'users_vocabulary'
-    #     else:
-    #         choice_source = self.pick_dictionary()
-    #     logging.info(f"Randomly picking a word from {choice_source}")
-    #     if choice_source == 'users_vocabulary':
-    #         users_vocabulary_list = list(self.user.dictionaries.vocabulary.keys())
-    #         word = users_vocabulary_list[random.randrange(0, len(users_vocabulary_list))]
-    #         word_dict = {word: self.user.dictionaries.vocabulary[word]}
-    #         if self.user.strict_spelling and AmE in word_dict[word].keys():
-    #             word_dict = self.pick_which_spelling(word, word_dict)
-    #     elif choice_source == 'commonly_misspelled':
-    #         commonly_misspelled_list = list(self.user.dictionaries.commonly_misspelled.keys())
-    #         word = commonly_misspelled_list[random.randrange(0, len(commonly_misspelled_list))]
-    #         word_dict = {word: self.user.dictionaries.commonly_misspelled[word]}
-    #         if self.user.strict_spelling and AmE in word_dict[word].keys():
-    #             word_dict = self.pick_which_spelling(word, word_dict)
-    #     elif choice_source == 'common_english':
-    #         common_english_words_list = list(self.user.dictionaries.common_english_words.keys())
-    #         word = common_english_words_list[random.randrange(0, len(common_english_words_list))]
-    #         word_dict = {word: self.user.dictionaries.common_english_words[word]}
-    #         if self.user.strict_spelling and AmE in word_dict[word].keys():
-    #             word_dict = self.pick_which_spelling(word, word_dict)
-    #     else:
-    #         word_dict = self.generate_random_word()
-    #     logging.info(word_dict)
-    #     return word_dict
-
     def generate_word(self):
         """
         Retrieves one random word for practice from one of the existing dictionaries or
@@ -53,8 +18,6 @@ class WordGenerator:
 
         :return: dictionary containing a word and its definition
         """
-        word_dict = "empty_vocab"
-        word = ""
         choice_source = self.pick_dictionary()
         logging.info(f"Randomly picking a word from {choice_source}")
         if choice_source == 'vocabulary':
@@ -63,6 +26,7 @@ class WordGenerator:
                 word_dict = {word: self.user.dictionaries.vocabulary[word]}
             except IndexError:
                 self.callback()
+                return
         elif choice_source == 'commonly_misspelled':
             word = random.choice(list(self.user.dictionaries.commonly_misspelled.keys()))
             word_dict = {word: self.user.dictionaries.commonly_misspelled[word]}

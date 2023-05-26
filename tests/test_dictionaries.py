@@ -19,6 +19,11 @@ class LoadDictionaryTest(unittest.TestCase):
         self.assertDictEqual(dictionaries.vocabulary, {})
         self.assertDictEqual(dictionaries.learned_words, {})
 
+    def test_dictionary_length(self):
+        dictionaries = Dictionaries()
+        self.assertEqual(len(dictionaries.commonly_misspelled), 474)
+        self.assertEqual(len(dictionaries.common_english_words), 6207)
+
 
 class VocabularyTest(unittest.TestCase):
     def setUp(self):

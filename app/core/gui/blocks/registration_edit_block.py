@@ -110,10 +110,10 @@ class RegistrationEditBlock(BaseFrame):
                                                              width=3, outline='white')
         self.selected_avatar = image_name
 
-    @staticmethod
-    def update_strict_spelling(parent, current_user=None):
-        if current_user:
-            state = parent.strict_spelling.get()
-            current_user.toggle_strict_spelling(state)
-        # else:
-        #     pass  # TODO: Why do I need else, is this function used?
+    # @staticmethod
+    # def update_strict_spelling(parent, current_user=None):
+    #     if current_user:
+    #         state = parent.strict_spelling.get()
+    #         current_user.toggle_strict_spelling(state)
+    #     # else:
+    #     #     pass  # TODO: Why do I need else, is this function used?

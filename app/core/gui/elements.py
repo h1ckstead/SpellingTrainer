@@ -37,6 +37,7 @@ class PlayButton(CTkLabel):
         CTkLabel.__init__(self, parent, **kwargs)
         self.normal = CTkImage(Image.open(helpers.get_path("assets", "play.png")), size=(40, 40))
         self.hovered = CTkImage(Image.open(helpers.get_path("assets", "play-dark.png")), size=(40, 40))
+        self.disabled = CTkImage(Image.open(helpers.get_path("assets", "play-disabled.png")), size=(40, 40))
 
         self.configure(image=self.normal, text="")
         self.bind("<Enter>", self.on_enter)  # Bind hover enter event
@@ -50,14 +51,14 @@ class PlayButton(CTkLabel):
 
 
 class EntryField(CTkEntry):
-    def __init__(self, parent, text=None, placeholder_text=None, width=250, validate=False, **kwargs):
+    def __init__(self, parent, text=None, placeholder_text=None, width=250, validate=False, max_chars=20, **kwargs):
         super().__init__(parent, placeholder_text=placeholder_text, width=width, **kwargs)
         if text:
             self.insert(0, text)
         if not placeholder_text:
             self.focus_set()
         if validate:
-            self.configure(validate="key", validatecommand=(self.register(lambda s: len(s) <= 20), '%P'))
+            self.configure(validate="key", validatecommand=(self.register(lambda s: len(s) <= max_chars), '%P'))
 
 
 class StrictSpellingSwitch(CTkSwitch):

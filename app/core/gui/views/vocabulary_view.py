@@ -68,10 +68,12 @@ class VocabularyBlock(BaseFrame):
         self.checkbox_vars = []
         self.empty_msg = None
 
-        self.search_field = EntryField(self, placeholder_text=strings.SEARCH_PLACEHOLDER, width=170)
+        self.search_field = EntryField(self, placeholder_text=strings.SEARCH_PLACEHOLDER, width=170, validate=True,
+                                       max_chars=50)
         self.search_field.bind("<KeyRelease>", lambda event: self.on_entry_change())
         self.clear_btn = CTAButton(self, text=strings.CLEAR_BTN, width=50, height=28, state=tk.DISABLED,
-                                   command=lambda: [self.search_field.delete(0, 'end'), self.load_vocabulary(),
+                                   command=lambda: [self.search_field.delete(0, 'end'), self.enable_prev_next_buttons(),
+                                                    self.load_vocabulary(),
                                                     self.on_entry_change()])
         self.line = GreyLine(self, width=270)
         self.select_all_var = BooleanVar()
@@ -162,7 +164,7 @@ class VocabularyBlock(BaseFrame):
 
     def show_word_not_found(self, search_text):
         self.create_empty_rows()
-        self.empty_msg = CTkLabel(self, text=strings.NOT_FOUND.format(search_text))
+        self.empty_msg = CTkLabel(self, text=strings.NOT_FOUND.format(search_text), wraplength=250)
         self.empty_msg.grid(row=4, column=0, columnspan=2, rowspan=7)
         self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
         self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
@@ -232,7 +234,7 @@ class VocabularyBlock(BaseFrame):
                         placeholder_label = CTkLabel(self, text="0", text_color="#2b2b2b", height=18)
                         placeholder_label.grid(row=i + len(current_page_data) + 4, column=0, columnspan=2, pady=1,
                                                sticky=tk.EW)
-            self.page_label.configure(text=f"Page: {self.current_page}")
+            self.page_label.configure(text=f"Page: {self.current_page}/{self.total_pages}")
             self.display_master_checkbox()
 
     def update_select_all_checkbox(self, *args):
@@ -248,6 +250,10 @@ class VocabularyBlock(BaseFrame):
                                           variable=self.select_all_var,
                                           command=lambda: [self.toggle_select_all(), self.update_delete_button_state()])
         select_all_checkbox.grid(row=2, column=0, rowspan=2, padx=10, sticky=tk.W)
+
+    def enable_prev_next_buttons(self):
+        self.prev_button.configure(state=tk.NORMAL, fg_color="#246ba3")
+        self.next_button.configure(state=tk.NORMAL, fg_color="#246ba3")
 
     def clear_data_frame(self):
         self.checkboxes = []
@@ -415,10 +421,11 @@ class AddWordsBlock(BaseFrame):
             success_message.after(3000, lambda: success_message.destroy())
 
     def show_success_message(self, word):
-        container = CTkFrame(self, width=250, height=45, border_width=3, border_color="#02732d")
-        validation_msg = CTkLabel(container, wraplength=200,
+        container = CTkFrame(self, width=400, height=50, border_width=2, border_color=config.GREEN, fg_color="white")
+        # container.grid_propagate(False)
+        validation_msg = CTkLabel(container, wraplength=350, width=400, height=50,
                                   text=f'The word "{word}" has been added to your vocabulary',
-                                  text_color="#02732d")
+                                  text_color="black")
         validation_msg.pack(padx=10, pady=10)
         return container
 
