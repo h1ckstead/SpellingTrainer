@@ -24,9 +24,13 @@ jobs:
       
       - name: Test with unittest
         run: |
+          echo "Current directory:"
           pwd
+          echo "ls:"
           ls
+          echo "cd.."
           cd ..
+          echo "another ls:"
           ls
           echo $PYTHONPATH
           export PYTHONPATH=/home/runner/work/SpellingTrainer/SpellingTrainer/app:$PYTHONPATH
