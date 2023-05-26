@@ -1,23 +1,21 @@
 import logging
-from tkinter import ttk, messagebox
+import platform
 import tkinter as tk
+import webbrowser
+from tkinter import messagebox
 
 import customtkinter
 from customtkinter import CTk, CTkFont, CTkFrame
 
-import util.load_savefile as load_savefile
 from core import config
 from core.gui.views.main_view import MainPage
 from core.gui.views.welcome_view import WelcomePage
 from util import helpers
-import platform
-import webbrowser
 
 
 class SpellingTrainerApp(CTk):
     def __init__(self, *args, **kwargs):
         CTk.__init__(self, *args, **kwargs)
-        # self.iconbitmap("path_to_your_icon.ico") <-- Icon
         logging.debug("Initializing top level window")
         if platform.system() == 'Windows':
             self.iconbitmap(helpers.get_path("assets", "favicon.ico"))
@@ -25,7 +23,6 @@ class SpellingTrainerApp(CTk):
         self.title_font = CTkFont(family="Arial", size=config.TITLE_FONT_SIZE, weight="bold")
         self.font = CTkFont(family="Arial", size=config.FONT_SIZE)
         self.geometry(f'{config.WINDOW_WIDTH}x{config.WINDOW_HEIGHT}+{self.center_x()}+{self.center_y()}')
-        # self.resizable(False, False)
         customtkinter.set_appearance_mode("dark")
 
         self.create_menu()
@@ -36,7 +33,7 @@ class SpellingTrainerApp(CTk):
         mainframe.grid_rowconfigure(0, weight=1)
         mainframe.grid_columnconfigure(0, weight=1)
 
-        saved_data = load_savefile.load_save()
+        saved_data = helpers.load_save()
         logging.debug(f"Loaded savefile: {saved_data}")
         if saved_data is None:
             WelcomePage(parent=mainframe, controller=self).tkraise()
@@ -68,11 +65,11 @@ class SpellingTrainerApp(CTk):
     def show_info():
         messagebox.showinfo(message="Copyright (C) 2023 Victoria Lazareva.\n\n"
                                     f"Version: {config.VERSION}\n\n"
-                            "Spelling Trainer is free software\n\n"
-                            "Credits:\n"
-                            "Logo by Vecteezy\n"
-                            "Avatars by Freepik\n"
-                            "Icons by Uxwing\n"
+                                    "Spelling Trainer is free software\n\n"
+                                    "Credits:\n"
+                                    "Logo by Vecteezy\n"
+                                    "Avatars by Freepik\n"
+                                    "Icons by Uxwing\n"
                             )
 
     @staticmethod

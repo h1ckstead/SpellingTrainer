@@ -36,10 +36,6 @@ class ProfilePage(BaseView):
                                        command=lambda: self.main_page.tkraise())
         self.back_to_learning = CTAButton(self, text=strings.BACK_TO_LEARNING, image=self.learn_button_image,
                                           compound="left", command=self.update_previous_and_raise)
-        # self.line = GreyLine(self, width=650)
-        self.pencil_icon = CTkLabel(self, text="",
-                                    image=CTkImage(Image.open(helpers.get_path('assets/pencil.png')), size=(30, 30)))
-
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(5, weight=1)
 

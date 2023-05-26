@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 from app.core.dictionaries import Dictionaries
 from app.core.session import Session
-from core.config import TIMES_TO_SPELL_IF_CORRECT, TIMES_TO_SPELL_IF_INCORRECT
-from core.constants import TIMES_TO_SPELL, CORRECT, INCORRECT, ALREADY_EXISTS, AmE
+from app.core.config import TIMES_TO_SPELL_IF_CORRECT, TIMES_TO_SPELL_IF_INCORRECT
+from app.core.constants import TIMES_TO_SPELL, CORRECT, INCORRECT, ALREADY_EXISTS, AmE
 
 
 class LoadDictionaryTest(unittest.TestCase):

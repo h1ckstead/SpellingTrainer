@@ -8,6 +8,7 @@ from core.spelling_trainer import SpellingTrainerApp
 
 if __name__ == '__main__':
     log_file = "SpellingTrainer.log"
+    log_dir = ""
 
     if os.name == 'posix':  # macOS or Linux
         username = getpass.getuser()

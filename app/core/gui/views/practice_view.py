@@ -5,6 +5,7 @@ from tkinter import Text, Label, BooleanVar
 from PIL import Image
 from PIL.ImageTk import PhotoImage
 from customtkinter import CTkFrame, CTkLabel, CTkImage, CTkSlider, CTkFont, CTkScrollbar, CTkToplevel, CTkSwitch
+from tktooltip import ToolTip
 
 from core import config, strings, constants
 from core.gui.elements import Button, CTAButton, HintLabel, EntryField, GreyLine, CustomToolTip, PlayButton
@@ -236,7 +237,7 @@ class SpellingTrainerBlock(BaseFrame):
         speech.say(word, self.volume_slider.get())
 
     def new_word(self):
-        self.spelling_hint.forget()
+        self.spelling_hint.grid_forget()
         self.word_dict = self.word_generator.generate_word()
         word = list(self.word_dict.keys())[0]
         if constants.SPELLING in self.word_dict[word].keys():
@@ -332,7 +333,7 @@ class SessionHistoryBlock(BaseFrame):
         self.header_text = CTkLabel(self, text=strings.HISTORY_HEADER, font=CTkFont("Arial", config.HEADER_FONT_SIZE,
                                                                                     weight="bold"))
         self.times_to_spell_text = CTkLabel(self, text=strings.TIMES_TO_SPELL_HEADER)
-        self.times_to_spell_tooltip = CustomToolTip(self.times_to_spell_text, msg=strings.TIMES_TO_SPELL)
+        self.times_to_spell_tooltip = ToolTip(self.times_to_spell_text, msg=strings.TIMES_TO_SPELL_TOOLTIP)
         self.filler_image = CTkLabel(self, text="", image=self.cat_image())
 
         self.status_header.grid(row=0, column=0)
@@ -406,8 +407,6 @@ class DefinitionBlock(BaseFrame):
         self.definition_hint = HintLabel(self, text=strings.DEFINITION_HINT, wraplength=220, padx=10)
         self.definition_header = CTkLabel(self, text=strings.DEFINITION_HEADER, font=CTkFont(weight="bold"))
         self.horizontal_line = GreyLine(self, width=345)
-        self.pencil_icon = CTkLabel(self, text="",
-                                    image=CTkImage(Image.open(helpers.get_path('assets/pencil.png')), size=(20, 20)))
         self.definition_field = self.create_definition_field()
 
         # Display widgets and content blocks on the page
