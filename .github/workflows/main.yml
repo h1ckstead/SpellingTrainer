@@ -22,12 +22,14 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       
-      - name: Test with unittest
-        run: |
-          export PYTHONPATH=/home/runner/work/SpellingTrainer/app:$PYTHONPATH
-          python -m unittest
       - name: Debug information
         run: |
+          export PYTHONPATH=/home/runner/work/SpellingTrainer/app:$PYTHONPATH
           echo "Current directory: $(pwd)"
           echo "PYTHONPATH: $PYTHONPATH"
+      
+      - name: Test with unittest
+        run: |
+          python -m unittest
+
 
