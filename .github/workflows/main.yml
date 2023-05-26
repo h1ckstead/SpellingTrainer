@@ -16,11 +16,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-          
-      - name: Create and activate virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
       
       - name: Install dependencies
         run: |
@@ -31,4 +26,8 @@ jobs:
         run: |
           export PYTHONPATH=/home/runner/work/SpellingTrainer/app:$PYTHONPATH
           python -m unittest
+      - name: Debug information
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "PYTHONPATH: $PYTHONPATH"
 
