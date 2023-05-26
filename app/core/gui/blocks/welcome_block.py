@@ -52,6 +52,9 @@ class WelcomeBlock(BaseFrame):
                                         command=lambda: self.next_page.tkraise())
             self.block_body = CTkLabel(self, text=strings.WELCOME_PAGE_TEXT, wraplength=400, justify=tk.LEFT)
 
+            self.grid_columnconfigure(0, weight=1)
+            self.grid_columnconfigure(2, weight=1)
+
             self.title.grid(row=0, column=0, columnspan=3, padx=15, pady=15)
             self.block_body.grid(row=1, column=0, columnspan=3)
             self.cta_button.grid(row=2, column=1, pady=(25, 0))

@@ -17,8 +17,6 @@ class BaseView(CTkFrame):
         self.grid(row=0, column=0, sticky=tk.NSEW)
 
         self.close_button = Button(self, text=strings.CLOSE, command=lambda: self.controller.destroy())
-        self.pencil_icon = CTkLabel(self, text="",
-                                    image=CTkImage(Image.open(helpers.get_path('assets/pencil.png')), size=(20, 20)))
         self.horizontal_line = GreyLine(self, width=750)
 
     @property

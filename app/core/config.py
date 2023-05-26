@@ -25,5 +25,5 @@ GREEN = "#6bbe66"
 RED = "#ff4141"
 
 # Mac OS
-MAC_OS_VOICES = ['Daniel', 'Karen', 'Kate', 'Samantha', 'Serena']
+MAC_OS_VOICES = ['Daniel', 'Karen', 'Kate', 'Samantha']
 MAC_SAVE_FILE_PATH = '~/Library/Application Support/SpellingTrainer/savefile'
