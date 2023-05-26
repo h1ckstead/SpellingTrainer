@@ -24,7 +24,7 @@ jobs:
       
       - name: Test with unittest
         run: |
-          export PYTHONPATH=/home/runner/work/SpellingTrainer/SpellingTrainer:$PYTHONPATH
+          export PYTHONPATH=/home/runner/work/SpellingTrainer/SpellingTrainer/app:$PYTHONPATH
           python -m unittest
 
 
