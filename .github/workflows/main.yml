@@ -24,10 +24,11 @@ jobs:
       
       - name: Test with unittest
         run: |
-          echo pwd
-          echo ls
+          pwd
+          ls
           cd ..
-          echo ls
+          ls
+          echo $PYTHONPATH
           export PYTHONPATH=/home/runner/work/SpellingTrainer/SpellingTrainer/app:$PYTHONPATH
           python -m unittest
 
