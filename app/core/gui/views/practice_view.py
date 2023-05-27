@@ -420,8 +420,8 @@ class DefinitionBlock(BaseFrame):
         self.horizontal_line.grid(row=2, column=0, columnspan=3, padx=(10, 0), pady=(0, 10), sticky=tk.NW)
 
     def create_definition_field(self):
-        definition_field = Text(self, height=6, width=42, background="#333333", cursor='arrow', wrap="word",
-                                borderwidth=0, relief="flat", font=(None, 12))
+        definition_field = Text(self, height=6, width=42, background="#333333", foreground="#FFFFFF",
+                                cursor='arrow', wrap="word", highlightthickness=0, font=(None, 12))
         definition_field.tag_config("bold", font=CTkFont(None, 12, "bold"))
         return definition_field
 
