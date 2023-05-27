@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 from random_words import RandomWords
 
-from app.core.user import User
-from app.core.word_generator import WordGenerator
+from core.user import User
+from core.word_generator import WordGenerator
 from core.constants import SPELLING, AmE, BrE, DEFINITIONS, TIMES_TO_SPELL
 
 
@@ -104,22 +104,22 @@ class TestWordGenerator(unittest.TestCase):
         }
         self.word_generator = WordGenerator(self.user, callback=None)
 
-    @patch("app.core.word_generator.WordGenerator.pick_dictionary", return_value='commonly_misspelled')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='commonly_misspelled')
     def test_commonly_misspelled(self, mock_pick_dictionary):
         word_dict = self.word_generator.generate_word()
         self.assertIn(list(word_dict.keys())[0], self.user.dictionaries.commonly_misspelled.keys())
 
-    @patch("app.core.word_generator.WordGenerator.pick_dictionary", return_value='common_english')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='common_english')
     def test_common_english(self, mock_pick_dictionary):
         word_dict = self.word_generator.generate_word()
         self.assertIn(list(word_dict.keys())[0], self.user.dictionaries.common_english_words)
 
-    @patch("app.core.word_generator.WordGenerator.pick_dictionary", return_value='vocabulary')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='vocabulary')
     def test_users_vocabulary(self, mock_pick_dictionary):
         word_dict = self.word_generator.generate_word()
         self.assertIn(list(word_dict.keys())[0], self.user.dictionaries.vocabulary)
 
-    @patch("app.core.word_generator.WordGenerator.pick_dictionary", return_value='random')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='random')
     def test_random_word(self, pick_dictionary):
         word_dict = self.word_generator.generate_word()
         word = list(word_dict.keys())[0]
@@ -147,16 +147,16 @@ class TestWordGeneratorStrictSpelling(unittest.TestCase):
         }
         self.word_generator = WordGenerator(self.user, callback=None)
 
-    @patch("app.core.word_generator.WordGenerator.pick_which_spelling")
+    @patch("core.word_generator.WordGenerator.pick_which_spelling")
     @patch("random.choice", return_value="Appetite")
-    @patch("app.core.word_generator.WordGenerator.pick_dictionary", return_value='common_english')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='common_english')
     def test_strict_spelling_word(self, mock_pick_dictionary, mock_randrange, pick_which_spelling):
         self.word_generator.generate_word()
         pick_which_spelling.assert_not_called()
 
-    @patch("app.core.word_generator.WordGenerator.pick_which_spelling")
+    @patch("core.word_generator.WordGenerator.pick_which_spelling")
     @patch("random.choice", return_value="Colour")
-    @patch("app.core.word_generator.WordGenerator.pick_dictionary", return_value='common_english')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='common_english')
     def test_strict_spelling_alt_word(self, mock_pick_dictionary, mock_randrange, pick_which_spelling):
         self.word_generator.generate_word()
         pick_which_spelling.assert_called_once()

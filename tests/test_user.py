@@ -1,7 +1,7 @@
 import unittest
 
-from app.core.user import User
-from app.util.helpers import get_avatars_list
+from core.user import User
+from util.helpers import get_avatars_list
 
 
 class TestUser(unittest.TestCase):

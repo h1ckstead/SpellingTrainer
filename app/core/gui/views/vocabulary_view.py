@@ -67,6 +67,7 @@ class VocabularyBlock(BaseFrame):
         self.checkboxes = []
         self.checkbox_vars = []
         self.empty_msg = None
+        self.empty_text = None
 
         self.search_field = EntryField(self, placeholder_text=strings.SEARCH_PLACEHOLDER, width=170, validate=True,
                                        max_chars=50)
@@ -152,13 +153,23 @@ class VocabularyBlock(BaseFrame):
             placeholder_label = CTkLabel(self, text="0", text_color="#2b2b2b", height=18)
             placeholder_label.grid(row=i + 4, column=0, columnspan=2, pady=1, sticky=tk.EW)
 
+    # def show_empty_vocab_message(self):
+    #     self.create_empty_rows()
+    #     self.empty_msg = CTkLabel(self, text=strings.EMPTY_VOCAB_HEADER, font=("Arial", config.HEADER_FONT_SIZE),
+    #                               wraplength=250)
+    #     text = CTkLabel(self, text=strings.EMPTY_VOCAB_TEXT, wraplength=250)
+    #     self.empty_msg.grid(row=4, column=0, columnspan=2, rowspan=7)
+    #     text.grid(row=8, column=0, columnspan=2, rowspan=7)
+    #     self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+    #     self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+
     def show_empty_vocab_message(self):
         self.create_empty_rows()
         self.empty_msg = CTkLabel(self, text=strings.EMPTY_VOCAB_HEADER, font=("Arial", config.HEADER_FONT_SIZE),
                                   wraplength=250)
-        text = CTkLabel(self, text=strings.EMPTY_VOCAB_TEXT, wraplength=250)
+        self.empty_text = CTkLabel(self, text=strings.EMPTY_VOCAB_TEXT, wraplength=250)
         self.empty_msg.grid(row=4, column=0, columnspan=2, rowspan=7)
-        text.grid(row=8, column=0, columnspan=2, rowspan=7)
+        self.empty_text.grid(row=8, column=0, columnspan=2, rowspan=7)
         self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
         self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
 
@@ -173,6 +184,11 @@ class VocabularyBlock(BaseFrame):
         self.user_vocabulary_copy = self.current_user.dictionaries.vocabulary.copy()
         vocabulary_lst = list(self.user_vocabulary_copy.keys())
         self.total_pages = (len(vocabulary_lst) + self.page_size - 1) // self.page_size
+
+        # Check if the current page exceeds the total pages after deleting words
+        if self.current_page > self.total_pages:
+            self.current_page = self.total_pages if self.total_pages > 0 else 1
+
         self.display_vocabulary()
 
     def display_vocabulary(self, *args):
@@ -208,6 +224,9 @@ class VocabularyBlock(BaseFrame):
                     if self.total_pages <= 1:
                         self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
                         self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+                    elif self.current_page == 1 and self.total_pages > 1:
+                        self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+                        self.next_button.configure(state=tk.NORMAL, fg_color="#246ba3")
                     elif self.current_page == 1:
                         self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
 
@@ -255,6 +274,28 @@ class VocabularyBlock(BaseFrame):
         self.prev_button.configure(state=tk.NORMAL, fg_color="#246ba3")
         self.next_button.configure(state=tk.NORMAL, fg_color="#246ba3")
 
+    # def clear_data_frame(self):
+    #     self.checkboxes = []
+    #     self.checkbox_vars = []
+    #
+    #     if self.empty_msg:
+    #         try:
+    #             self.empty_msg.destroy()
+    #         except TclError:
+    #             pass
+    #         self.empty_msg = None
+    #
+    #     for widget in self.winfo_children():
+    #         if isinstance(widget, CTkCheckBox):
+    #             widget.destroy()
+    #         elif isinstance(widget, CTkLabel):
+    #             try:
+    #                 value = int(widget.cget("text"))
+    #                 widget.destroy()
+    #             except ValueError:
+    #                 pass
+    #     self.select_all_var.set(False)
+
     def clear_data_frame(self):
         self.checkboxes = []
         self.checkbox_vars = []
@@ -265,6 +306,13 @@ class VocabularyBlock(BaseFrame):
             except TclError:
                 pass
             self.empty_msg = None
+
+        if self.empty_text:
+            try:
+                self.empty_text.destroy()
+            except TclError:
+                pass
+            self.empty_text = None
 
         for widget in self.winfo_children():
             if isinstance(widget, CTkCheckBox):

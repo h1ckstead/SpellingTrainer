@@ -141,7 +141,7 @@ class SpellingTrainerBlock(BaseFrame):
         entry_field.bind("<KeyRelease>", lambda event: self.on_entry_change())
         return entry_field
 
-    def handle_enter(self, event):
+    def handle_enter(self, event=None):
         user_input = self.word_entry.get().strip()
         if user_input:
             self.perform_spellcheck()

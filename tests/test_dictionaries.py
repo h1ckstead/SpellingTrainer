@@ -1,10 +1,10 @@
 import unittest
 from unittest.mock import patch
 
-from app.core.dictionaries import Dictionaries
-from app.core.session import Session
-from app.core.config import TIMES_TO_SPELL_IF_CORRECT, TIMES_TO_SPELL_IF_INCORRECT
-from app.core.constants import TIMES_TO_SPELL, CORRECT, INCORRECT, ALREADY_EXISTS, AmE
+from core.dictionaries import Dictionaries
+from core.session import Session
+from core.config import TIMES_TO_SPELL_IF_CORRECT, TIMES_TO_SPELL_IF_INCORRECT
+from core.constants import TIMES_TO_SPELL, CORRECT, INCORRECT, ALREADY_EXISTS, AmE
 
 
 class LoadDictionaryTest(unittest.TestCase):
@@ -159,7 +159,7 @@ class AddWordToVocabManually(unittest.TestCase):
     def setUp(self):
         self.dictionaries = Dictionaries()
 
-    @patch("app.core.dictionaries.Dictionaries.check_word_in_dicts")
+    @patch("core.dictionaries.Dictionaries.check_word_in_dicts")
     def test_word_already_in_vocab(self, mock_check_word_in_dicts):
         mock_check_word_in_dicts.return_value = (True, self.dictionaries.vocabulary)
         result = self.dictionaries.add_word_to_vocab_manually("Test")

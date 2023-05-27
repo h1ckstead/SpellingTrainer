@@ -49,9 +49,9 @@ class Dictionaries:
                                                constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}})
                 alt_dictionary.pop(alternative_spelling)
             elif word_exists:
+                word_dictionary.pop(word)
                 self.vocabulary.update({word: {constants.AmE: alternative_spelling,
                                                constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}})
-                word_dictionary.pop(word)
             else:
                 self.vocabulary.update({word: {constants.AmE: alternative_spelling,
                                                constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}})
