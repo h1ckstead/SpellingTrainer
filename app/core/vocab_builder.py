@@ -7,7 +7,7 @@ class VocabBuilder:
 
     def manage_vocabulary_based_on_word_status(self, word, word_dict, status, session):
         if status == CORRECT:
-            if word in self.user.dictionaries.vocabulary.keys():
+            if word in self.user.dictionaries.vocabulary:
                 if self.user.dictionaries.vocabulary[word][TIMES_TO_SPELL] == 1:
                     self.user.dictionaries.mark_word_as_learned(word, word_dict, session)
                 else:
@@ -16,7 +16,7 @@ class VocabBuilder:
                 self.user.dictionaries.add_word_to_vocab(word, word_dict, status, session)
             self.user.increment_attempts_correct()
         elif status == INCORRECT:
-            if word in self.user.dictionaries.vocabulary.keys():
+            if word in self.user.dictionaries.vocabulary:
                 self.user.dictionaries.increment_times_to_spell(word)
             else:
                 self.user.dictionaries.add_word_to_vocab(word, word_dict, status, session)

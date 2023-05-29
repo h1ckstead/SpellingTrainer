@@ -8,21 +8,10 @@ from util import helpers
 
 class Dictionaries:
     def __init__(self):
-        self.commonly_misspelled = self.load_dictionary(constants.COMMONLY_MISSPELLED)
-        self.common_english_words = self.load_dictionary(constants.COMMON_ENGLISH_WORDS)
+        self.high_priority_words = helpers.load_dictionary(constants.HIGH_PRIORITY_WORDS)
+        self.low_priority_words = helpers.load_dictionary(constants.LOW_PRIORITY_WORDS)
         self.vocabulary = {}
         self.learned_words = {}
-
-    @staticmethod
-    def load_dictionary(name):
-        """
-        Loads appropriate binary file containing dict of words.
-
-        :param name: str filename
-        :return: dict
-        """
-        with open(helpers.get_path(f'assets/{name}'), mode='rb') as document:
-            return pickle.load(document)
 
     def add_word_to_vocab_manually(self, word, alternative_spelling=None):
         """
@@ -49,9 +38,9 @@ class Dictionaries:
                                                constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}})
                 alt_dictionary.pop(alternative_spelling)
             elif word_exists:
+                word_dictionary.pop(word)
                 self.vocabulary.update({word: {constants.AmE: alternative_spelling,
                                                constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}})
-                word_dictionary.pop(word)
             else:
                 self.vocabulary.update({word: {constants.AmE: alternative_spelling,
                                                constants.TIMES_TO_SPELL: config.TIMES_TO_SPELL_IF_INCORRECT}})
@@ -118,9 +107,10 @@ class Dictionaries:
         :param user_word: str
         :return: bool, dict or None, None
         """
-        dictionaries = [self.commonly_misspelled, self.common_english_words, self.vocabulary, self.learned_words]
+        dictionaries = [self.high_priority_words["data"], self.low_priority_words["data"], self.vocabulary,
+                        self.learned_words]
         for dictionary in dictionaries:
-            if user_word in dictionary.keys():
+            if user_word in dictionary:
                 return True, dictionary
         return None, None
 

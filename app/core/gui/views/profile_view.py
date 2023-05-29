@@ -9,6 +9,7 @@ from core.gui.elements import Button, CTAButton, HintLabel, GreyLine, StrictSpel
 from core.gui.views.base_view import BaseView, BaseFrame
 from core.gui.views.vocabulary_view import VocabularyPage
 from util import helpers
+import tkinter as tk
 
 
 class ProfilePage(BaseView):
@@ -22,11 +23,12 @@ class ProfilePage(BaseView):
         self.session = session
 
         # Create widgets and content blocks
-        self.title_text = Label(self, text=strings.PROFILE_PAGE_TITLE, font=self.controller.title_font)
+        self.title_text = Label(self, text=strings.PROFILE_PAGE_TITLE, font=self.controller.title_font,
+                                background="#333333", foreground="#FFFFFF")
         self.user_block = UserBlock(self, self.controller, self.current_user)
         self.overall_statistics_block = StatisticsBlock(self, self.controller, current_user=self.current_user)
         self.session_statistics_block = StatisticsBlock(self, self.controller, session=self.session)
-        self.show_vocab_btn = CTAButton(self, text=strings.SHOW_VOCAB, width=215,
+        self.show_vocab_btn = CTAButton(self, text=strings.SHOW_VOCAB, width=200,
                                         command=lambda: VocabularyPage(parent=self.parent, controller=self.controller,
                                                                        previous_page=self,
                                                                        current_user=self.current_user).tkraise())
@@ -34,21 +36,23 @@ class ProfilePage(BaseView):
                                        command=lambda: self.main_page.tkraise())
         self.back_to_learning = CTAButton(self, text=strings.BACK_TO_LEARNING, image=self.learn_button_image,
                                           compound="left", command=self.update_previous_and_raise)
-        self.line = GreyLine(self, width=650)
-        self.pencil_icon = CTkLabel(self, text="",
-                                    image=CTkImage(Image.open(helpers.get_path('assets/pencil.png')), size=(30, 30)))
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(5, weight=1)
 
-        self.title_text.grid(row=0, column=2, columnspan=4, padx=(0, 210), pady=20)
-        self.user_block.grid(row=1, column=0, rowspan=3, columnspan=2, padx=20, sticky="n")
-        self.overall_statistics_block.grid(row=1, column=2, columnspan=2, pady=(0, 20))
-        self.session_statistics_block.grid(row=2, column=2, columnspan=2)
-        self.show_vocab_btn.grid(row=2, column=0, columnspan=2, sticky="s")
-        self.pencil_icon.grid(row=4, column=3, padx=(350, 0), pady=(40, 0))
-        self.line.grid(row=5, column=0, columnspan=4, pady=(0, 40))
-        self.back_to_main_btn.grid(row=6, column=0)
-        self.close_button.grid(row=6, column=0, columnspan=3, padx=(190, 0))
-        self.back_to_learning.grid(row=6, column=3, sticky="e")
-        self.report_bug_btn.grid(row=7, column=0, columnspan=4, padx=(42, 0), pady=(71, 0))
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(4, weight=1)
+        self.grid_rowconfigure(7, weight=1)
+
+        self.title_text.grid(row=0, column=0, columnspan=6, pady=10)
+        self.user_block.grid(row=2, column=1, rowspan=2, sticky=tk.N)
+        self.overall_statistics_block.grid(row=2, column=2, columnspan=3, padx=10, sticky=tk.NSEW)
+        self.session_statistics_block.grid(row=3, column=2, columnspan=3, padx=10, pady=(20, 0), sticky=tk.NSEW)
+        self.show_vocab_btn.grid(row=3, column=1, sticky=tk.SE)
+        self.horizontal_line.grid(row=5, column=0, columnspan=6, pady=30)
+        self.back_to_main_btn.grid(row=6, column=1)
+        self.close_button.grid(row=6, column=2, sticky=tk.W)
+        self.back_to_learning.grid(row=6, column=4, padx=(0, 15), sticky=tk.E)
+        self.report_bug_btn.grid(row=8, column=0, columnspan=6, pady=(0, 5))
 
     def update_previous_and_raise(self):
         if not self.previous_page.spelling_trainer_block.is_play_btn_on and not self.current_user.only_from_vocabulary:
@@ -107,11 +111,12 @@ class UserBlock(BaseFrame):
 
 class StatisticsBlock(BaseFrame):
     def __init__(self, parent, controller, current_user=None, session=None):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 500)
+        BaseFrame.__init__(self, parent, controller)
         self.parent = parent
         self.controller = controller
         self.current_user = current_user
         self.session = session
+        # self.grid_propagate(False)
 
         if current_user:
             self.header_text = CTkLabel(self, text=strings.OVERALL_STATISTICS,
@@ -120,13 +125,13 @@ class StatisticsBlock(BaseFrame):
             self.attempts_tip = CustomToolTip(self.attempts, msg="Overall number of times\n you've spelled words")
             self.correctly = StaticsLabel(self, text=self.current_user.attempts_correct)
             self.correctly_tip = CustomToolTip(self.correctly, msg="Number of times you\n correctly spelled words")
-            self.learned_words = CTkLabel(self, text=len(current_user.dictionaries.learned_words.keys()),
+            self.learned_words = CTkLabel(self, text=len(current_user.dictionaries.learned_words),
                                           font=CTkFont(family=None, size=config.TITLE_FONT_SIZE, weight="bold"),
                                           text_color="#6bbe66")
             self.learned_words_tip = CustomToolTip(self.learned_words, msg="The number of words you've consistently\n "
                                                                            "spelled correctly and now you know\n how "
                                                                            "to spell them")
-            self.to_learn = StaticsLabel(self, text=len(current_user.dictionaries.vocabulary.keys()))
+            self.to_learn = StaticsLabel(self, text=len(current_user.dictionaries.vocabulary))
             self.to_learn_tip = CustomToolTip(self.to_learn, msg="Words in your vocabulary\n "
                                                                  "which require more practice")
             self.to_learn_label = CTkLabel(self, text=strings.TO_LEARN)
@@ -172,11 +177,11 @@ class StatisticsBlock(BaseFrame):
         self.to_learn.grid(row=1, column=3)
         self.incorrectly.grid(row=1, column=4)
 
-        self.blue_line.grid(row=2, column=0, padx=20)
+        self.blue_line.grid(row=2, column=0, padx=27)
         self.light_green_line.grid(row=2, column=1)
-        self.green_line.grid(row=2, column=2, padx=20)
+        self.green_line.grid(row=2, column=2, padx=27)
         self.yellow_line.grid(row=2, column=3)
-        self.red_line.grid(row=2, column=4, padx=20)
+        self.red_line.grid(row=2, column=4, padx=27)
 
         self.attempts_label.grid(row=3, column=0)
         self.correctly_label.grid(row=3, column=1)

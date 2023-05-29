@@ -1,23 +1,34 @@
 import unittest
 from unittest.mock import patch
 
-from app.core.dictionaries import Dictionaries
-from app.core.session import Session
-from core.config import TIMES_TO_SPELL_IF_CORRECT, TIMES_TO_SPELL_IF_INCORRECT
-from core.constants import TIMES_TO_SPELL, CORRECT, INCORRECT, ALREADY_EXISTS, AmE
+from core.dictionaries import Dictionaries
+from core.session import Session
+from core.config import TIMES_TO_SPELL_IF_CORRECT, TIMES_TO_SPELL_IF_INCORRECT, DICT_VERSION
+from core.constants import TIMES_TO_SPELL, CORRECT, INCORRECT, ALREADY_EXISTS, AmE, HIGH_PRIORITY_WORDS
+from util import helpers
 
 
 class LoadDictionaryTest(unittest.TestCase):
     def test_load_dictionary(self):
-        commonly_misspelled = Dictionaries.load_dictionary("commonly_misspelled")
-        self.assertIn("Embarrassment", commonly_misspelled)
+        high_priority_words = helpers.load_dictionary(HIGH_PRIORITY_WORDS)
+        self.assertIn("Embarrassment", high_priority_words["data"])
+
+    def test_dictionary_version(self):
+        dictionaries = Dictionaries()
+        self.assertEqual(dictionaries.high_priority_words["version"], DICT_VERSION)
+        self.assertEqual(dictionaries.low_priority_words["version"], DICT_VERSION)
 
     def test_initialization(self):
         dictionaries = Dictionaries()
-        self.assertIsNotNone(dictionaries.commonly_misspelled)
-        self.assertIsNotNone(dictionaries.common_english_words)
+        self.assertIsNotNone(dictionaries.high_priority_words)
+        self.assertIsNotNone(dictionaries.low_priority_words)
         self.assertDictEqual(dictionaries.vocabulary, {})
         self.assertDictEqual(dictionaries.learned_words, {})
+
+    def test_dictionary_length(self):
+        dictionaries = Dictionaries()
+        self.assertEqual(len(dictionaries.high_priority_words["data"]), 775)  # old: 474
+        self.assertEqual(len(dictionaries.low_priority_words["data"]), 5697)  # old: 6207
 
 
 class VocabularyTest(unittest.TestCase):
@@ -70,15 +81,15 @@ class WordInDictsTest(unittest.TestCase):
     def setUp(self):
         self.dictionaries = Dictionaries()
 
-    def test_word_in_commonly_misspelled(self):
+    def test_word_in_high_priority(self):
         exists, dictionary = self.dictionaries.check_word_in_dicts("Questionnaire")
         self.assertTrue(exists)
-        self.assertEqual(dictionary, self.dictionaries.commonly_misspelled)
+        self.assertEqual(dictionary, self.dictionaries.high_priority_words["data"])
 
-    def test_word_in_common_english_words(self):
+    def test_word_in_low_priority(self):
         exists, dictionary = self.dictionaries.check_word_in_dicts("Entertainment")
         self.assertTrue(exists)
-        self.assertEqual(dictionary, self.dictionaries.common_english_words)
+        self.assertEqual(dictionary, self.dictionaries.low_priority_words["data"])
 
     def test_word_in_vocabulary(self):
         self.dictionaries.vocabulary.update({'VocabAppetite': {
@@ -154,7 +165,7 @@ class AddWordToVocabManually(unittest.TestCase):
     def setUp(self):
         self.dictionaries = Dictionaries()
 
-    @patch("app.core.dictionaries.Dictionaries.check_word_in_dicts")
+    @patch("core.dictionaries.Dictionaries.check_word_in_dicts")
     def test_word_already_in_vocab(self, mock_check_word_in_dicts):
         mock_check_word_in_dicts.return_value = (True, self.dictionaries.vocabulary)
         result = self.dictionaries.add_word_to_vocab_manually("Test")
@@ -171,13 +182,13 @@ class AddWordToVocabManually(unittest.TestCase):
         expected = {"Test": {AmE: "Essential", TIMES_TO_SPELL: TIMES_TO_SPELL_IF_INCORRECT}}
         self.dictionaries.add_word_to_vocab_manually("Test", alternative_spelling="Essential")
         self.assertEqual(self.dictionaries.vocabulary, expected)
-        self.assertNotIn("Essential", self.dictionaries.common_english_words)
+        self.assertNotIn("Essential", self.dictionaries.low_priority_words)
 
     def test_alt_word_exists_in_commonly_misspelled(self):
         expected = {"Test": {AmE: "Successful", TIMES_TO_SPELL: TIMES_TO_SPELL_IF_INCORRECT}}
         self.dictionaries.add_word_to_vocab_manually("Test", alternative_spelling="Successful")
         self.assertEqual(self.dictionaries.vocabulary, expected)
-        self.assertNotIn("Successful", self.dictionaries.common_english_words)
+        self.assertNotIn("Successful", self.dictionaries.low_priority_words)
 
     def test_alt_word_exists_in_learned(self):
         self.dictionaries.learned_words.update({"AmericanTest": {}})
@@ -190,28 +201,21 @@ class AddWordToVocabManually(unittest.TestCase):
         expected = {"Essential": {AmE: "TestWord", TIMES_TO_SPELL: TIMES_TO_SPELL_IF_INCORRECT}}
         self.dictionaries.add_word_to_vocab_manually("Essential", alternative_spelling="TestWord")
         self.assertEqual(self.dictionaries.vocabulary, expected)
-        self.assertNotIn("Essential", self.dictionaries.common_english_words)
+        self.assertNotIn("Essential", self.dictionaries.low_priority_words)
 
     def test_add_word_double_spelling(self):
         expected = {"BritishTest": {AmE: "AmericanTest", TIMES_TO_SPELL: TIMES_TO_SPELL_IF_INCORRECT}}
         self.dictionaries.add_word_to_vocab_manually("BritishTest", alternative_spelling="AmericanTest")
         self.assertEqual(self.dictionaries.vocabulary, expected)
 
-    def test_add_word_exists_in_common_english(self):
-        expected = {"Essential": {'definitions': {'Noun': ['anything indispensable'],
-                                                  'Adjective': ['absolutely necessary; vitally necessary',
-                                                                'basic and fundamental', 'of the greatest importance',
-                                                                'being or relating to or containing the essence of a'
-                                                                ' plant etc', 'defining rights and duties as opposed '
-                                                                              'to giving the rules by which rights and '
-                                                                              'duties are established']},
-                                  TIMES_TO_SPELL: TIMES_TO_SPELL_IF_INCORRECT,
-                                  }}
-        self.dictionaries.add_word_to_vocab_manually("Essential")
+    def test_add_word_exists_in_low_priority(self):
+        expected = {"Disclosure": {'definitions': {'Noun': ['the speech act of making something evident']},
+                                   TIMES_TO_SPELL: TIMES_TO_SPELL_IF_INCORRECT}}
+        self.dictionaries.add_word_to_vocab_manually("Disclosure")
         self.assertEqual(self.dictionaries.vocabulary, expected)
-        self.assertNotIn("Essential", self.dictionaries.common_english_words)
+        self.assertNotIn("Essential", self.dictionaries.low_priority_words)
 
-    def test_add_word_exists_in_commonly_misspelled(self):
+    def test_add_word_exists_in_high_priority(self):
         expected = {"Successful": {'definitions': {'Adjective':
                                                        ['having succeeded or being marked by a favorable outcome']},
                                    TIMES_TO_SPELL: TIMES_TO_SPELL_IF_INCORRECT,
@@ -219,7 +223,7 @@ class AddWordToVocabManually(unittest.TestCase):
 
         self.dictionaries.add_word_to_vocab_manually("Successful")
         self.assertEqual(self.dictionaries.vocabulary, expected)
-        self.assertNotIn("Successful", self.dictionaries.commonly_misspelled)
+        self.assertNotIn("Successful", self.dictionaries.high_priority_words)
 
     def test_add_word_exists_in_learned(self):
         expected = {"TestLearned": {TIMES_TO_SPELL: TIMES_TO_SPELL_IF_INCORRECT}}

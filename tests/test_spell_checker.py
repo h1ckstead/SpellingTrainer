@@ -1,9 +1,9 @@
 import unittest
 from unittest.mock import patch
 
-from app.core.session import Session
-from app.core.spell_checker import SpellChecker
-from app.core.user import User
+from core.session import Session
+from core.spell_checker import SpellChecker
+from core.user import User
 from core.constants import CORRECT, INCORRECT, SPELLING, AmE, BrE, DEFINITIONS
 
 
@@ -15,13 +15,13 @@ class TestSpellCheck(unittest.TestCase):
                                    SPELLING: AmE}}
         self.session = Session()
 
-    @patch("app.core.spell_checker.SpellChecker.strict_spellcheck")
+    @patch("core.spell_checker.SpellChecker.strict_spellcheck")
     def test_strict_spellcheck_called(self, strict_spellcheck):
         self.user.strict_spelling = True
         self.spell_checker.spell_check(self.word_dict, "Bear", self.session)
         strict_spellcheck.assert_called_once()
 
-    @patch("app.core.spell_checker.SpellChecker.soft_spellcheck")
+    @patch("core.spell_checker.SpellChecker.soft_spellcheck")
     def test_soft_spellcheck_called(self, soft_spellcheck):
         self.spell_checker.spell_check(self.word_dict, "Bear", self.session)
         soft_spellcheck.assert_called_once()
@@ -77,7 +77,7 @@ class TestSoftSpellcheck(unittest.TestCase):
         self.word_dict = {"Bear": {DEFINITIONS: "a large, heavy mammal that has thick fur and a very short tail."}}
         self.session = Session()
 
-    @patch("app.core.spell_checker.SpellChecker.soft_spellcheck_alt_spelling")
+    @patch("core.spell_checker.SpellChecker.soft_spellcheck_alt_spelling")
     def test_alt_called(self, soft_spellcheck_alt_spelling):
         word_dict = {'Colour': {AmE: 'Color', SPELLING: AmE, DEFINITIONS: {
             'Noun': ['a visual attribute of things that results from the light they emit or transmit or reflect']}}}
@@ -102,13 +102,16 @@ class TestSoftSpellCheckAltSpelling(unittest.TestCase):
         self.session = Session()
 
     def test_british_correct(self):
-        status = self.spell_checker.soft_spellcheck_alt_spelling("Colour", self.word_dict, "Colour", self.session)
+        status = self.spell_checker.soft_spellcheck_alt_spelling(word="Colour", word_dict=self.word_dict, user_word="Colour",
+                                                                 session=self.session)
         self.assertEqual(status, CORRECT)
 
     def test_american_correct(self):
-        status = self.spell_checker.soft_spellcheck_alt_spelling("Colour", self.word_dict, "Color", self.session)
+        status = self.spell_checker.soft_spellcheck_alt_spelling(word="Colour", word_dict=self.word_dict, user_word="Color",
+                                                                 session=self.session)
         self.assertEqual(status, CORRECT)
 
     def test_incorrect(self):
-        status = self.spell_checker.soft_spellcheck_alt_spelling("Colour", self.word_dict, "Bear", self.session)
+        status = self.spell_checker.soft_spellcheck_alt_spelling(word="Colour", word_dict=self.word_dict, user_word="Bear",
+                                                                 session=self.session)
         self.assertEqual(status, INCORRECT)

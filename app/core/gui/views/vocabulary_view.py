@@ -2,7 +2,7 @@ import tkinter as tk
 from _tkinter import TclError
 from tkinter import StringVar, Label, BooleanVar, messagebox
 
-from PIL import Image
+from PIL import Image, ImageTk
 from PIL.ImageTk import PhotoImage
 from customtkinter import CTkFrame, CTkComboBox, CTkFont, CTkImage, CTkLabel, CTkCheckBox, CTkButton, CTkSwitch, \
     CTkProgressBar, CTkToplevel
@@ -20,12 +20,14 @@ class VocabularyPage(BaseView):
         self.controller = controller
         self.previous_page = previous_page  # Profile Page
         self.current_user = current_user
-        self.avatar = PhotoImage(Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}")),
-                                 size=(60, 60))
+
+        avatar_image = Image.open(helpers.get_path(f"assets/avatars/{self.current_user.avatar}"))
+        avatar_image = avatar_image.resize((60, 60), Image.ANTIALIAS)
+        self.avatar = ImageTk.PhotoImage(avatar_image)
 
         # Create widgets and content blocks
-        self.title_text = Label(self, text=strings.VOCABULARY,
-                                image=self.avatar,
+        self.title_text = Label(self, text=strings.VOCABULARY, background="#333333", foreground="#FFFFFF",
+                                image=self.avatar, padx=10,
                                 compound=tk.LEFT,
                                 font=self.controller.title_font)
         self.vocabulary_block = VocabularyBlock(self, controller=self.controller, current_user=self.current_user)
@@ -35,15 +37,18 @@ class VocabularyPage(BaseView):
         self.back_btn = CTAButton(self, text=strings.BACK_BUTTON_TEXT, command=lambda: self.previous_page.tkraise())
 
         # Display widgets and content blocks on the page
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(4, weight=1)
 
-        self.title_text.grid(row=0, column=0, columnspan=2, pady=(20, 15))
-        self.vocabulary_block.grid(row=1, column=0, rowspan=3)
-        self.add_words_block.grid(row=1, column=1, sticky=tk.N)
-        self.about_block.grid(row=2, column=1)
-        self.back_btn.grid(row=3, column=1, sticky=tk.E)
-        self.report_bug_btn.grid(row=4, column=0, columnspan=5, pady=(29, 0))
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(3, weight=1)
+
+        self.grid_rowconfigure(4, weight=1)
+
+        self.title_text.grid(row=0, column=0, columnspan=4, pady=(20, 15))
+        self.vocabulary_block.grid(row=1, column=1, rowspan=3, padx=10)
+        self.add_words_block.grid(row=1, column=2, sticky=tk.N)
+        self.about_block.grid(row=2, column=2)
+        self.back_btn.grid(row=3, column=2, sticky=tk.E)
+        self.report_bug_btn.grid(row=5, column=0, columnspan=4, pady=(0, 5))
 
 
 class VocabularyBlock(BaseFrame):
@@ -60,11 +65,14 @@ class VocabularyBlock(BaseFrame):
         self.checkboxes = []
         self.checkbox_vars = []
         self.empty_msg = None
+        self.empty_text = None
 
-        self.search_field = EntryField(self, placeholder_text=strings.SEARCH_PLACEHOLDER, width=170)
+        self.search_field = EntryField(self, placeholder_text=strings.SEARCH_PLACEHOLDER, width=170, validate=True,
+                                       max_chars=50)
         self.search_field.bind("<KeyRelease>", lambda event: self.on_entry_change())
         self.clear_btn = CTAButton(self, text=strings.CLEAR_BTN, width=50, height=28, state=tk.DISABLED,
-                                   command=lambda: [self.search_field.delete(0, 'end'), self.load_vocabulary(),
+                                   command=lambda: [self.search_field.delete(0, 'end'), self.enable_prev_next_buttons(),
+                                                    self.load_vocabulary(),
                                                     self.on_entry_change()])
         self.line = GreyLine(self, width=270)
         self.select_all_var = BooleanVar()
@@ -109,12 +117,12 @@ class VocabularyBlock(BaseFrame):
 
     def display_sorting_dropdown(self):
         sorting_hint = CTkLabel(self, text=strings.SORT_BY, font=CTkFont("Arial", 10), height=15)
-        self.sorting = CTkComboBox(self, state="readonly", cursor="arrow", width=100, height=20,
+        self.sorting = CTkComboBox(self, state="readonly", cursor="arrow", width=105, height=20,
                                    font=CTkFont("Arial", 10), values=strings.SORTING_OPTIONS,
                                    command=self.on_sorting_change)
         self.sorting.grid(row=2, column=0, columnspan=2, sticky=tk.E)
         self.sorting.focus_set()  # To avoid bug where default_value appears only on hover
-        sorting_hint.grid(row=2, column=0, columnspan=2, padx=(45, 0), pady=(0, 5))
+        sorting_hint.grid(row=2, column=0, columnspan=2, padx=(40, 0), pady=(0, 5))
 
     def on_sorting_change(self, event):
         sort_choice = self.sorting.get()
@@ -143,28 +151,108 @@ class VocabularyBlock(BaseFrame):
             placeholder_label = CTkLabel(self, text="0", text_color="#2b2b2b", height=18)
             placeholder_label.grid(row=i + 4, column=0, columnspan=2, pady=1, sticky=tk.EW)
 
+    # def show_empty_vocab_message(self):
+    #     self.create_empty_rows()
+    #     self.empty_msg = CTkLabel(self, text=strings.EMPTY_VOCAB_HEADER, font=("Arial", config.HEADER_FONT_SIZE),
+    #                               wraplength=250)
+    #     text = CTkLabel(self, text=strings.EMPTY_VOCAB_TEXT, wraplength=250)
+    #     self.empty_msg.grid(row=4, column=0, columnspan=2, rowspan=7)
+    #     text.grid(row=8, column=0, columnspan=2, rowspan=7)
+    #     self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+    #     self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+
     def show_empty_vocab_message(self):
         self.create_empty_rows()
         self.empty_msg = CTkLabel(self, text=strings.EMPTY_VOCAB_HEADER, font=("Arial", config.HEADER_FONT_SIZE),
                                   wraplength=250)
-        text = CTkLabel(self, text=strings.EMPTY_VOCAB_TEXT, wraplength=250)
+        self.empty_text = CTkLabel(self, text=strings.EMPTY_VOCAB_TEXT, wraplength=250)
         self.empty_msg.grid(row=4, column=0, columnspan=2, rowspan=7)
-        text.grid(row=8, column=0, columnspan=2, rowspan=7)
+        self.empty_text.grid(row=8, column=0, columnspan=2, rowspan=7)
         self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
         self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
 
     def show_word_not_found(self, search_text):
         self.create_empty_rows()
-        self.empty_msg = CTkLabel(self, text=strings.NOT_FOUND.format(search_text))
+        self.empty_msg = CTkLabel(self, text=strings.NOT_FOUND.format(search_text), wraplength=250)
         self.empty_msg.grid(row=4, column=0, columnspan=2, rowspan=7)
         self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
         self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
 
     def load_vocabulary(self, *args):
         self.user_vocabulary_copy = self.current_user.dictionaries.vocabulary.copy()
-        vocabulary_lst = list(self.user_vocabulary_copy.keys())
+        vocabulary_lst = list(self.user_vocabulary_copy)
         self.total_pages = (len(vocabulary_lst) + self.page_size - 1) // self.page_size
+
+        # Check if the current page exceeds the total pages after deleting words
+        if self.current_page > self.total_pages:
+            self.current_page = self.total_pages if self.total_pages > 0 else 1
+
         self.display_vocabulary()
+
+    # def display_vocabulary(self, *args):
+    #     self.clear_data_frame()
+    #     self.checkboxes = []
+    #     self.checkbox_vars = []
+    #
+    #     if len(self.user_vocabulary_copy) == 0:  # Empty vocabulary case
+    #         self.show_empty_vocab_message()
+    #     else:
+    #         search_text = self.search_field.get().lower()
+    #         if not search_text:  # No search prompt, display all vocabulary words
+    #             matched_words = list(self.user_vocabulary_copy)
+    #         else:
+    #             matched_words = self.search_vocabulary(search_text)  # Search for matching words
+    #
+    #         if len(self.user_vocabulary_copy) == 0:  # Empty vocabulary case
+    #             self.show_empty_vocab_message()
+    #         else:
+    #             search_text = self.search_field.get().lower()
+    #             if not search_text:  # No search prompt, display all vocabulary words
+    #                 matched_words = list(self.user_vocabulary_copy)
+    #             else:
+    #                 matched_words = self.search_vocabulary(search_text)  # Search for matching words
+    #
+    #             if len(matched_words) == 0:  # No matched words case
+    #                 self.show_word_not_found(search_text)
+    #             else:
+    #                 start_index = (self.current_page - 1) * self.page_size
+    #                 end_index = start_index + self.page_size
+    #                 current_page_data = matched_words[start_index:end_index]
+    #
+    #                 if self.total_pages <= 1:
+    #                     self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+    #                     self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+    #                 elif self.current_page == 1 and self.total_pages > 1:
+    #                     self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+    #                     self.next_button.configure(state=tk.NORMAL, fg_color="#246ba3")
+    #                 elif self.current_page == 1:
+    #                     self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+    #
+    #                 for row, word in enumerate(current_page_data, start=4):
+    #                     checkbox_var = BooleanVar()
+    #                     checkbox_var.trace('w', self.update_select_all_checkbox)
+    #                     self.checkbox_vars.append(checkbox_var)
+    #
+    #                     times_to_spell = self.user_vocabulary_copy[word][constants.TIMES_TO_SPELL]
+    #                     label_text = f"{word}"
+    #                     checkbox = CTkCheckBox(self, checkbox_width=18, checkbox_height=18, border_width=1, height=15,
+    #                                            text=label_text, variable=checkbox_var,
+    #                                            command=self.update_delete_button_state)
+    #                     checkbox.grid(row=row, column=0, padx=(10, 0), pady=1, sticky=tk.W)
+    #
+    #                     times_to_spell_label = CTkLabel(self, text=f"{times_to_spell}", height=15)
+    #                     times_to_spell_label.grid(row=row, column=1, padx=(10, 0), pady=1)
+    #
+    #                     self.checkboxes.append(checkbox_var)
+    #
+    #                 # Add empty rows or placeholder widgets to fill the remaining space
+    #                 remaining_rows = self.page_size - len(current_page_data)
+    #                 for i in range(remaining_rows):
+    #                     placeholder_label = CTkLabel(self, text="0", text_color="#2b2b2b", height=18)
+    #                     placeholder_label.grid(row=i + len(current_page_data) + 4, column=0, columnspan=2, pady=1,
+    #                                            sticky=tk.EW)
+    #         self.page_label.configure(text=f"Page: {self.current_page}/{self.total_pages}")
+    #         self.display_master_checkbox()
 
     def display_vocabulary(self, *args):
         self.clear_data_frame()
@@ -173,60 +261,61 @@ class VocabularyBlock(BaseFrame):
 
         if len(self.user_vocabulary_copy) == 0:  # Empty vocabulary case
             self.show_empty_vocab_message()
+            return
+
+        search_text = self.search_field.get().lower()
+        if not search_text:  # No search prompt, display all vocabulary words
+            matched_words = list(self.user_vocabulary_copy)
         else:
-            search_text = self.search_field.get().lower()
-            if not search_text:  # No search prompt, display all vocabulary words
-                matched_words = list(self.user_vocabulary_copy.keys())
-            else:
-                matched_words = self.search_vocabulary(search_text)  # Search for matching words
+            matched_words = self.search_vocabulary(search_text)  # Search for matching words
 
-            if len(self.user_vocabulary_copy) == 0:  # Empty vocabulary case
-                self.show_empty_vocab_message()
-            else:
-                search_text = self.search_field.get().lower()
-                if not search_text:  # No search prompt, display all vocabulary words
-                    matched_words = list(self.user_vocabulary_copy.keys())
-                else:
-                    matched_words = self.search_vocabulary(search_text)  # Search for matching words
+        if len(matched_words) == 0:  # No matched words case
+            self.show_word_not_found(search_text)
+            return
 
-                if len(matched_words) == 0:  # No matched words case
-                    self.show_word_not_found(search_text)
-                else:
-                    start_index = (self.current_page - 1) * self.page_size
-                    end_index = start_index + self.page_size
-                    current_page_data = matched_words[start_index:end_index]
+        start_index = (self.current_page - 1) * self.page_size
+        end_index = start_index + self.page_size
+        current_page_data = matched_words[start_index:end_index]
 
-                    if self.total_pages <= 1:
-                        self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
-                        self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
-                    elif self.current_page == 1:
-                        self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+        if self.total_pages <= 1 or self.current_page == 1:
+            self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+        else:
+            self.prev_button.configure(state=tk.NORMAL, fg_color="#246ba3")
 
-                    for row, word in enumerate(current_page_data, start=4):
-                        checkbox_var = BooleanVar()
-                        checkbox_var.trace('w', self.update_select_all_checkbox)
-                        self.checkbox_vars.append(checkbox_var)
+        if self.current_page >= self.total_pages or len(current_page_data) < self.page_size:
+            self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+        else:
+            self.next_button.configure(state=tk.NORMAL, fg_color="#246ba3")
 
-                        times_to_spell = self.user_vocabulary_copy[word][constants.TIMES_TO_SPELL]
-                        label_text = f"{word}"
-                        checkbox = CTkCheckBox(self, checkbox_width=18, checkbox_height=18, border_width=1, height=15,
-                                               text=label_text, variable=checkbox_var,
-                                               command=self.update_delete_button_state)
-                        checkbox.grid(row=row, column=0, padx=(10, 0), pady=1, sticky=tk.W)
+        for row, word in enumerate(current_page_data, start=4):
+            checkbox_var = BooleanVar()
+            checkbox_var.trace('w', self.update_select_all_checkbox)
+            self.checkbox_vars.append(checkbox_var)
 
-                        times_to_spell_label = CTkLabel(self, text=f"{times_to_spell}", height=15)
-                        times_to_spell_label.grid(row=row, column=1, padx=(10, 0), pady=1)
+            times_to_spell = self.user_vocabulary_copy[word][constants.TIMES_TO_SPELL]
+            label_text = f"{word}"
+            checkbox = CTkCheckBox(self, checkbox_width=18, checkbox_height=18, border_width=1, height=15,
+                                   text=label_text, variable=checkbox_var,
+                                   command=self.update_delete_button_state)
+            checkbox.grid(row=row, column=0, padx=(10, 0), pady=1, sticky=tk.W)
 
-                        self.checkboxes.append(checkbox_var)
+            times_to_spell_label = CTkLabel(self, text=f"{times_to_spell}", height=15)
+            times_to_spell_label.grid(row=row, column=1, padx=(10, 0), pady=1)
 
-                    # Add empty rows or placeholder widgets to fill the remaining space
-                    remaining_rows = self.page_size - len(current_page_data)
-                    for i in range(remaining_rows):
-                        placeholder_label = CTkLabel(self, text="0", text_color="#2b2b2b", height=18)
-                        placeholder_label.grid(row=i + len(current_page_data) + 4, column=0, columnspan=2, pady=1,
-                                               sticky=tk.EW)
-            self.page_label.configure(text=f"Page: {self.current_page}")
-            self.display_master_checkbox()
+            self.checkboxes.append(checkbox_var)
+
+        # Add empty rows or placeholder widgets to fill the remaining space
+        remaining_rows = self.page_size - len(current_page_data)
+        for i in range(remaining_rows):
+            placeholder_label = CTkLabel(self, text="0", text_color="#2b2b2b", height=18)
+            placeholder_label.grid(row=i + len(current_page_data) + 4, column=0, columnspan=2, pady=1,
+                                   sticky=tk.EW)
+
+        # Update the total pages based on the matched words
+        self.total_pages = (len(matched_words) + self.page_size - 1) // self.page_size
+
+        self.page_label.configure(text=f"Page: {self.current_page}/{self.total_pages}")
+        self.display_master_checkbox()
 
     def update_select_all_checkbox(self, *args):
         if not self.empty_msg:  # Check if no word found message is displayed
@@ -242,6 +331,10 @@ class VocabularyBlock(BaseFrame):
                                           command=lambda: [self.toggle_select_all(), self.update_delete_button_state()])
         select_all_checkbox.grid(row=2, column=0, rowspan=2, padx=10, sticky=tk.W)
 
+    def enable_prev_next_buttons(self):
+        self.prev_button.configure(state=tk.NORMAL, fg_color="#246ba3")
+        self.next_button.configure(state=tk.NORMAL, fg_color="#246ba3")
+
     def clear_data_frame(self):
         self.checkboxes = []
         self.checkbox_vars = []
@@ -252,6 +345,13 @@ class VocabularyBlock(BaseFrame):
             except TclError:
                 pass
             self.empty_msg = None
+
+        if self.empty_text:
+            try:
+                self.empty_text.destroy()
+            except TclError:
+                pass
+            self.empty_text = None
 
         for widget in self.winfo_children():
             if isinstance(widget, CTkCheckBox):
@@ -297,7 +397,7 @@ class VocabularyBlock(BaseFrame):
 
     def search_vocabulary(self, search_text):
         matched_words = []
-        for word in self.user_vocabulary_copy.keys():
+        for word in self.user_vocabulary_copy:
             if search_text in word.lower():
                 matched_words.append(word)
         return matched_words
@@ -310,7 +410,7 @@ class VocabularyBlock(BaseFrame):
 
         for i, checkbox_var in enumerate(self.checkbox_vars, start=start_index):
             if checkbox_var.get():
-                word = list(self.user_vocabulary_copy.keys())[i]
+                word = list(self.user_vocabulary_copy)[i]
                 words_to_delete.append(word)
                 checkbox_vars_to_delete.append(checkbox_var)  # Store the checkbox variable to delete
 
@@ -338,7 +438,7 @@ class VocabularyBlock(BaseFrame):
 
 class AddWordsBlock(BaseFrame):
     def __init__(self, parent, controller, current_user):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 480, height=config.WINDOW_HEIGHT - 350)
+        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 350, height=config.WINDOW_HEIGHT - 350)
         self.parent = parent
         self.controller = controller
         self.current_user = current_user
@@ -347,15 +447,15 @@ class AddWordsBlock(BaseFrame):
 
         self.title = CTkLabel(self, text=strings.ADD_WORDS_HEADER, font=CTkFont("Arial", config.HEADER_FONT_SIZE,
                                                                                 weight="bold"))
-        self.hint = CTkLabel(self, text=strings.ADD_WORDS_HINT, wraplength=250, font=CTkFont("Arial", 12))
+        self.hint = CTkLabel(self, text=strings.ADD_WORDS_HINT, wraplength=350, font=CTkFont("Arial", 12))
         self.entry_field = EntryField(self, placeholder_text=strings.ADD_WORD, width=200)
         self.entry_field.bind("<KeyRelease>", lambda event: self.on_entry_change())
         self.add_btn = CTAButton(self, text=strings.ADD, width=50, height=28, state=tk.DISABLED, fg_color="#565b5e",
                                  command=lambda: self.add_word(self.entry_field.get().title()))
-        self.line = GreyLine(self, width=config.WINDOW_WIDTH - 500)
-        self.double_spelling = CTAButton(self, text=strings.DOUBLE_SPELLING_BTN, height=25,
+        self.line = GreyLine(self, width=400)
+        self.double_spelling = CTAButton(self, text=strings.DOUBLE_SPELLING_BTN, height=30,
                                          command=self.add_word_double_spelling)
-        self.double_spelling_hint = CTkLabel(self, text=strings.DOUBLE_SPELLING_HINT, wraplength=250,
+        self.double_spelling_hint = CTkLabel(self, text=strings.DOUBLE_SPELLING_HINT, wraplength=350,
                                              font=CTkFont("Arial", 12))
 
         # Display widgets and content blocks on the page
@@ -364,8 +464,8 @@ class AddWordsBlock(BaseFrame):
 
         self.title.grid(row=0, column=0, columnspan=2, pady=10)
         self.hint.grid(row=1, column=0, columnspan=2, pady=(0, 10))
-        self.entry_field.grid(row=2, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
-        self.add_btn.grid(row=2, column=0, columnspan=2, padx=(0, 40), sticky=tk.E)
+        self.entry_field.grid(row=2, column=0, columnspan=2, padx=(25, 0), sticky=tk.W)
+        self.add_btn.grid(row=2, column=1, columnspan=2, padx=10, sticky=tk.W)
         self.line.grid(row=3, column=0, columnspan=2, pady=10)
         self.double_spelling_hint.grid(row=4, column=0, columnspan=2)
         self.double_spelling.grid(row=5, column=0, columnspan=2, pady=(15, 0))
@@ -408,10 +508,11 @@ class AddWordsBlock(BaseFrame):
             success_message.after(3000, lambda: success_message.destroy())
 
     def show_success_message(self, word):
-        container = CTkFrame(self, width=250, height=45, border_width=3, border_color="#02732d")
-        validation_msg = CTkLabel(container, wraplength=200,
+        container = CTkFrame(self, width=400, height=50, border_width=2, border_color=config.GREEN, fg_color="white")
+        # container.grid_propagate(False)
+        validation_msg = CTkLabel(container, wraplength=350, width=400, height=50,
                                   text=f'The word "{word}" has been added to your vocabulary',
-                                  text_color="#02732d")
+                                  text_color="black")
         validation_msg.pack(padx=10, pady=10)
         return container
 
@@ -482,12 +583,12 @@ class AddWordsBlock(BaseFrame):
 
 class AboutBlock(BaseFrame):
     def __init__(self, parent, controller):
-        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 480, height=config.WINDOW_HEIGHT - 450)
+        BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 350, height=config.WINDOW_HEIGHT - 450)
         self.parent = parent
         self.controller = controller
         self.grid_propagate(False)
 
-        self.text = CTkLabel(self, text=strings.VOCAB_TUTORIAL_TEXT, wraplength=140, justify=tk.LEFT,
+        self.text = CTkLabel(self, text=strings.VOCAB_TUTORIAL_TEXT, wraplength=150, justify=tk.LEFT,
                              font=CTkFont(family="Arial", size=12))
         self.line = self.create_vertical_line()
         self.only_vocab_switch = CTkSwitch(self, text=strings.ONLY_VOCAB_SWITCH, onvalue=True, offvalue=False,

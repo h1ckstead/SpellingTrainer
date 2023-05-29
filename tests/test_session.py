@@ -1,5 +1,5 @@
 import unittest
-from app.core.session import Session
+from core.session import Session
 
 
 class TestSession(unittest.TestCase):

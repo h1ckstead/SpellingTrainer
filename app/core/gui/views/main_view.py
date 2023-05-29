@@ -24,9 +24,9 @@ class MainPage(BaseView):
         else:
             self.session = session
 
+        # Create widgets
         self.welcome_block = WelcomeBlock(self, self.controller, self.last_user, self.saved_data,
                                           next_page=self.practice_page())
-
         self.change_user_btn = Button(self, text=strings.CHANGE_USER,
                                       command=lambda: ChangeUserPage(parent=self.parent,
                                                                      controller=self.controller,
@@ -39,16 +39,24 @@ class MainPage(BaseView):
                                                                    session=self.session, main_page=self))
 
         # Display widgets and content blocks on the page
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(2, weight=1)
+        self.configure_rows_and_columns()
+        self.display_widgets_on_page()
 
-        self.welcome_block.grid(row=0, column=0, columnspan=3, pady=(40, 20))
-        self.change_user_btn.grid(row=1, column=0, padx=(17, 0))
-        self.user_profile_btn.grid(row=1, column=1, columnspan=2, padx=(0, 72))
-        self.pencil_icon.grid(row=2, column=2, sticky=tk.E, padx=(0, 80))
-        self.horizontal_line.grid(row=2, column=0, columnspan=3, sticky=tk.S, pady=(0, 3))
-        self.close_button.grid(row=3, column=1, columnspan=2, padx=(0, 72), pady=(20, 0))
-        self.report_bug_btn.grid(row=4, column=0, columnspan=3, pady=(50, 0))
+    def configure_rows_and_columns(self):
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(3, weight=1)
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(6, weight=1)
+
+    def display_widgets_on_page(self):
+        self.welcome_block.grid(row=1, column=1, columnspan=2, sticky=tk.NSEW, pady=(0, 20))
+        self.change_user_btn.grid(row=3, column=1, sticky=tk.W)
+        self.user_profile_btn.grid(row=3, column=2, sticky=tk.E)
+        self.horizontal_line.grid(row=4, column=1, columnspan=2, pady=30)
+        self.close_button.grid(row=5, column=2, sticky=tk.E)
+        self.report_bug_btn.grid(row=7, column=0, columnspan=4, sticky=tk.S, pady=(0, 5))
 
     def practice_page(self):
         return PracticePage(parent=self.parent, controller=self.controller,

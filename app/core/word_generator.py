@@ -3,48 +3,14 @@ import random
 
 from random_words import RandomWords
 
-from core.constants import BrE, AmE, DEFINITIONS, SPELLING
+from core.constants import BrE, AmE, DEFINITIONS, SPELLING, VOCABULARY, RANDOM_WORDS, HIGH_PRIORITY_WORDS, \
+    LOW_PRIORITY_WORDS
 
 
 class WordGenerator:
     def __init__(self, user, callback):
         self.user = user
         self.callback = callback
-
-    # def generate_word(self):
-    #     """
-    #     Retrieves one random word for practice from one of the existing dictionaries or
-    #     generates a random word.
-    #
-    #     :return: dictionary containing a word and its definition
-    #     """
-    #     if self.user.only_from_vocabulary:
-    #         choice_source = 'users_vocabulary'
-    #     else:
-    #         choice_source = self.pick_dictionary()
-    #     logging.info(f"Randomly picking a word from {choice_source}")
-    #     if choice_source == 'users_vocabulary':
-    #         users_vocabulary_list = list(self.user.dictionaries.vocabulary.keys())
-    #         word = users_vocabulary_list[random.randrange(0, len(users_vocabulary_list))]
-    #         word_dict = {word: self.user.dictionaries.vocabulary[word]}
-    #         if self.user.strict_spelling and AmE in word_dict[word].keys():
-    #             word_dict = self.pick_which_spelling(word, word_dict)
-    #     elif choice_source == 'commonly_misspelled':
-    #         commonly_misspelled_list = list(self.user.dictionaries.commonly_misspelled.keys())
-    #         word = commonly_misspelled_list[random.randrange(0, len(commonly_misspelled_list))]
-    #         word_dict = {word: self.user.dictionaries.commonly_misspelled[word]}
-    #         if self.user.strict_spelling and AmE in word_dict[word].keys():
-    #             word_dict = self.pick_which_spelling(word, word_dict)
-    #     elif choice_source == 'common_english':
-    #         common_english_words_list = list(self.user.dictionaries.common_english_words.keys())
-    #         word = common_english_words_list[random.randrange(0, len(common_english_words_list))]
-    #         word_dict = {word: self.user.dictionaries.common_english_words[word]}
-    #         if self.user.strict_spelling and AmE in word_dict[word].keys():
-    #             word_dict = self.pick_which_spelling(word, word_dict)
-    #     else:
-    #         word_dict = self.generate_random_word()
-    #     logging.info(word_dict)
-    #     return word_dict
 
     def generate_word(self):
         """
@@ -53,22 +19,21 @@ class WordGenerator:
 
         :return: dictionary containing a word and its definition
         """
-        word_dict = "empty_vocab"
-        word = ""
         choice_source = self.pick_dictionary()
         logging.info(f"Randomly picking a word from {choice_source}")
-        if choice_source == 'vocabulary':
+        if choice_source == VOCABULARY:
             try:
                 word = random.choice(list(self.user.dictionaries.vocabulary.keys()))
                 word_dict = {word: self.user.dictionaries.vocabulary[word]}
             except IndexError:
                 self.callback()
-        elif choice_source == 'commonly_misspelled':
-            word = random.choice(list(self.user.dictionaries.commonly_misspelled.keys()))
-            word_dict = {word: self.user.dictionaries.commonly_misspelled[word]}
-        elif choice_source == 'common_english':
-            word = random.choice(list(self.user.dictionaries.common_english_words.keys()))
-            word_dict = {word: self.user.dictionaries.common_english_words[word]}
+                return
+        elif choice_source == HIGH_PRIORITY_WORDS:
+            word = random.choice(list(self.user.dictionaries.high_priority_words["data"].keys()))
+            word_dict = {word: self.user.dictionaries.high_priority_words["data"][word]}
+        elif choice_source == LOW_PRIORITY_WORDS:
+            word = random.choice(list(self.user.dictionaries.low_priority_words["data"].keys()))
+            word_dict = {word: self.user.dictionaries.low_priority_words["data"][word]}
         else:
             word, word_dict = self.generate_random_word()
         if self.user.strict_spelling and word_dict.get(word, {}).get(AmE):
@@ -78,13 +43,13 @@ class WordGenerator:
 
     def generate_random_word(self):
         """
-        Uses RandomWords to generate a word with min length of 4.
+        Uses RandomWords to generate a word with min length of 5.
 
         :return: dict containing word and definition
         """
         random_words = RandomWords()
         while True:
-            word = random_words.random_word(min_letter_count=4).title()
+            word = random_words.random_word(min_letter_count=5).title()
             if not self.is_duplicate(word.title()):
                 word_dict = {word: {DEFINITIONS: None}}  # TODO: Think about loading definition in the background
                 return word, word_dict
@@ -96,7 +61,7 @@ class WordGenerator:
         :param word: str containing a random word
         :return: bool
         """
-        if word in self.user.dictionaries.vocabulary.keys() or word in self.user.dictionaries.learned_words.keys():
+        if word in self.user.dictionaries.vocabulary or word in self.user.dictionaries.learned_words:
             return True
         else:
             return False
@@ -109,29 +74,36 @@ class WordGenerator:
         :return: str containing dictionary name
         """
         if self.user.only_from_vocabulary:
-            return 'vocabulary'
+            return VOCABULARY
+
         choice_sources = self.get_non_empty_dicts()
+        weights = {
+            VOCABULARY: 5,
+            HIGH_PRIORITY_WORDS: 4,
+            LOW_PRIORITY_WORDS: 3,
+            RANDOM_WORDS: 1
+        }
+
         if len(self.user.dictionaries.vocabulary) > 30:
-            choice_source = random.choices(['vocabulary', 'random_words'] + choice_sources,
-                                           weights=[4, 3, 2, 1], k=1)
-        else:
-            choice_source = random.choices(['random_words'] + choice_sources,
-                                           weights=[4, 3, 1], k=1)
-        logging.info(f'Word choice source: {choice_source}')
+            choice_sources.append(VOCABULARY)
+
+        choice_source = random.choices(choice_sources + [RANDOM_WORDS],
+                                       weights=[weights[dict_name] for dict_name in choice_sources] + [1],
+                                       k=1)
         return choice_source[0]
 
     def get_non_empty_dicts(self):
         """
-        Checks if commonly_misspelled or common_english still have
-        words. If so, they are added to choice_sources.
+        Checks if high_priority or low_priority dictionaries still
+        have words. If so, they are added to choice_sources.
 
         :return: list of strings
         """
         choice_sources = []
-        if len(self.user.dictionaries.commonly_misspelled) > 0:
-            choice_sources.append('commonly_misspelled')
-        if len(self.user.dictionaries.common_english_words) > 0:
-            choice_sources.append('common_english')
+        if len(self.user.dictionaries.high_priority_words["data"]) > 0:
+            choice_sources.append(HIGH_PRIORITY_WORDS)
+        if len(self.user.dictionaries.low_priority_words["data"]) > 0:
+            choice_sources.append(LOW_PRIORITY_WORDS)
         return choice_sources
 
     @staticmethod

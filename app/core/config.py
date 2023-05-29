@@ -1,3 +1,6 @@
+VERSION = "0.7.0"
+DICT_VERSION = 0
+
 # General
 APP_NAME = 'Spelling Trainer'
 APP_DESC = 'This is the app to drill correct spelling in you.'
@@ -23,5 +26,9 @@ GREEN = "#6bbe66"
 RED = "#ff4141"
 
 # Mac OS
-MAC_OS_VOICES = ['Daniel', 'Karen', 'Kate', 'Samantha', 'Serena']
-MAC_SAVE_FILE_PATH = '~/Library/Application Support/SpellingTrainer/savefile'
+INITIAL_VOICES = ['Daniel', 'Karen', 'Samantha']
+VENTURA_VOICES = ['Albert', 'Bad', 'Bahh', 'Bells', 'Boing', 'Bubbles', 'Cellos', 'Daniel', 'Wobble', 'Eddy', 'Flo',
+                  'Fred', 'Good', 'Grandma', 'Grandpa', 'Jester', 'Junior', 'Karen', 'Kathy', 'Moira', 'Organ',
+                  'Superstar', 'Ralph', 'Reed', 'Rishi', 'Rocko', 'Samantha', 'Sandy', 'Shelley', 'Tessa', 'Trinoids',
+                  'Whisper', 'Zarvox']
+MONTEREY_VOICES = ['Moira', 'Tessa'] + INITIAL_VOICES
