@@ -2,6 +2,7 @@ from core import strings
 from core.gui.blocks.registration_edit_block import RegistrationEditBlock
 from core.gui.elements import CTAButton, Button
 from core.gui.views.base_view import BaseView
+from util import helpers
 
 
 class EditProfilePage(BaseView):
@@ -27,9 +28,12 @@ class EditProfilePage(BaseView):
         self.report_bug_btn.grid(row=4, column=0, columnspan=3, pady=(42, 0))
 
     def save_changes(self):
-        self.current_user.edit_username(self.profile_edit_block.get_username())
+        old_username = self.current_user.name
+        new_username = self.profile_edit_block.get_username()
+        self.current_user.edit_username(new_username)
         self.current_user.edit_avatar(self.profile_edit_block.selected_avatar)
 
         # Update existing pages
         self.previous_page.user_block.update_profile()
+        self.previous_page.main_page.saved_data = helpers.load_save()
         self.previous_page.main_page.welcome_block.change_current_user(self.current_user)
