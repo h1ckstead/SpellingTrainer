@@ -20,7 +20,7 @@ class SpellChecker:
         """
         word, user_word = self.prepare_data(word_dict, user_word)
         logging.debug(f'Reference word: {word}, User word: {user_word}')
-        if self.user.strict_spelling and SPELLING in word_dict[word].keys():
+        if self.user.strict_spelling and SPELLING in word_dict[word]:
             status = self.strict_spellcheck(word, word_dict, user_word, session)
         else:
             status = self.soft_spellcheck(word, word_dict, user_word, session)
@@ -36,7 +36,7 @@ class SpellChecker:
         :param user_word: str a word user has typed
         :return: str reference word, str capitalized user word
         """
-        word = list(word_dict.keys())[0]
+        word = list(word_dict)[0]
         user_word = user_word.title()
         return word, user_word
 
@@ -76,18 +76,21 @@ class SpellChecker:
         :param user_word: str a word user has typed
         :return: str status "Correct" or "Incorrect"
         """
-        if AmE in word_dict[word].keys():
-            status = self.soft_spellcheck_alt_spelling(word, user_word, word_dict, session)
+        if AmE in word_dict[word]:
+            status = self.soft_spellcheck_alt_spelling(word=word, user_word=user_word, word_dict=word_dict,
+                                                       session=session)
         else:
             if user_word == word:
                 status = CORRECT
-                self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
+                self.vocab_builder.manage_vocabulary_based_on_word_status(word=word, word_dict=word_dict,
+                                                                          status=status, session=session)
             else:
                 status = INCORRECT
-                self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
+                self.vocab_builder.manage_vocabulary_based_on_word_status(word=word, word_dict=word_dict,
+                                                                          status=status, session=session)
         return status
 
-    def soft_spellcheck_alt_spelling(self, word, word_dict, user_word, session):
+    def soft_spellcheck_alt_spelling(self, word, user_word, word_dict, session):
         """
         Checks if user word matches any of the acceptable spellings.
 
@@ -101,8 +104,10 @@ class SpellChecker:
         words = [word, word_dict[word][AmE]]
         if user_word in words:
             status = CORRECT
-            self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
+            self.vocab_builder.manage_vocabulary_based_on_word_status(word=word, word_dict=word_dict, status=status,
+                                                                      session=session)
         else:
             status = INCORRECT
-            self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
+            self.vocab_builder.manage_vocabulary_based_on_word_status(word=word, word_dict=word_dict, status=status,
+                                                                      session=session)
         return status

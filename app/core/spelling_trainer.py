@@ -38,6 +38,7 @@ class SpellingTrainerApp(CTk):
         if saved_data is None:
             WelcomePage(parent=mainframe, controller=self).tkraise()
         else:
+            helpers.verify_dicts_version(saved_data)
             MainPage(parent=mainframe, controller=self, saved_data=saved_data).tkraise()
 
     def center_x(self):

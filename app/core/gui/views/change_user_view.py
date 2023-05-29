@@ -57,7 +57,7 @@ class ContentBlock(CTkFrame):
         self.practice_page = practice_page
         self.grid_propagate(False)
 
-        users = [k for k in self.saved_data.keys() if k != 'last_user']
+        users = [k for k in self.saved_data if k != 'last_user']
         default_value = StringVar(value=saved_data["last_user"])
         self.title_text = Label(self, text=strings.CHANGE_USER_TITLE, font=self.controller.title_font,
                                 background="#2b2b2b", foreground="#FFFFFF")

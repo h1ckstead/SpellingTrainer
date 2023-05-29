@@ -125,13 +125,13 @@ class StatisticsBlock(BaseFrame):
             self.attempts_tip = CustomToolTip(self.attempts, msg="Overall number of times\n you've spelled words")
             self.correctly = StaticsLabel(self, text=self.current_user.attempts_correct)
             self.correctly_tip = CustomToolTip(self.correctly, msg="Number of times you\n correctly spelled words")
-            self.learned_words = CTkLabel(self, text=len(current_user.dictionaries.learned_words.keys()),
+            self.learned_words = CTkLabel(self, text=len(current_user.dictionaries.learned_words),
                                           font=CTkFont(family=None, size=config.TITLE_FONT_SIZE, weight="bold"),
                                           text_color="#6bbe66")
             self.learned_words_tip = CustomToolTip(self.learned_words, msg="The number of words you've consistently\n "
                                                                            "spelled correctly and now you know\n how "
                                                                            "to spell them")
-            self.to_learn = StaticsLabel(self, text=len(current_user.dictionaries.vocabulary.keys()))
+            self.to_learn = StaticsLabel(self, text=len(current_user.dictionaries.vocabulary))
             self.to_learn_tip = CustomToolTip(self.to_learn, msg="Words in your vocabulary\n "
                                                                  "which require more practice")
             self.to_learn_label = CTkLabel(self, text=strings.TO_LEARN)

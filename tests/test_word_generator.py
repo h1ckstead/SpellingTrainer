@@ -1,11 +1,13 @@
+import collections
 import unittest
 from unittest.mock import patch
 
 from random_words import RandomWords
 
+from core.constants import SPELLING, AmE, BrE, DEFINITIONS, TIMES_TO_SPELL, HIGH_PRIORITY_WORDS, LOW_PRIORITY_WORDS, \
+    VOCABULARY, RANDOM_WORDS
 from core.user import User
 from core.word_generator import WordGenerator
-from core.constants import SPELLING, AmE, BrE, DEFINITIONS, TIMES_TO_SPELL
 
 
 class TestPickSpelling(unittest.TestCase):
@@ -38,7 +40,7 @@ class TestPickDictionary(unittest.TestCase):
     def test_pick_dictionary_with_few_vocab(self):
         self.user.dictionaries.vocabulary = {"Dog": {DEFINITIONS: []}, "Cat": {DEFINITIONS: []}}
         choice_source = self.word_generator.pick_dictionary()
-        self.assertIn(choice_source, ['commonly_misspelled', 'common_english', 'random_words'])
+        self.assertIn(choice_source, [HIGH_PRIORITY_WORDS, LOW_PRIORITY_WORDS, 'random_words'])
 
     def test_choose_dictionary_with_many_vocab(self):
         random_words = RandomWords()
@@ -46,23 +48,25 @@ class TestPickDictionary(unittest.TestCase):
         for k in random_key:
             self.user.dictionaries.vocabulary.update({f"{k}": {DEFINITIONS: []}})
         choice_source = self.word_generator.pick_dictionary()
-        self.assertIn(choice_source, ['vocabulary', 'commonly_misspelled', 'common_english', 'random_words'])
+        self.assertIn(choice_source, [VOCABULARY, HIGH_PRIORITY_WORDS, LOW_PRIORITY_WORDS, RANDOM_WORDS])
 
     def test_choose_dictionary_probabilities(self):
-        with patch('random.choices', side_effect=[['commonly_misspelled'], ['common_english'], ['random_words']]):
-            results = [self.word_generator.pick_dictionary() for _ in range(3)]
-        self.assertAlmostEqual(results.count('commonly_misspelled') / len(results), 0.44, delta=0.2)
-        self.assertAlmostEqual(results.count('common_english') / len(results), 0.33, delta=0.2)
-        self.assertAlmostEqual(results.count('random_words') / len(results), 0.22, delta=0.2)
+        num_iterations = 1000
+        results = [self.word_generator.pick_dictionary() for _ in range(num_iterations)]
+        dictionary_counts = collections.Counter(results)
+        self.assertAlmostEqual(dictionary_counts[HIGH_PRIORITY_WORDS] / num_iterations, 0.44, delta=0.1)
+        self.assertAlmostEqual(dictionary_counts[LOW_PRIORITY_WORDS] / num_iterations, 0.33, delta=0.1)
+        self.assertAlmostEqual(dictionary_counts[RANDOM_WORDS] / num_iterations, 0.11, delta=0.1)
 
     def test_choose_dictionary_probabilities_with_vocab(self):
-        with patch('random.choices', side_effect=[['vocabulary'], ['commonly_misspelled'], ['common_english'],
-                                                  ['random_words']]):
-            results = [self.word_generator.pick_dictionary() for _ in range(4)]
-        self.assertAlmostEqual(results.count('commonly_misspelled') / len(results), 0.44, delta=0.2)
-        self.assertAlmostEqual(results.count('common_english') / len(results), 0.33, delta=0.2)
-        self.assertAlmostEqual(results.count('random_words') / len(results), 0.22, delta=0.2)
-        self.assertAlmostEqual(results.count('random_words') / len(results), 0.11, delta=0.2)
+        num_iterations = 1000
+        self.user.dictionaries.vocabulary = [f"word_{i}" for i in range(31)]  # Generate 31 words for vocabulary
+        results = [self.word_generator.pick_dictionary() for _ in range(num_iterations)]
+        dictionary_counts = collections.Counter(results)
+        self.assertAlmostEqual(dictionary_counts[VOCABULARY] / num_iterations, 0.55, delta=0.2)
+        self.assertAlmostEqual(dictionary_counts[HIGH_PRIORITY_WORDS] / num_iterations, 0.44, delta=0.2)
+        self.assertAlmostEqual(dictionary_counts[LOW_PRIORITY_WORDS] / num_iterations, 0.33, delta=0.2)
+        self.assertAlmostEqual(dictionary_counts[RANDOM_WORDS] / num_iterations, 0.11, delta=0.2)
 
 
 class TestIsDuplicate(unittest.TestCase):
@@ -104,22 +108,22 @@ class TestWordGenerator(unittest.TestCase):
         }
         self.word_generator = WordGenerator(self.user, callback=None)
 
-    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='commonly_misspelled')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value=HIGH_PRIORITY_WORDS)
     def test_commonly_misspelled(self, mock_pick_dictionary):
         word_dict = self.word_generator.generate_word()
-        self.assertIn(list(word_dict.keys())[0], self.user.dictionaries.commonly_misspelled.keys())
+        self.assertIn(list(word_dict.keys())[0], self.user.dictionaries.high_priority_words["data"])
 
-    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='common_english')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value=LOW_PRIORITY_WORDS)
     def test_common_english(self, mock_pick_dictionary):
         word_dict = self.word_generator.generate_word()
-        self.assertIn(list(word_dict.keys())[0], self.user.dictionaries.common_english_words)
+        self.assertIn(list(word_dict.keys())[0], self.user.dictionaries.low_priority_words["data"])
 
-    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='vocabulary')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value=VOCABULARY)
     def test_users_vocabulary(self, mock_pick_dictionary):
         word_dict = self.word_generator.generate_word()
         self.assertIn(list(word_dict.keys())[0], self.user.dictionaries.vocabulary)
 
-    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='random')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value=RANDOM_WORDS)
     def test_random_word(self, pick_dictionary):
         word_dict = self.word_generator.generate_word()
         word = list(word_dict.keys())[0]
@@ -130,33 +134,35 @@ class TestWordGenerator(unittest.TestCase):
 class TestWordGeneratorStrictSpelling(unittest.TestCase):
     def setUp(self):
         self.user = User('TestWordGeneratorStrictSpelling', strict_spelling=True)
-        self.user.dictionaries.common_english_words = {
-            'Colour': {
-                AmE: 'Color',
-                DEFINITIONS: {
-                    'Noun': ['a visual attribute of things that results from the light they emit'
-                             ' or transmit or reflect']
+        self.user.dictionaries.low_priority_words = {
+            'data': {
+                'Colour': {
+                    AmE: 'Color',
+                    DEFINITIONS: {
+                        'Noun': ['a visual attribute of things that results from the light they emit'
+                                 ' or transmit or reflect']
+                    }
+                },
+                'Appetite': {
+                    TIMES_TO_SPELL: 0,
+                    DEFINITIONS: {
+                        'Noun': ['a feeling of craving something']
+                         }
                 }
-            },
-            'Appetite': {
-                TIMES_TO_SPELL: 0,
-                DEFINITIONS: {
-                    'Noun': ['a feeling of craving something']
-                     }
             }
         }
         self.word_generator = WordGenerator(self.user, callback=None)
 
     @patch("core.word_generator.WordGenerator.pick_which_spelling")
     @patch("random.choice", return_value="Appetite")
-    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='common_english')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value=LOW_PRIORITY_WORDS)
     def test_strict_spelling_word(self, mock_pick_dictionary, mock_randrange, pick_which_spelling):
         self.word_generator.generate_word()
         pick_which_spelling.assert_not_called()
 
     @patch("core.word_generator.WordGenerator.pick_which_spelling")
     @patch("random.choice", return_value="Colour")
-    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value='common_english')
+    @patch("core.word_generator.WordGenerator.pick_dictionary", return_value=LOW_PRIORITY_WORDS)
     def test_strict_spelling_alt_word(self, mock_pick_dictionary, mock_randrange, pick_which_spelling):
         self.word_generator.generate_word()
         pick_which_spelling.assert_called_once()
@@ -164,14 +170,14 @@ class TestWordGeneratorStrictSpelling(unittest.TestCase):
     @patch("random.choice", return_value='Colour')
     def test_strict_spelling_alt_word_american(self, mock_choice):
         result = self.word_generator.pick_which_spelling(
-            "Colour", {"Colour": self.user.dictionaries.common_english_words["Colour"]})
+            "Colour", {"Colour": self.user.dictionaries.low_priority_words["data"]["Colour"]})
         self.assertIn(SPELLING, result["Colour"].keys())
         self.assertEqual(BrE, result["Colour"][SPELLING])
 
     @patch("random.choice", return_value='Color')
     def test_strict_spelling_alt_word_british(self, mock_choice):
         result = self.word_generator.pick_which_spelling(
-            "Colour", {"Colour": self.user.dictionaries.common_english_words["Colour"]})
+            "Colour", {"Colour": self.user.dictionaries.low_priority_words["data"]["Colour"]})
         self.assertIn(SPELLING, result["Colour"].keys())
         self.assertEqual(AmE, result["Colour"][SPELLING])
 

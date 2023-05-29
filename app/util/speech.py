@@ -6,12 +6,13 @@ import threading
 
 import pyttsx3
 
-from core.config import MAC_OS_VOICES
+from core.config import MONTEREY_VOICES, VENTURA_VOICES
 
 
 def say(word, volume):
     if platform.system() == 'Darwin':  # macOS
-        voice = get_random_macos_voice()
+        mac_version = platform.mac_ver()[0]
+        voice = get_random_macos_voice(mac_version)
         os.system(f'/usr/bin/say [[volm {volume}]] -v {voice} ' + word)
         logging.info(f'{voice} is speaking')
     elif platform.system() == 'Windows':  # Windows
@@ -42,9 +43,15 @@ def say_in_thread(word, volume, voice, engine):
     threading.Thread(target=win_say, args=(word, volume, voice, engine)).start()
 
 
-def get_random_macos_voice():
+def get_random_macos_voice(mac_version):
     # cmd = "say -v '?' | grep 'en[_-]' | awk -F '[ .]' '{print $1}'"
     # cmd_out = subprocess.run(cmd, capture_output=True, shell=True, text=True)
     # str_out = cmd_out.stdout.strip().splitlines()
     # return random.choice(str_out)
-    return random.choice(MAC_OS_VOICES)
+    version_components = mac_version.split('.')
+    major_version = int(version_components[0])
+
+    if major_version <= 12:
+        return random.choice(MONTEREY_VOICES)
+    else:
+        return random.choice(VENTURA_VOICES)

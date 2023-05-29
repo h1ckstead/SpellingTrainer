@@ -72,6 +72,7 @@ class PracticePage(BaseView):
     def change_current_user(self, new_user):
         # Needed for change user feature
         self.current_user = new_user
+        self.spelling_trainer_block.update_user(new_user)
         self.avatar = self.load_avatar()
         self.title_text.configure(image=self.avatar)
 
@@ -112,6 +113,11 @@ class SpellingTrainerBlock(BaseFrame):
         self.spellcheck_hint.grid(row=3, column=0, columnspan=3, padx=10, pady=5, sticky=tk.W)
         self.spellcheck_btn.grid(row=4, column=0, columnspan=2, padx=20, pady=15, sticky=tk.W)
         # self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
+
+    def update_user(self, new_user):
+        self.current_user = new_user
+        self.word_generator = WordGenerator(new_user, self.handle_empty_vocabulary)
+        self.spell_checker = SpellChecker(new_user)
 
     def create_spelling_hint(self):
         attention_img = CTkImage(Image.open(helpers.get_path('assets/attention.png')), size=(15, 15))
@@ -233,14 +239,14 @@ class SpellingTrainerBlock(BaseFrame):
     def say_word(self, event=None):
         if self.word_dict is None:  # case when user just opened the page
             self.new_word()
-        word = list(self.word_dict.keys())[0]
+        word = list(self.word_dict)[0]
         speech.say(word, self.volume_slider.get())
 
     def new_word(self):
         self.spelling_hint.grid_forget()
         self.word_dict = self.word_generator.generate_word()
-        word = list(self.word_dict.keys())[0]
-        if constants.SPELLING in self.word_dict[word].keys():
+        word = list(self.word_dict)[0]
+        if constants.SPELLING in self.word_dict[word]:
             if self.word_dict[word][constants.SPELLING] == constants.AmE:
                 self.spelling_hint.configure(text=strings.AMERICAN_SPELLING)
             elif self.word_dict[word][constants.SPELLING] == constants.BrE:
@@ -366,11 +372,11 @@ class SessionHistoryBlock(BaseFrame):
 
     def update_user_input(self, word_dict, user_word, status):
         self.statuses.append(status)
-        self.corrections.append(list(word_dict.keys())[0])
+        self.corrections.append(list(word_dict)[0])
         self.user_input.append(user_word.title())
         try:
             self.times_to_spell.append(
-                self.parent.current_user.dictionaries.vocabulary[list(word_dict.keys())[0]][constants.TIMES_TO_SPELL])
+                self.parent.current_user.dictionaries.vocabulary[list(word_dict)[0]][constants.TIMES_TO_SPELL])
         except KeyError:
             self.times_to_spell.append("Learned")
         self.statuses = self.statuses[-6:]  # Limit the list size to 5
@@ -447,11 +453,11 @@ class DefinitionBlock(BaseFrame):
         self.definition_field.delete("1.0", tk.END)
         self.show_definition_btn.configure(state=tk.NORMAL, fg_color="#246ba3")
 
-        word = list(word_dict.keys())[0]
-        if constants.DEFINITIONS not in word_dict[word].keys() or word_dict[word][constants.DEFINITIONS] is None:
+        word = list(word_dict)[0]
+        if constants.DEFINITIONS not in word_dict[word] or word_dict[word][constants.DEFINITIONS] is None:
             self.definition_field.insert(tk.END, f"{strings.NO_DEFINITION_FOUND}")
         else:
-            for part_of_speech in word_dict[word][constants.DEFINITIONS].keys():
+            for part_of_speech in word_dict[word][constants.DEFINITIONS]:
                 self.definition_field.insert(tk.END, f"{part_of_speech}:\n", "bold")
                 for i, definition in enumerate(word_dict[word][constants.DEFINITIONS][part_of_speech], start=1):
                     self.definition_field.insert(tk.END, f"{i}. {definition}\n")

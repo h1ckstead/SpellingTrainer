@@ -102,13 +102,16 @@ class TestSoftSpellCheckAltSpelling(unittest.TestCase):
         self.session = Session()
 
     def test_british_correct(self):
-        status = self.spell_checker.soft_spellcheck_alt_spelling("Colour", self.word_dict, "Colour", self.session)
+        status = self.spell_checker.soft_spellcheck_alt_spelling(word="Colour", word_dict=self.word_dict, user_word="Colour",
+                                                                 session=self.session)
         self.assertEqual(status, CORRECT)
 
     def test_american_correct(self):
-        status = self.spell_checker.soft_spellcheck_alt_spelling("Colour", self.word_dict, "Color", self.session)
+        status = self.spell_checker.soft_spellcheck_alt_spelling(word="Colour", word_dict=self.word_dict, user_word="Color",
+                                                                 session=self.session)
         self.assertEqual(status, CORRECT)
 
     def test_incorrect(self):
-        status = self.spell_checker.soft_spellcheck_alt_spelling("Colour", self.word_dict, "Bear", self.session)
+        status = self.spell_checker.soft_spellcheck_alt_spelling(word="Colour", word_dict=self.word_dict, user_word="Bear",
+                                                                 session=self.session)
         self.assertEqual(status, INCORRECT)
