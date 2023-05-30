@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "data": {
+    "Outreach": {
+      "definitions": {
+        "Noun": [
+          "the act of reaching out"
+        ]
+      }
+    },
+    "Oblige": {
+      "definitions": {
+        "Verb": [
+          "force somebody to do something",
+          "bind by an obligation; cause to be indebted",
+          "provide a service or favor for someone"
+        ]
+      }
+    },
+    "Manoeuvre": {
+      "AmE": "Maneuver",
+      "definitions": {
+        "Noun": [
+          "a military training exercise",
+          "a plan for attaining a particular goal",
+          "a deliberate coordinated movement requiring dexterity and skill",
+          "a move made to gain a tactical end",
+          "an action aimed at evading an opponent"
+        ],
+        "Verb": [
+          "direct the course; determine the direction of travelling",
+          "act in order to achieve a certain goal",
+          "perform a movement in military or naval tactics in order to secure an advantage in attack or defense"
+        ]
+      }
+    },
+    "Merchant": {
+      "definitions": {
+        "Noun": [
+          "a businessperson engaged in retail trade"
+        ]
+      }
+    },
+    "Proponent": {
+      "definitions": {
+        "Noun": [
+          "a person who pleads for a cause or propounds an idea"
+        ]
+      }
+    },
+    "Refurbish": {
+      "definitions": {
+        "Verb": [
+          "make brighter and prettier"
+        ]
+      }
+    },
+    "Aluminium": {
+      "definitions": {
+        "Noun": [
+          "a silvery ductile metallic element found primarily in bauxite"
+        ]
+      },
+      "AmE": "Aluminum"
+    },
+    "Approximately": {
+      "definitions": {
+        "Adverb": [
+          "(of quantities) imprecise but fairly close to correct"
+        ]
+      }
+    },
+    "Astronaut": {
+      "definitions": {
+        "Noun": [
+          "a person trained to travel in a spacecraft"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "Outreach": {
+    "times_to_spell": 3,
+    "definitions": {
+      "Noun": [
+        "the act of reaching out"
+      ]
+    }
+  },
+  "Miscellaneous": {
+    "times_to_spell": 5,
+    "definitions": {
+      "Adjective": [
+        "consisting of a haphazard assortment of different kinds",
+        "having many aspects or qualities"
+      ]
+    }
+  },
+  "Oblige": {
+    "times_to_spell": 1,
+    "definitions": {
+      "Verb": [
+        "force somebody to do something",
+        "bind by an obligation; cause to be indebted",
+        "provide a service or favor for someone"
+      ]
+    }
+  },
+  "Languish": {
+    "times_to_spell": 11,
+    "definitions": {
+      "Verb": [
+        "lose vigor, health, or flesh, as through grief",
+        "have a desire for something or someone who is not present",
+        "become feeble"
+      ]
+    }
+  },
+  "Manoeuvre": {
+    "times_to_spell": 7,
+    "AmE": "Maneuver",
+    "definitions": {
+      "Noun": [
+        "a military training exercise",
+        "a plan for attaining a particular goal",
+        "a deliberate coordinated movement requiring dexterity and skill",
+        "a move made to gain a tactical end",
+        "an action aimed at evading an opponent"
+      ],
+      "Verb": [
+        "direct the course; determine the direction of travelling",
+        "act in order to achieve a certain goal",
+        "perform a movement in military or naval tactics in order to secure an advantage in attack or defense"
+      ]
+    }
+  },
+  "Moustache": {
+    "times_to_spell": 8,
+    "definitions": {
+      "Noun": [
+        "an unshaved growth of hair on the upper lip"
+      ]
+    },
+    "AmE": "Mustache"
+  },
+  "Merchant": {
+    "times_to_spell": 1,
+    "definitions": {
+      "Noun": [
+        "a businessperson engaged in retail trade"
+      ]
+    }
+  },
+  "Nuance": {
+    "times_to_spell": 7,
+    "definitions": {
+      "Noun": [
+        "a subtle difference in meaning or opinion or attitude"
+      ]
+    }
+  },
+  "NonexistentWord": {
+    "times_to_spell": 10,
+    "definitions": {
+      "Noun": [
+        "word that doesn't exist in the dictionaries"
+      ]
+    }
+  }
+}
