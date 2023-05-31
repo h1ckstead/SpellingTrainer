@@ -1,11 +1,10 @@
 import tkinter as tk
-import webbrowser
 
 from PIL import Image
-from customtkinter import CTkLabel, CTkImage, CTkFrame, CTkFont, CTkButton
+from customtkinter import CTkImage, CTkFrame, CTkFont, CTkButton
 
 from core import strings, config
-from core.gui.elements import Button, GreyLine, HintLabel
+from core.gui.elements import Button, GreyLine
 from util import helpers
 
 
@@ -23,7 +22,7 @@ class BaseView(CTkFrame):
     def report_bug_btn(self):
         bug = CTkImage(Image.open(helpers.get_path('assets/bug.png')), size=(13, 13))
         button = CTkButton(self, text=strings.BUG_REPORT, text_color="#abb0b6", image=bug, compound=tk.LEFT,
-                           command=lambda: webbrowser.open("mailto:spellingtrainer@proton.me"))
+                           command=helpers.report_bug)
         button.configure(width=90, height=20, font=CTkFont(None, 8), fg_color="transparent", hover_color="#212121")
         return button
 
