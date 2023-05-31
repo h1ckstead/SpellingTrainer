@@ -1,8 +1,10 @@
-import os
-import sys
-import pickle
-from core import config
 import logging
+import os
+import pickle
+import sys
+import webbrowser
+
+from core import config
 from core import constants
 from core.constants import HIGH_PRIORITY_WORDS, LOW_PRIORITY_WORDS
 
@@ -51,6 +53,17 @@ def get_path(*args):
 
 def get_avatars_list():
     return os.listdir(get_path("assets/avatars"))
+
+
+def report_bug():
+    email_address = "spellingtrainer@proton.me"
+    subject = "[Bug Report] for Spelling Trainer"
+
+    body = f"Hello,\n\nI wanted to provide feedback for the Spelling Trainer {config.VERSION}.\n\n" \
+           f"[Your feedback here, include any relevant information, steps to reproduce, screenshots]"
+
+    mailto_url = f"mailto:{email_address}?subject={subject}&body={body}"
+    webbrowser.open(mailto_url)
 
 
 def load_dictionary(name):
