@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "data": {
+    "Epic": {
+      "definitions": {
+        "Noun": [
+          "a long narrative poem telling of a hero's deeds"
+        ],
+        "Adjective": [
+          "very imposing or impressive; surpassing the ordinary (especially in size or scale)",
+          "constituting or having to do with or suggestive of a literary epic"
+        ]
+      }
+    }
+  }
+}

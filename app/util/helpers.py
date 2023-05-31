@@ -4,11 +4,11 @@ import pickle
 from core import config
 import logging
 from core import constants
+from core.constants import HIGH_PRIORITY_WORDS, LOW_PRIORITY_WORDS
 
 
 def load_save():
     savefile_path = get_savefile_path()
-    logging.info(savefile_path)
     try:
         with open(savefile_path, 'rb') as file:
             data = pickle.load(file)
@@ -71,49 +71,94 @@ def verify_dicts_version(saved_data):
     :param saved_data: dict
     :return:
     """
-    if saved_data[saved_data["last_user"]].dictionaries.high_priority_words["version"] < config.DICT_VERSION:
-        users = saved_data.pop("last_user")
-        update_user_dicts(users)
+    updated = False
+    last_user = saved_data["last_user"]
+    if saved_data[last_user].dictionaries.high_priority_words["version"] < config.HIGH_PRIORITY_DICT_VERSION:
+        logging.info(f"{HIGH_PRIORITY_WORDS} is stale. Updating from "
+                     f"{saved_data[last_user].dictionaries.high_priority_words['version']} to "
+                     f"{config.HIGH_PRIORITY_DICT_VERSION}.")
+        saved_data.pop("last_user")
+        users = saved_data
+        update_user_dict(users, to_update=HIGH_PRIORITY_WORDS)
+        users["last_user"] = last_user
+        updated = True
+    if saved_data[last_user].dictionaries.low_priority_words["version"] < config.LOW_PRIORITY_DICT_VERSION:
+        logging.info(f"{LOW_PRIORITY_WORDS} is stale. Updating from "
+                     f"{saved_data[last_user].dictionaries.low_priority_words['version']} to "
+                     f"{config.LOW_PRIORITY_DICT_VERSION}.")
+        saved_data.pop("last_user")
+        users = saved_data
+        update_user_dict(users, to_update=LOW_PRIORITY_WORDS)
+        users["last_user"] = last_user
+        updated = True
     else:
         logging.info("Users' dictionaries are up to date")
+    return updated
 
 
-def update_user_dicts(users):
+def update_user_dict(users, to_update):
     """
     Updates dictionaries for all existing users.
 
     :param users: dict
+    :param to_update str name of the dictionary
     :return:
     """
-    new_high_priority_words = load_dictionary(constants.HIGH_PRIORITY_WORDS)
-    new_low_priority_words = load_dictionary(constants.LOW_PRIORITY_WORDS)
-    for user in users:
-        vocabulary = users[user].vocabulary
-        learned_words = users[user].learned_words
+    for user in users.values():
+        existing_data = []
+        if len(user.dictionaries.vocabulary) == 0 and len(user.dictionaries.learned_words) == 0:
+            if to_update == HIGH_PRIORITY_WORDS:
+                user.dictionaries.high_priority_words = load_dictionary(constants.HIGH_PRIORITY_WORDS)
+                return
+            elif to_update == LOW_PRIORITY_WORDS:
+                user.dictionaries.low_priority_words = load_dictionary(constants.LOW_PRIORITY_WORDS)
+                return
+        elif len(user.dictionaries.vocabulary) == 0:
+            existing_data = [user.dictionaries.learned_words]
+        elif len(user.dictionaries.learned_words) == 0:
+            existing_data = [user.dictionaries.vocabulary]
+        else:
+            existing_data = [user.dictionaries.vocabulary, user.dictionaries.learned_words]
 
-        updated_high_priority_words = remove_duplicates(to_remove_from=new_high_priority_words, model=vocabulary)
-        final_high_priority_words = remove_duplicates(to_remove_from=updated_high_priority_words, model=learned_words)
-        
-        updated_low_priority_words = remove_duplicates(to_remove_from=new_low_priority_words, model=vocabulary)
-        final_low_priority_words = remove_duplicates(to_remove_from=updated_low_priority_words, model=learned_words)
-
-        users[user].dictionaries.high_priority_words = final_high_priority_words
-        users[user].dictionaries.low_priority_words = final_low_priority_words
+        if to_update == HIGH_PRIORITY_WORDS:
+            new_high_priority_words = load_dictionary(constants.HIGH_PRIORITY_WORDS)["data"]
+            for data in existing_data:
+                updated_high_priority_words = remove_duplicates(to_remove_from=new_high_priority_words, model=data)
+                user.dictionaries.high_priority_words["data"] = updated_high_priority_words
+                user.dictionaries.high_priority_words["version"] = config.HIGH_PRIORITY_DICT_VERSION
+        elif to_update == LOW_PRIORITY_WORDS:
+            new_low_priority_words = load_dictionary(constants.LOW_PRIORITY_WORDS)["data"]
+            for data in existing_data:
+                updated_low_priority_words = remove_duplicates(to_remove_from=new_low_priority_words, model=data)
+                user.dictionaries.low_priority_words["data"] = updated_low_priority_words
+                user.dictionaries.low_priority_words["version"] = config.LOW_PRIORITY_DICT_VERSION
+        user.save_progress()
 
 
 def remove_duplicates(to_remove_from, model):
     """
-    Compares two dicts and removes common values from one of them.
+    Compares two dicts and removes common values from one of them
+    Updates changed values.
 
     :param to_remove_from: dict
     :param model: dict
     :return: dict
     """
-    new_dict = {}
+    keys_to_remove = []
     for key, value in to_remove_from.items():
-        if key not in model:
-            new_dict[key] = value
-        else:
-            print(f"Removed {key} from dict")
-    to_remove_from = new_dict
+        if key in model and constants.AmE in model[key] and constants.AmE not in value:
+            del model[key][constants.AmE]
+            logging.info(f"Removed 'AmE' value for word {key}")
+        if key in model and constants.AmE in value:
+            model[key][constants.AmE] = value[constants.AmE]
+            logging.info(f"Added/Updated 'AmE' value for word {key}")
+        if key in model and value[constants.DEFINITIONS] == model[key]:
+            keys_to_remove.append(key)
+        elif key in model:
+            model[key][constants.DEFINITIONS] = value[constants.DEFINITIONS]
+            keys_to_remove.append(key)
+            logging.info(f"Updated value of word {key}")
+    for key in keys_to_remove:
+        del to_remove_from[key]
+        logging.info(f"Removed {key} from dict")
     return to_remove_from

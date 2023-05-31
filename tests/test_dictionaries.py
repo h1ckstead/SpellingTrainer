@@ -3,7 +3,8 @@ from unittest.mock import patch
 
 from core.dictionaries import Dictionaries
 from core.session import Session
-from core.config import TIMES_TO_SPELL_IF_CORRECT, TIMES_TO_SPELL_IF_INCORRECT, DICT_VERSION
+from core.config import TIMES_TO_SPELL_IF_CORRECT, TIMES_TO_SPELL_IF_INCORRECT, HIGH_PRIORITY_DICT_VERSION, \
+    LOW_PRIORITY_DICT_VERSION
 from core.constants import TIMES_TO_SPELL, CORRECT, INCORRECT, ALREADY_EXISTS, AmE, HIGH_PRIORITY_WORDS
 from util import helpers
 
@@ -15,8 +16,8 @@ class LoadDictionaryTest(unittest.TestCase):
 
     def test_dictionary_version(self):
         dictionaries = Dictionaries()
-        self.assertEqual(dictionaries.high_priority_words["version"], DICT_VERSION)
-        self.assertEqual(dictionaries.low_priority_words["version"], DICT_VERSION)
+        self.assertEqual(dictionaries.high_priority_words["version"], HIGH_PRIORITY_DICT_VERSION)
+        self.assertEqual(dictionaries.low_priority_words["version"], LOW_PRIORITY_DICT_VERSION)
 
     def test_initialization(self):
         dictionaries = Dictionaries()
@@ -27,8 +28,8 @@ class LoadDictionaryTest(unittest.TestCase):
 
     def test_dictionary_length(self):
         dictionaries = Dictionaries()
-        self.assertEqual(len(dictionaries.high_priority_words["data"]), 775)  # old: 474
-        self.assertEqual(len(dictionaries.low_priority_words["data"]), 5697)  # old: 6207
+        self.assertEqual(len(dictionaries.high_priority_words["data"]), 805)  # old: 474
+        self.assertEqual(len(dictionaries.low_priority_words["data"]), 5535)  # old: 6207
 
 
 class VocabularyTest(unittest.TestCase):
