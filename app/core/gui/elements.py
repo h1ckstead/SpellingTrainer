@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import Label
-from typing import Callable, Union
 
 from PIL import ImageTk, Image
 from customtkinter import CTkButton, CTkEntry, CTkSwitch, CTkLabel, CTkFont, CTkProgressBar, CTkImage
@@ -14,15 +13,6 @@ class Button(CTkButton):
     def __init__(self, parent, text, command=None, image=None, width=140, height=35, **kwargs):
         super().__init__(parent, text=text, command=command, image=image, width=width, height=height, **kwargs)
         self.configure(border_width=1, border_color="white", fg_color="transparent", hover_color="#212121")
-        # self.hover_bg_color = "#d3d3d3"
-        # self.bind("<Enter>", self.on_enter)
-        # self.bind("<Leave>", self.on_leave)
-
-    # def on_enter(self, event):
-    #     self.config(bg=self.hover_bg_color)
-    #
-    # def on_leave(self, event):
-    #     self.config(bg=self["bg"])
 
 
 class CTAButton(CTkButton):
@@ -79,13 +69,6 @@ class HintLabel(Label):
             self.config(image=self.image, compound="left", padx=6)
 
 
-class StrictSpellingHint(CTkLabel):
-    def __init__(self, parent, wraplength=200):
-        super().__init__(parent, text=strings.STRICT_SPELLING_HINT,
-                         font=CTkFont(family=None, size=config.HINT_FONT_SIZE),
-                         wraplength=wraplength, justify="left", pady=10)
-
-
 class GreyLine(CTkProgressBar):
     def __init__(self, parent, width, height=2, progress_color="#aab0b5", **kwargs):
         CTkProgressBar.__init__(self, parent, **kwargs)
@@ -108,39 +91,6 @@ class ThickLine(CTkProgressBar):
 
 
 class CustomToolTip(ToolTip):
-    def __init__(
-            self,
-            widget: tk.Widget,
-            msg: Union[str, Callable] = None,
-            delay: float = 0.0,
-            follow: bool = True,
-            refresh: float = 1.0,
-            x_offset: int = +10,
-            y_offset: int = +10,
-            parent_kwargs: dict = {"bg": "black", "padx": 1, "pady": 1},
-            bordercolor: str = "black",
-            **message_kwargs,
-    ):
-        # Call the super constructor to initialize the ToolTip
-        super().__init__(
-            widget,
-            msg,
-            delay,
-            follow,
-            refresh,
-            x_offset,
-            y_offset,
-            parent_kwargs,
-            **message_kwargs,
-        )
-        # Add the bordercolor attribute to the CustomToolTip class
-        self.bordercolor = bordercolor
-
-    def _show(self):
-        super()._show()  # Call the super method to display the ToolTip
-
-        # Modify the border color
-        self.configure(background="white")
-        if isinstance(self.msg, tk.StringVar):
-            self.msg.set(self.msg.get())
-            self.msg.config(highlightbackground=self.bordercolor, highlightthickness=1)
+    def __init__(self, widget, text):
+        super().__init__(widget=widget, msg=text, delay=0.7, parent_kwargs={"bg": "#dce4ee", "padx": 1, "pady": 1},
+                         bg="#2b2b2b", fg="#dce4ee")

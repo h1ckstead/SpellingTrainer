@@ -28,7 +28,6 @@ class EditProfilePage(BaseView):
         self.report_bug_btn.grid(row=4, column=0, columnspan=3, pady=(42, 0))
 
     def save_changes(self):
-        old_username = self.current_user.name
         new_username = self.profile_edit_block.get_username()
         self.current_user.edit_username(new_username)
         self.current_user.edit_avatar(self.profile_edit_block.selected_avatar)
