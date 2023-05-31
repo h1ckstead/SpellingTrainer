@@ -3,7 +3,6 @@ from _tkinter import TclError
 from tkinter import StringVar, Label, BooleanVar, messagebox
 
 from PIL import Image, ImageTk
-from PIL.ImageTk import PhotoImage
 from customtkinter import CTkFrame, CTkComboBox, CTkFont, CTkImage, CTkLabel, CTkCheckBox, CTkButton, CTkSwitch, \
     CTkProgressBar, CTkToplevel
 
@@ -448,7 +447,7 @@ class AddWordsBlock(BaseFrame):
         self.title = CTkLabel(self, text=strings.ADD_WORDS_HEADER, font=CTkFont("Arial", config.HEADER_FONT_SIZE,
                                                                                 weight="bold"))
         self.hint = CTkLabel(self, text=strings.ADD_WORDS_HINT, wraplength=350, font=CTkFont("Arial", 12))
-        self.entry_field = EntryField(self, placeholder_text=strings.ADD_WORD, width=200)
+        self.entry_field = EntryField(self, placeholder_text=strings.ADD_WORD, width=200, validate=True, max_chars=45)
         self.entry_field.bind("<KeyRelease>", lambda event: self.on_entry_change())
         self.add_btn = CTAButton(self, text=strings.ADD, width=50, height=28, state=tk.DISABLED, fg_color="#565b5e",
                                  command=lambda: self.add_word(self.entry_field.get().title()))
@@ -533,9 +532,9 @@ class AddWordsBlock(BaseFrame):
 
             british_label = CTkLabel(self.dialog, text=strings.BRITISH_SPELLING)
             british_entry_var = StringVar(self.dialog)
-            british_entry = EntryField(self.dialog, textvariable=british_entry_var)
+            british_entry = EntryField(self.dialog, textvariable=british_entry_var, validate=True, max_chars=45)
             british_entry_var.trace('w', validate_entries)
-            american_label = CTkLabel(self.dialog, text=strings.AMERICAN_SPELLING)
+            american_label = CTkLabel(self.dialog, text=strings.AMERICAN_SPELLING, validate=True, max_chars=45)
             american_entry_var = StringVar(self.dialog)
             american_entry = EntryField(self.dialog, textvariable=american_entry_var)
             american_entry_var.trace('w', validate_entries)

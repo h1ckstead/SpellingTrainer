@@ -1,5 +1,3 @@
-import pickle
-
 from spellchecker import SpellChecker
 
 from core import config, constants
