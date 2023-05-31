@@ -55,7 +55,7 @@ class SpellingTrainerApp(CTk):
         menu_bar = tk.Menu(self)
 
         file_menu = tk.Menu(menu_bar, tearoff=0)
-        file_menu.add_command(label="Check for updates...")  # TODO: Add check for updates function
+        file_menu.add_command(label="Check for updates...", command=helpers.check_for_updates)
         file_menu.add_command(label="Report a bug", command=helpers.report_bug)
         file_menu.add_command(label="Donate", command=self.open_donate_page)
         file_menu.add_command(label="About", command=self.show_info)

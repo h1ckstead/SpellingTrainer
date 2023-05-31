@@ -7,6 +7,6 @@ RandomWords~=0.4.0
 pyttsx3~=2.90
 setuptools~=65.5.1
 
-requests~=2.5.1
+requests~=2.31.0
 bs4~=0.0.1
 beautifulsoup4~=4.11.2
