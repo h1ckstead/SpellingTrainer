@@ -28,9 +28,4 @@ GREEN = "#6bbe66"
 RED = "#ff4141"
 
 # Mac OS
-INITIAL_VOICES = ['Daniel', 'Karen', 'Samantha']
-VENTURA_VOICES = ['Albert', 'Bad', 'Bahh', 'Bells', 'Boing', 'Bubbles', 'Cellos', 'Daniel', 'Wobble', 'Eddy', 'Flo',
-                  'Fred', 'Good', 'Grandma', 'Grandpa', 'Jester', 'Junior', 'Karen', 'Kathy', 'Moira', 'Organ',
-                  'Superstar', 'Ralph', 'Reed', 'Rishi', 'Rocko', 'Samantha', 'Sandy', 'Shelley', 'Tessa', 'Trinoids',
-                  'Whisper', 'Zarvox']
-MONTEREY_VOICES = ['Moira', 'Tessa'] + INITIAL_VOICES
+MACOS_VOICES = ['Daniel', 'Karen', 'Samantha', 'Moira', 'Tessa']
