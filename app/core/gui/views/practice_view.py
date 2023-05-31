@@ -339,7 +339,12 @@ class SessionHistoryBlock(BaseFrame):
         self.header_text = CTkLabel(self, text=strings.HISTORY_HEADER, font=CTkFont("Arial", config.HEADER_FONT_SIZE,
                                                                                     weight="bold"))
         self.times_to_spell_text = CTkLabel(self, text=strings.TIMES_TO_SPELL_HEADER)
-        self.times_to_spell_tooltip = ToolTip(self.times_to_spell_text, msg=strings.TIMES_TO_SPELL_TOOLTIP)
+        # self.times_to_spell_tooltip = ToolTip(self.times_to_spell_text, msg=strings.TIMES_TO_SPELL_TOOLTIP, delay=0.7,
+        #                                       # parent_kwargs={"bg": "white", "padx": 1, "pady": 1},
+        #                                       parent_kwargs={"bg": "white", "padx": 1, "pady": 1},
+        #                                       bg="yellow", fg="red"
+        #                                       )
+        self.times_to_spell_tooltip = CustomToolTip(self.times_to_spell_text, text=strings.TIMES_TO_SPELL_TOOLTIP)
         self.filler_image = CTkLabel(self, text="", image=self.cat_image())
 
         self.status_header.grid(row=0, column=0)

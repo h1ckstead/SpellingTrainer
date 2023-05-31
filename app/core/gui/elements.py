@@ -108,39 +108,6 @@ class ThickLine(CTkProgressBar):
 
 
 class CustomToolTip(ToolTip):
-    def __init__(
-            self,
-            widget: tk.Widget,
-            msg: Union[str, Callable] = None,
-            delay: float = 0.0,
-            follow: bool = True,
-            refresh: float = 1.0,
-            x_offset: int = +10,
-            y_offset: int = +10,
-            parent_kwargs: dict = {"bg": "black", "padx": 1, "pady": 1},
-            bordercolor: str = "black",
-            **message_kwargs,
-    ):
-        # Call the super constructor to initialize the ToolTip
-        super().__init__(
-            widget,
-            msg,
-            delay,
-            follow,
-            refresh,
-            x_offset,
-            y_offset,
-            parent_kwargs,
-            **message_kwargs,
-        )
-        # Add the bordercolor attribute to the CustomToolTip class
-        self.bordercolor = bordercolor
-
-    def _show(self):
-        super()._show()  # Call the super method to display the ToolTip
-
-        # Modify the border color
-        self.configure(background="white")
-        if isinstance(self.msg, tk.StringVar):
-            self.msg.set(self.msg.get())
-            self.msg.config(highlightbackground=self.bordercolor, highlightthickness=1)
+    def __init__(self, widget, text, ):
+        super().__init__(widget=widget, msg=text, delay=0.7, parent_kwargs={"bg": "white", "padx": 1, "pady": 1},
+                         bg="yellow", fg="red")
