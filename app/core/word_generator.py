@@ -50,7 +50,7 @@ class WordGenerator:
         random_words = RandomWords()
         while True:
             word = random_words.random_word(min_letter_count=5).title()
-            if not self.is_duplicate(word.title()):
+            if not self.is_duplicate(word):
                 word_dict = {word: {DEFINITIONS: None}}  # TODO: Think about loading definition in the background
                 return word, word_dict
 
@@ -100,9 +100,9 @@ class WordGenerator:
         :return: list of strings
         """
         choice_sources = []
-        if len(self.user.dictionaries.high_priority_words["data"]) > 0:
+        if bool(self.user.dictionaries.high_priority_words["data"]):
             choice_sources.append(HIGH_PRIORITY_WORDS)
-        if len(self.user.dictionaries.low_priority_words["data"]) > 0:
+        if bool(self.user.dictionaries.low_priority_words["data"]):
             choice_sources.append(LOW_PRIORITY_WORDS)
         return choice_sources
 
@@ -117,7 +117,7 @@ class WordGenerator:
         :return: original dict with added key Spelling
         """
         word_choice = random.choice([word, word_dict[word][AmE]])
-        if word_choice in word_dict.keys():
+        if word_choice in word_dict:
             word_dict[word].update({SPELLING: BrE})
         else:
             word_dict[word].update({SPELLING: AmE})
