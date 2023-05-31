@@ -3,6 +3,10 @@ import os
 import pickle
 import sys
 import webbrowser
+import requests
+from bs4 import BeautifulSoup
+from tkinter import messagebox
+
 
 from core import config
 from core import constants
@@ -175,3 +179,24 @@ def remove_duplicates(to_remove_from, model):
         del to_remove_from[key]
         logging.info(f"Removed {key} from dict")
     return to_remove_from
+
+
+def check_for_updates():
+    page_url = 'https://spellingtrainer.wixsite.com/spelling-trainer'
+
+    response = requests.get(page_url)
+    html = response.text
+
+    soup = BeautifulSoup(html, 'html.parser')
+    footer = soup.find("footer", {"class": "SITE_FOOTER_WRAPPER"})
+    version_element = footer.find('p', text=lambda text: text and 'Version: ' in text).string
+    version = version_element.replace('Version: ', '')
+
+    if version != config.VERSION:
+        message = 'New version is available: {}\n\nDo you want to go to the website and download the update?'.format(
+            version)
+        result = messagebox.askquestion('Update Available', message, icon='question')
+        if result == 'yes':
+            webbrowser.open(page_url)
+    else:
+        messagebox.showinfo('Up to Date', 'Already up to date', icon='info')
