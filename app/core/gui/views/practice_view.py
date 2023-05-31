@@ -338,11 +338,6 @@ class SessionHistoryBlock(BaseFrame):
         self.header_text = CTkLabel(self, text=strings.HISTORY_HEADER, font=CTkFont("Arial", config.HEADER_FONT_SIZE,
                                                                                     weight="bold"))
         self.times_to_spell_text = CTkLabel(self, text=strings.TIMES_TO_SPELL_HEADER)
-        # self.times_to_spell_tooltip = ToolTip(self.times_to_spell_text, msg=strings.TIMES_TO_SPELL_TOOLTIP, delay=0.7,
-        #                                       # parent_kwargs={"bg": "white", "padx": 1, "pady": 1},
-        #                                       parent_kwargs={"bg": "white", "padx": 1, "pady": 1},
-        #                                       bg="yellow", fg="red"
-        #                                       )
         self.times_to_spell_tooltip = CustomToolTip(self.times_to_spell_text, text=strings.TIMES_TO_SPELL_TOOLTIP)
         self.filler_image = CTkLabel(self, text="", image=self.cat_image())
 
@@ -376,7 +371,11 @@ class SessionHistoryBlock(BaseFrame):
 
     def update_user_input(self, word_dict, user_word, status):
         self.statuses.append(status)
-        self.corrections.append(list(word_dict)[0])
+        word = list(word_dict)[0]
+        if constants.SPELLING in word_dict[word] and word_dict[word][constants.SPELLING] == constants.AmE:
+            self.corrections.append(word_dict[word][constants.AmE])
+        else:
+            self.corrections.append(word)
         self.user_input.append(user_word.title())
         try:
             self.times_to_spell.append(
@@ -443,7 +442,7 @@ class DefinitionBlock(BaseFrame):
             self.scroll.grid(row=3, column=3, columnspan=2)
         self.show_definition_btn.configure(state=tk.DISABLED, fg_color="#565b5e")
 
-    def hide_definition(self, word_dict, user_word, status):  # TODO: Think how to do it without params
+    def hide_definition(self, word_dict, user_word, status):
         self.definition_hint.grid(row=0, column=1, columnspan=2, padx=(38, 0), pady=(10, 0))
         self.definition_header.grid_forget()
         self.definition_field.grid_forget()

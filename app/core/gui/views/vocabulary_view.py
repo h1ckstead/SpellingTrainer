@@ -534,9 +534,9 @@ class AddWordsBlock(BaseFrame):
             british_entry_var = StringVar(self.dialog)
             british_entry = EntryField(self.dialog, textvariable=british_entry_var, validate=True, max_chars=45)
             british_entry_var.trace('w', validate_entries)
-            american_label = CTkLabel(self.dialog, text=strings.AMERICAN_SPELLING, validate=True, max_chars=45)
+            american_label = CTkLabel(self.dialog, text=strings.AMERICAN_SPELLING)
             american_entry_var = StringVar(self.dialog)
-            american_entry = EntryField(self.dialog, textvariable=american_entry_var)
+            american_entry = EntryField(self.dialog, textvariable=american_entry_var, validate=True, max_chars=45)
             american_entry_var.trace('w', validate_entries)
             cancel = Button(self.dialog, text=strings.CANCEL, width=60, command=self.dialog.destroy)
             add = CTAButton(self.dialog, text=strings.ADD, width=60, state=tk.DISABLED, fg_color="#565b5e",
