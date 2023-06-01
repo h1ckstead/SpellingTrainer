@@ -27,9 +27,6 @@ def get_random_win_voice(engine):
     return random.choice(voices).id
 
 
-is_speech_in_progress = False
-
-
 def win_say(word, volume, voice, engine, rate=0.8):
     initial_rate = engine.getProperty('rate')
     engine.setProperty('voice', voice)

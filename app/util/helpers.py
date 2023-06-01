@@ -126,10 +126,8 @@ def update_user_dict(users, to_update):
         if not user.dictionaries.vocabulary and not user.dictionaries.learned_words:
             if to_update == HIGH_PRIORITY_WORDS:
                 user.dictionaries.high_priority_words = load_dictionary(constants.HIGH_PRIORITY_WORDS)
-                return
             elif to_update == LOW_PRIORITY_WORDS:
                 user.dictionaries.low_priority_words = load_dictionary(constants.LOW_PRIORITY_WORDS)
-                return
         elif not user.dictionaries.vocabulary:
             existing_data = [user.dictionaries.learned_words]
         elif not user.dictionaries.learned_words:
