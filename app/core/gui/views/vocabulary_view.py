@@ -123,7 +123,7 @@ class VocabularyBlock(BaseFrame):
         self.sorting.focus_set()  # To avoid bug where default_value appears only on hover
         sorting_hint.grid(row=2, column=0, columnspan=2, padx=(40, 0), pady=(0, 5))
 
-    def on_sorting_change(self, event):
+    def on_sorting_change(self, event=None):
         sort_choice = self.sorting.get()
         if sort_choice == strings.AZ:
             self.sort_alphabetically()
@@ -149,16 +149,6 @@ class VocabularyBlock(BaseFrame):
         for i in range(self.page_size):
             placeholder_label = CTkLabel(self, text="0", text_color="#2b2b2b", height=18)
             placeholder_label.grid(row=i + 4, column=0, columnspan=2, pady=1, sticky=tk.EW)
-
-    # def show_empty_vocab_message(self):
-    #     self.create_empty_rows()
-    #     self.empty_msg = CTkLabel(self, text=strings.EMPTY_VOCAB_HEADER, font=("Arial", config.HEADER_FONT_SIZE),
-    #                               wraplength=250)
-    #     text = CTkLabel(self, text=strings.EMPTY_VOCAB_TEXT, wraplength=250)
-    #     self.empty_msg.grid(row=4, column=0, columnspan=2, rowspan=7)
-    #     text.grid(row=8, column=0, columnspan=2, rowspan=7)
-    #     self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
-    #     self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
 
     def show_empty_vocab_message(self):
         self.create_empty_rows()
@@ -186,72 +176,10 @@ class VocabularyBlock(BaseFrame):
         if self.current_page > self.total_pages:
             self.current_page = self.total_pages if self.total_pages > 0 else 1
 
-        self.display_vocabulary()
-
-    # def display_vocabulary(self, *args):
-    #     self.clear_data_frame()
-    #     self.checkboxes = []
-    #     self.checkbox_vars = []
-    #
-    #     if len(self.user_vocabulary_copy) == 0:  # Empty vocabulary case
-    #         self.show_empty_vocab_message()
-    #     else:
-    #         search_text = self.search_field.get().lower()
-    #         if not search_text:  # No search prompt, display all vocabulary words
-    #             matched_words = list(self.user_vocabulary_copy)
-    #         else:
-    #             matched_words = self.search_vocabulary(search_text)  # Search for matching words
-    #
-    #         if len(self.user_vocabulary_copy) == 0:  # Empty vocabulary case
-    #             self.show_empty_vocab_message()
-    #         else:
-    #             search_text = self.search_field.get().lower()
-    #             if not search_text:  # No search prompt, display all vocabulary words
-    #                 matched_words = list(self.user_vocabulary_copy)
-    #             else:
-    #                 matched_words = self.search_vocabulary(search_text)  # Search for matching words
-    #
-    #             if len(matched_words) == 0:  # No matched words case
-    #                 self.show_word_not_found(search_text)
-    #             else:
-    #                 start_index = (self.current_page - 1) * self.page_size
-    #                 end_index = start_index + self.page_size
-    #                 current_page_data = matched_words[start_index:end_index]
-    #
-    #                 if self.total_pages <= 1:
-    #                     self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
-    #                     self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
-    #                 elif self.current_page == 1 and self.total_pages > 1:
-    #                     self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
-    #                     self.next_button.configure(state=tk.NORMAL, fg_color="#246ba3")
-    #                 elif self.current_page == 1:
-    #                     self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
-    #
-    #                 for row, word in enumerate(current_page_data, start=4):
-    #                     checkbox_var = BooleanVar()
-    #                     checkbox_var.trace('w', self.update_select_all_checkbox)
-    #                     self.checkbox_vars.append(checkbox_var)
-    #
-    #                     times_to_spell = self.user_vocabulary_copy[word][constants.TIMES_TO_SPELL]
-    #                     label_text = f"{word}"
-    #                     checkbox = CTkCheckBox(self, checkbox_width=18, checkbox_height=18, border_width=1, height=15,
-    #                                            text=label_text, variable=checkbox_var,
-    #                                            command=self.update_delete_button_state)
-    #                     checkbox.grid(row=row, column=0, padx=(10, 0), pady=1, sticky=tk.W)
-    #
-    #                     times_to_spell_label = CTkLabel(self, text=f"{times_to_spell}", height=15)
-    #                     times_to_spell_label.grid(row=row, column=1, padx=(10, 0), pady=1)
-    #
-    #                     self.checkboxes.append(checkbox_var)
-    #
-    #                 # Add empty rows or placeholder widgets to fill the remaining space
-    #                 remaining_rows = self.page_size - len(current_page_data)
-    #                 for i in range(remaining_rows):
-    #                     placeholder_label = CTkLabel(self, text="0", text_color="#2b2b2b", height=18)
-    #                     placeholder_label.grid(row=i + len(current_page_data) + 4, column=0, columnspan=2, pady=1,
-    #                                            sticky=tk.EW)
-    #         self.page_label.configure(text=f"Page: {self.current_page}/{self.total_pages}")
-    #         self.display_master_checkbox()
+        if self.sorting.get():
+            self.on_sorting_change()
+        else:
+            self.display_vocabulary()
 
     def display_vocabulary(self, *args):
         self.clear_data_frame()
@@ -501,17 +429,17 @@ class AddWordsBlock(BaseFrame):
             success_message = self.show_success_message(word)
             success_message.grid(row=0, column=0, columnspan=2, rowspan=2)
             self.entry_field.delete(0, 'end')
+            self.add_btn.configure(state=tk.DISABLED, fg_color="#565b5e")
             self.current_user.save_progress()
             self.parent.vocabulary_block.load_vocabulary()
             self.update_practice_page()
             success_message.after(3000, lambda: success_message.destroy())
 
     def show_success_message(self, word):
-        container = CTkFrame(self, width=400, height=50, border_width=2, border_color=config.GREEN, fg_color="white")
-        # container.grid_propagate(False)
+        container = CTkFrame(self, width=400, height=50, border_width=2, border_color=config.GREEN)
         validation_msg = CTkLabel(container, wraplength=350, width=400, height=50,
                                   text=f'The word "{word}" has been added to your vocabulary',
-                                  text_color="black")
+                                  text_color=config.GREEN)
         validation_msg.pack(padx=10, pady=10)
         return container
 
@@ -592,9 +520,7 @@ class AboutBlock(BaseFrame):
         self.line = self.create_vertical_line()
         self.only_vocab_switch = CTkSwitch(self, text=strings.ONLY_VOCAB_SWITCH, onvalue=True, offvalue=False,
                                            font=CTkFont(family="Arial", underline=True),
-                                           command=lambda: self.parent.current_user.toggle_only_from_vocabulary(
-                                               self.only_vocab_switch.get()
-                                           ))
+                                           command=self.on_vocab_switch)
         self.configure_vocab_switch()
         self.only_vocab_hint = HintLabel(self, text=strings.ONLY_VOCAB_HINT, image=False, wraplength=150)
 
@@ -612,6 +538,11 @@ class AboutBlock(BaseFrame):
     def configure_vocab_switch(self):
         switch_var = BooleanVar(value=self.parent.current_user.only_from_vocabulary)
         self.only_vocab_switch.configure(variable=switch_var)
+
+    def on_vocab_switch(self):
+        self.parent.current_user.toggle_only_from_vocabulary(self.only_vocab_switch.get())
+        if self.parent.previous_page.previous_page.spelling_trainer_block.word_dict:
+            self.parent.previous_page.previous_page.spelling_trainer_block.word_dict = None
 
     def create_vertical_line(self):
         line = CTkProgressBar(self, orientation=tk.VERTICAL, height=config.WINDOW_HEIGHT - 470, width=2,

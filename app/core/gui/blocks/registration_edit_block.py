@@ -109,11 +109,3 @@ class RegistrationEditBlock(BaseFrame):
         self.selected_image_circle = self.canvas.create_oval(position_x, position_y, position_x + 54, position_y + 54,
                                                              width=3, outline='white')
         self.selected_avatar = image_name
-
-    # @staticmethod
-    # def update_strict_spelling(parent, current_user=None):
-    #     if current_user:
-    #         state = parent.strict_spelling.get()
-    #         current_user.toggle_strict_spelling(state)
-    #     # else:
-    #     #     pass  # TODO: Why do I need else, is this function used?

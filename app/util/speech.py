@@ -18,7 +18,6 @@ def say(word, volume):
         engine = pyttsx3.init()
         voice = get_random_win_voice(engine)
         say_in_thread(word, volume, voice, engine)
-        # win_say(word, volume, voice, engine)
         logging.info(f'{voice} is speaking')
     else:
         logging.error('Sorry, your operating system is not supported.')

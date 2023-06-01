@@ -29,8 +29,8 @@ class PlayButton(CTkLabel):
         self.hovered = CTkImage(Image.open(helpers.get_path("assets", "play-dark.png")), size=(40, 40))
 
         self.configure(image=self.normal, text="")
-        self.bind("<Enter>", self.on_enter)  # Bind hover enter event
-        self.bind("<Leave>", self.on_leave)  # Bind hover leave event
+        self.bind("<Enter>", self.on_enter)
+        self.bind("<Leave>", self.on_leave)
 
     def on_enter(self, event):
         self.configure(image=self.hovered)
@@ -80,7 +80,7 @@ class StaticsLabel(CTkLabel):
     def __init__(self, parent, text, text_color=None):
         super().__init__(parent, text=text, text_color=text_color,
                          font=CTkFont(family=None, size=config.STATISTICS_FONT_SIZE,
-                                      weight="bold"))  # TODO: Experiment with size
+                                      weight="bold"))
 
 
 class ThickLine(CTkProgressBar):

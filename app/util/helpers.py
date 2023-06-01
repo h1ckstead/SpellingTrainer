@@ -3,6 +3,10 @@ import os
 import pickle
 import sys
 import webbrowser
+import requests
+from bs4 import BeautifulSoup
+from tkinter import messagebox
+
 
 from core import config
 from core import constants
@@ -119,16 +123,16 @@ def update_user_dict(users, to_update):
     """
     for user in users.values():
         existing_data = []
-        if len(user.dictionaries.vocabulary) == 0 and len(user.dictionaries.learned_words) == 0:
+        if not user.dictionaries.vocabulary and not user.dictionaries.learned_words:
             if to_update == HIGH_PRIORITY_WORDS:
                 user.dictionaries.high_priority_words = load_dictionary(constants.HIGH_PRIORITY_WORDS)
                 return
             elif to_update == LOW_PRIORITY_WORDS:
                 user.dictionaries.low_priority_words = load_dictionary(constants.LOW_PRIORITY_WORDS)
                 return
-        elif len(user.dictionaries.vocabulary) == 0:
+        elif not user.dictionaries.vocabulary:
             existing_data = [user.dictionaries.learned_words]
-        elif len(user.dictionaries.learned_words) == 0:
+        elif not user.dictionaries.learned_words:
             existing_data = [user.dictionaries.vocabulary]
         else:
             existing_data = [user.dictionaries.vocabulary, user.dictionaries.learned_words]
@@ -175,3 +179,24 @@ def remove_duplicates(to_remove_from, model):
         del to_remove_from[key]
         logging.info(f"Removed {key} from dict")
     return to_remove_from
+
+
+def check_for_updates():
+    page_url = 'https://spellingtrainer.wixsite.com/download'
+
+    response = requests.get(page_url)
+    html = response.text
+
+    soup = BeautifulSoup(html, 'html.parser')
+    footer = soup.find("footer", {"class": "SITE_FOOTER_WRAPPER"})
+    version_element = footer.find('p', text=lambda text: text and 'Version: ' in text).string
+    version = version_element.replace('Version: ', '')
+
+    if version != config.VERSION:
+        message = 'New version is available: {}\n\nDo you want to go to the website and download the update?'.format(
+            version)
+        result = messagebox.askquestion('Update Available', message, icon='question')
+        if result == 'yes':
+            webbrowser.open(page_url)
+    else:
+        messagebox.showinfo('Up to Date', 'Already up to date', icon='info')

@@ -110,38 +110,39 @@ class TestRemoveDuplicates(unittest.TestCase):
 class TestVerifyDictsVersion(unittest.TestCase):
     def setUp(self):
         self.user = User(name="TestNewDictVersion", strict_spelling=False)
-        self.save_data = helpers.load_save()
 
-    @unittest.skip
     @patch("util.helpers.update_user_dict")
     def test_high_priority_words_stale(self, mock_update_user_dict):
-        self.save_data[self.user.name].dictionaries.low_priority_words["version"] = config.LOW_PRIORITY_DICT_VERSION
+        self.user.dictionaries.low_priority_words["version"] = config.LOW_PRIORITY_DICT_VERSION
         self.user.dictionaries.high_priority_words["version"] = 0
-        helpers.verify_dicts_version(saved_data=self.save_data)
+        self.user.save_progress()
+        save_data = helpers.load_save()
+        helpers.verify_dicts_version(saved_data=save_data)
         mock_update_user_dict.assert_called_once_with(ANY, to_update=HIGH_PRIORITY_WORDS)
 
-    @unittest.skip
     @patch("util.helpers.update_user_dict")
     def test_low_priority_words_stale(self, mock_update_user_dict):
-        self.save_data[self.user.name].dictionaries.high_priority_words["version"] = config.HIGH_PRIORITY_DICT_VERSION
+        self.user.dictionaries.high_priority_words["version"] = config.HIGH_PRIORITY_DICT_VERSION
         self.user.dictionaries.low_priority_words["version"] = 0
-        helpers.verify_dicts_version(saved_data=self.save_data)
+        self.user.save_progress()
+        save_data = helpers.load_save()
+        helpers.verify_dicts_version(saved_data=save_data)
         mock_update_user_dict.assert_called_once_with(ANY, to_update=LOW_PRIORITY_WORDS)
 
-    @unittest.skip
     @patch("util.helpers.update_user_dict")
     def test_both_dictionaries_stale(self, mock_update_user_dict):
         self.user.dictionaries.high_priority_words["version"] = 0
         self.user.dictionaries.low_priority_words["version"] = 0
-        helpers.verify_dicts_version(saved_data=self.save_data)
+        self.user.save_progress()
+        save_data = helpers.load_save()
+        helpers.verify_dicts_version(saved_data=save_data)
         mock_update_user_dict.assert_called()
         assert mock_update_user_dict.call_count == 2
 
     @patch("util.helpers.update_user_dict")
     def test_neither_dictionaries_stale(self, mock_update_user_dict):
-        self.save_data[self.user.name].dictionaries.low_priority_words["version"] = config.LOW_PRIORITY_DICT_VERSION
-        self.save_data[self.user.name].dictionaries.high_priority_words["version"] = config.HIGH_PRIORITY_DICT_VERSION
-        helpers.verify_dicts_version(saved_data=self.save_data)
+        save_data = helpers.load_save()
+        helpers.verify_dicts_version(saved_data=save_data)
         mock_update_user_dict.assert_not_called()
 
 
