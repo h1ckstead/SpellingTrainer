@@ -98,7 +98,9 @@ class SpellingTrainerBlock(BaseFrame):
         # Create widgets and content blocks
         self.play_word_btn = self.create_play_sound_btn()
         self.volume_slider = self.create_volume_slider()
-        self.spelling_hint = self.create_spelling_hint()
+        self.spelling_hint = CTkLabel(self, text="", text_color="#f8c543", compound=tk.LEFT, padx=5,
+                                      font=CTkFont(family="Arial", size=13, underline=True))
+        self.attention_img = CTkImage(Image.open(helpers.get_path('assets/attention.png')), size=(15, 15))
         self.spellcheck_hint = HintLabel(self, text=strings.SPELLCHECK_HINT, wraplength=250)
         self.word_entry = self.create_word_entry_field()
         self.spellcheck_btn = CTAButton(self, text=strings.CHECK, width=125, state=tk.DISABLED,
@@ -107,20 +109,17 @@ class SpellingTrainerBlock(BaseFrame):
         # Display widgets and content blocks on the page
         self.play_word_btn.grid(row=0, column=0, padx=20, pady=(10, 0), sticky=tk.W)
         self.volume_slider.grid(row=0, column=1, columnspan=3, padx=(0, 40), sticky=tk.W)
-        self.grid_rowconfigure(1, minsize=29)  # placeholder for Br/Am spelling hint
+        self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
         self.word_entry.grid(row=2, column=0, columnspan=3, padx=20, sticky=tk.W)
-        self.spellcheck_hint.grid(row=3, column=0, columnspan=3, padx=10, pady=5, sticky=tk.W)
-        self.spellcheck_btn.grid(row=4, column=0, columnspan=2, padx=20, pady=15, sticky=tk.W)
+        self.spellcheck_hint.grid(row=3, column=0, columnspan=3, padx=15, pady=5, sticky=tk.W)
+        self.grid_rowconfigure(4, weight=1)
+        self.spellcheck_btn.grid(row=5, column=0, columnspan=2, padx=20, sticky=tk.W)
+        self.grid_rowconfigure(6, weight=1)
 
     def update_user(self, new_user):
         self.current_user = new_user
         self.word_generator = WordGenerator(new_user, self.handle_empty_vocabulary)
         self.spell_checker = SpellChecker(new_user)
-
-    def create_spelling_hint(self):
-        attention_img = CTkImage(Image.open(helpers.get_path('assets/attention.png')), size=(15, 15))
-        return CTkLabel(self, text="", text_color="#f8c543", image=attention_img, compound=tk.LEFT,
-                        padx=5, font=CTkFont(family="Arial", size=13, underline=True))
 
     def create_play_sound_btn(self):
         button = PlayButton(self)
@@ -204,7 +203,7 @@ class SpellingTrainerBlock(BaseFrame):
             validation_msg = self.show_empty_word_string_message()
         else:
             validation_msg = CTkLabel(self, text=strings.UNKNOWN)
-        validation_msg.grid(row=4, column=2, padx=(0, 5), sticky=tk.W)
+        validation_msg.grid(row=5, column=2, padx=(0, 5), sticky=tk.W)
         validation_msg.after(2000, lambda: validation_msg.destroy())
 
     def show_empty_word_string_message(self):
@@ -241,15 +240,15 @@ class SpellingTrainerBlock(BaseFrame):
         speech.say(word, self.volume_slider.get())
 
     def new_word(self):
-        self.spelling_hint.grid_forget()
+        self.spelling_hint.configure(text="", image="")
         self.word_dict = self.word_generator.generate_word()
         word = list(self.word_dict)[0]
         if constants.SPELLING in self.word_dict[word]:
             if self.word_dict[word][constants.SPELLING] == constants.AmE:
-                self.spelling_hint.configure(text=strings.AMERICAN_SPELLING)
+                self.spelling_hint.configure(text=strings.AMERICAN_SPELLING, image=self.attention_img)
             elif self.word_dict[word][constants.SPELLING] == constants.BrE:
-                self.spelling_hint.configure(text=strings.BRITISH_SPELLING)
-            self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(10, 0), sticky=tk.W)
+                self.spelling_hint.configure(text=strings.BRITISH_SPELLING, image=self.attention_img)
+            self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
         self.on_new_word(self.word_dict)
 
     def handle_empty_vocabulary(self):
@@ -343,7 +342,8 @@ class SessionHistoryBlock(BaseFrame):
         self.status_header.grid(row=0, column=0)
         self.header_text.grid(row=0, column=0, columnspan=3)
         self.times_to_spell_text.grid(row=0, column=1, columnspan=2, padx=(0, 15), sticky=tk.E)
-        self.filler_image.grid(row=0, column=3, rowspan=7, sticky=tk.E)
+        self.grid_columnconfigure(3, weight=1)
+        self.filler_image.grid(row=0, column=3, rowspan=7)
 
         # Create empty rows initially
         for _ in range(6):
@@ -419,30 +419,34 @@ class DefinitionBlock(BaseFrame):
 
         # Display widgets and content blocks on the page
         self.grid_columnconfigure(0, minsize=92)
+
         self.grid_columnconfigure(1, minsize=92)
         self.grid_columnconfigure(2, minsize=30)
-        self.grid_rowconfigure(1, minsize=30)
 
-        self.show_definition_btn.grid(row=0, column=0, columnspan=2, padx=(10, 0), pady=(10, 0), sticky=tk.W)
-        self.definition_hint.grid(row=0, column=1, columnspan=2, padx=(38, 0), pady=(10, 0))
+        self.grid_rowconfigure(1, minsize=30)
+        self.grid_rowconfigure(5, weight=1)
+
+        self.show_definition_btn.grid(row=0, column=0, padx=(10, 0), pady=(10, 0), sticky=tk.W)
+        self.definition_hint.grid(row=0, column=1, pady=(10, 0), sticky=tk.W)
         self.horizontal_line.grid(row=2, column=0, columnspan=3, padx=(10, 0), pady=(0, 10), sticky=tk.NW)
 
     def create_definition_field(self):
         definition_field = Text(self, height=6, width=42, background="#333333", foreground="#FFFFFF",
-                                cursor='arrow', wrap="word", highlightthickness=0, font=(None, 12))
-        definition_field.tag_config("bold", font=CTkFont(None, 12, "bold"))
+                                cursor='arrow', wrap="word", highlightthickness=0, borderwidth=0,
+                                font=CTkFont("Arial", 14))
+        definition_field.tag_config("bold", font=CTkFont("Arial", 16, "bold"))
         return definition_field
 
     def show_definition(self):
         self.definition_hint.grid_forget()
         self.definition_header.grid(row=1, column=0, padx=(10, 0), sticky=tk.NW)
-        self.definition_field.grid(row=3, column=0, rowspan=2, columnspan=3, padx=(8, 0), sticky=tk.W)
+        self.definition_field.grid(row=3, column=0, rowspan=2, columnspan=3, padx=(10, 0), sticky=tk.NSEW)
         if self.scroll:
             self.scroll.grid(row=3, column=3, columnspan=2)
         self.show_definition_btn.configure(state=tk.DISABLED, fg_color="#565b5e")
 
     def hide_definition(self, *args):
-        self.definition_hint.grid(row=0, column=1, columnspan=2, padx=(38, 0), pady=(10, 0))
+        self.definition_hint.grid(row=0, column=1, pady=(10, 0), sticky=tk.W)
         self.definition_header.grid_forget()
         self.definition_field.grid_forget()
         if self.scroll:
