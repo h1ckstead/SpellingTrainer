@@ -120,6 +120,9 @@ class SpellingTrainerBlock(BaseFrame):
         self.current_user = new_user
         self.word_generator = WordGenerator(new_user, self.handle_empty_vocabulary)
         self.spell_checker = SpellChecker(new_user)
+        self.volume_slider.set(new_user.volume)
+        if self.word_dict:
+            self.word_dict = None
 
     def create_play_sound_btn(self):
         button = PlayButton(self)
