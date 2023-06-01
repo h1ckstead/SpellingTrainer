@@ -23,16 +23,16 @@ class WordGenerator:
         logging.info(f"Randomly picking a word from {choice_source}")
         if choice_source == VOCABULARY:
             try:
-                word = random.choice(list(self.user.dictionaries.vocabulary.keys()))
+                word = random.choice(list(self.user.dictionaries.vocabulary))
                 word_dict = {word: self.user.dictionaries.vocabulary[word]}
             except IndexError:
                 self.callback()
                 return
         elif choice_source == HIGH_PRIORITY_WORDS:
-            word = random.choice(list(self.user.dictionaries.high_priority_words["data"].keys()))
+            word = random.choice(list(self.user.dictionaries.high_priority_words["data"]))
             word_dict = {word: self.user.dictionaries.high_priority_words["data"][word]}
         elif choice_source == LOW_PRIORITY_WORDS:
-            word = random.choice(list(self.user.dictionaries.low_priority_words["data"].keys()))
+            word = random.choice(list(self.user.dictionaries.low_priority_words["data"]))
             word_dict = {word: self.user.dictionaries.low_priority_words["data"][word]}
         else:
             word, word_dict = self.generate_random_word()
@@ -51,7 +51,7 @@ class WordGenerator:
         while True:
             word = random_words.random_word(min_letter_count=5).title()
             if not self.is_duplicate(word):
-                word_dict = {word: {DEFINITIONS: None}}  # TODO: Think about loading definition in the background
+                word_dict = {word: {DEFINITIONS: None}}  # TODO: Load definitions in the background
                 return word, word_dict
 
     def is_duplicate(self, word):
@@ -100,9 +100,9 @@ class WordGenerator:
         :return: list of strings
         """
         choice_sources = []
-        if bool(self.user.dictionaries.high_priority_words["data"]):
+        if self.user.dictionaries.high_priority_words["data"]:
             choice_sources.append(HIGH_PRIORITY_WORDS)
-        if bool(self.user.dictionaries.low_priority_words["data"]):
+        if self.user.dictionaries.low_priority_words["data"]:
             choice_sources.append(LOW_PRIORITY_WORDS)
         return choice_sources
 
@@ -121,6 +121,4 @@ class WordGenerator:
             word_dict[word].update({SPELLING: BrE})
         else:
             word_dict[word].update({SPELLING: AmE})
-            logging.debug(word_dict)
-        logging.debug(word_dict)
         return word_dict

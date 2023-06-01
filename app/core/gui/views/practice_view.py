@@ -111,7 +111,6 @@ class SpellingTrainerBlock(BaseFrame):
         self.word_entry.grid(row=2, column=0, columnspan=3, padx=20, sticky=tk.W)
         self.spellcheck_hint.grid(row=3, column=0, columnspan=3, padx=10, pady=5, sticky=tk.W)
         self.spellcheck_btn.grid(row=4, column=0, columnspan=2, padx=20, pady=15, sticky=tk.W)
-        # self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
 
     def update_user(self, new_user):
         self.current_user = new_user
@@ -382,7 +381,7 @@ class SessionHistoryBlock(BaseFrame):
                 self.parent.current_user.dictionaries.vocabulary[list(word_dict)[0]][constants.TIMES_TO_SPELL])
         except KeyError:
             self.times_to_spell.append("Learned")
-        self.statuses = self.statuses[-6:]  # Limit the list size to 5
+        self.statuses = self.statuses[-6:]  # Limit the list size to 6
 
         # Update the displayed rows
         for i, (status, correction, times_to_spell) in enumerate(zip(self.status_labels, self.correction_labels,
@@ -442,7 +441,7 @@ class DefinitionBlock(BaseFrame):
             self.scroll.grid(row=3, column=3, columnspan=2)
         self.show_definition_btn.configure(state=tk.DISABLED, fg_color="#565b5e")
 
-    def hide_definition(self, word_dict, user_word, status):
+    def hide_definition(self, *args):
         self.definition_hint.grid(row=0, column=1, columnspan=2, padx=(38, 0), pady=(10, 0))
         self.definition_header.grid_forget()
         self.definition_field.grid_forget()

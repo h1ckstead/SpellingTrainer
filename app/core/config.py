@@ -1,7 +1,6 @@
-VERSION = "0.7.0"
-# TODO: Turn on TestVerifyDictVersion after update to version 1
-HIGH_PRIORITY_DICT_VERSION = 0
-LOW_PRIORITY_DICT_VERSION = 0
+VERSION = "0.8.0"
+HIGH_PRIORITY_DICT_VERSION = 1
+LOW_PRIORITY_DICT_VERSION = 1
 
 # General
 APP_NAME = 'Spelling Trainer'

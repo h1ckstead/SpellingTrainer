@@ -57,7 +57,7 @@ class SpellingTrainerApp(CTk):
         file_menu = tk.Menu(menu_bar, tearoff=0)
         file_menu.add_command(label="Check for updates...", command=helpers.check_for_updates)
         file_menu.add_command(label="Report a bug", command=helpers.report_bug)
-        file_menu.add_command(label="Donate", command=self.open_donate_page)
+        file_menu.add_command(label="Donate ♥️", command=self.open_donate_page)
         file_menu.add_command(label="About", command=self.show_info)
         menu_bar.add_cascade(label="Help", menu=file_menu)
 
@@ -77,4 +77,4 @@ class SpellingTrainerApp(CTk):
 
     @staticmethod
     def open_donate_page():
-        webbrowser.open('https://example.com/donate')
+        webbrowser.open('https://spellingtrainer.wixsite.com/donate')

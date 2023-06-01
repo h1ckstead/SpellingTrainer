@@ -123,16 +123,16 @@ def update_user_dict(users, to_update):
     """
     for user in users.values():
         existing_data = []
-        if len(user.dictionaries.vocabulary) == 0 and len(user.dictionaries.learned_words) == 0:
+        if not user.dictionaries.vocabulary and not user.dictionaries.learned_words:
             if to_update == HIGH_PRIORITY_WORDS:
                 user.dictionaries.high_priority_words = load_dictionary(constants.HIGH_PRIORITY_WORDS)
                 return
             elif to_update == LOW_PRIORITY_WORDS:
                 user.dictionaries.low_priority_words = load_dictionary(constants.LOW_PRIORITY_WORDS)
                 return
-        elif len(user.dictionaries.vocabulary) == 0:
+        elif not user.dictionaries.vocabulary:
             existing_data = [user.dictionaries.learned_words]
-        elif len(user.dictionaries.learned_words) == 0:
+        elif not user.dictionaries.learned_words:
             existing_data = [user.dictionaries.vocabulary]
         else:
             existing_data = [user.dictionaries.vocabulary, user.dictionaries.learned_words]
@@ -182,7 +182,7 @@ def remove_duplicates(to_remove_from, model):
 
 
 def check_for_updates():
-    page_url = 'https://spellingtrainer.wixsite.com/spelling-trainer'
+    page_url = 'https://spellingtrainer.wixsite.com/download'
 
     response = requests.get(page_url)
     html = response.text
