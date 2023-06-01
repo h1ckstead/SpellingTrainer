@@ -18,7 +18,6 @@ def say(word, volume):
         engine = pyttsx3.init()
         voice = get_random_win_voice(engine)
         say_in_thread(word, volume, voice, engine)
-        logging.info(f'{voice} is speaking')
     else:
         logging.error('Sorry, your operating system is not supported.')
 
@@ -26,6 +25,9 @@ def say(word, volume):
 def get_random_win_voice(engine):
     voices = engine.getProperty('voices')
     return random.choice(voices).id
+
+
+is_speech_in_progress = False
 
 
 def win_say(word, volume, voice, engine, rate=0.8):
@@ -38,4 +40,12 @@ def win_say(word, volume, voice, engine, rate=0.8):
 
 
 def say_in_thread(word, volume, voice, engine):
-    threading.Thread(target=win_say, args=(word, volume, voice, engine)).start()
+    if not getattr(engine, "is_speech_in_progress", False):
+        threading.Thread(target=process_speech, args=(word, volume, voice, engine)).start()
+        logging.info(f'{voice} is speaking')
+
+
+def process_speech(word, volume, voice, engine):
+    setattr(engine, "is_speech_in_progress", True)
+    win_say(word, volume, voice, engine)
+    setattr(engine, "is_speech_in_progress", False)
