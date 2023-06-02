@@ -1,7 +1,9 @@
 import logging
 import os
 import pickle
+import platform
 import sys
+import urllib
 import webbrowser
 import requests
 from bs4 import BeautifulSoup
@@ -59,11 +61,20 @@ def get_avatars_list():
 def report_bug():
     email_address = "spellingtrainer@proton.me"
     subject = "[Bug Report] for Spelling Trainer"
+    current_platform = platform.system()
+    newline = '\n'  # Default newline character
+    if current_platform == 'Windows':
+        newline = '\r\n'  # Use Windows newline character sequence
 
-    body = f"Hello,\n\nI wanted to provide feedback for the Spelling Trainer {config.VERSION}.\n\n" \
+    body = f"Hello,{newline}{newline}" \
+           f"I wanted to provide feedback for the Spelling Trainer {config.VERSION}.{newline}{newline}" \
            f"[Your feedback here, include any relevant information, steps to reproduce, screenshots]"
 
-    mailto_url = f"mailto:{email_address}?subject={subject}&body={body}"
+    if current_platform == 'Windows':
+        encoded_body = urllib.parse.quote(body)
+        mailto_url = f"mailto:{email_address}?subject={subject}&body={encoded_body}"
+    else:
+        mailto_url = f"mailto:{email_address}?subject={subject}&body={body}"
     webbrowser.open(mailto_url)
 
 

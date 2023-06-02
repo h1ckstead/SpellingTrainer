@@ -247,13 +247,17 @@ class SpellingTrainerBlock(BaseFrame):
         self.spelling_hint.configure(text="", image="")
         self.word_dict = self.word_generator.generate_word()
         word = list(self.word_dict)[0]
-        if constants.SPELLING in self.word_dict[word]:
-            if self.word_dict[word][constants.SPELLING] == constants.AmE:
-                self.spelling_hint.configure(text=strings.AMERICAN_SPELLING, image=self.attention_img)
-            elif self.word_dict[word][constants.SPELLING] == constants.BrE:
-                self.spelling_hint.configure(text=strings.BRITISH_SPELLING, image=self.attention_img)
-            self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
+        if self.current_user.strict_spelling and constants.SPELLING in self.word_dict[word]:
+            self.display_spelling_hint()
         self.on_new_word(self.word_dict)
+
+    def display_spelling_hint(self):
+        word = list(self.word_dict)[0]
+        if self.word_dict[word][constants.SPELLING] == constants.AmE:
+            self.spelling_hint.configure(text=strings.AMERICAN_SPELLING, image=self.attention_img)
+        elif self.word_dict[word][constants.SPELLING] == constants.BrE:
+            self.spelling_hint.configure(text=strings.BRITISH_SPELLING, image=self.attention_img)
+        self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
 
     def handle_empty_vocabulary(self):
         self.show_empty_vocab_message()
@@ -468,7 +472,10 @@ class DefinitionBlock(BaseFrame):
 
         word = list(word_dict)[0]
         if constants.DEFINITIONS not in word_dict[word] or word_dict[word][constants.DEFINITIONS] is None:
-            self.definition_field.insert(tk.END, f"{strings.NO_DEFINITION_FOUND}")
+            if platform.system() == 'Windows':
+                self.definition_field.insert(tk.END, f"{strings.NO_DEFINITION_FOUND.replace('☹️', '')}")
+            else:
+                self.definition_field.insert(tk.END, f"{strings.NO_DEFINITION_FOUND}")
         else:
             for part_of_speech in word_dict[word][constants.DEFINITIONS]:
                 self.definition_field.insert(tk.END, f"{part_of_speech}:\n", "bold")

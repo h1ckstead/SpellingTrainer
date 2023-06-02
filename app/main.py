@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 from logging.handlers import RotatingFileHandler
+import platform
 
 from core.spelling_trainer import SpellingTrainerApp
 #
@@ -51,7 +52,7 @@ from core.spelling_trainer import SpellingTrainerApp
 #     spelling_trainer.mainloop()
 
 # ------------------
-import fcntl
+# import fcntl
 
 
 def configure_paths_and_loggers():
@@ -104,19 +105,51 @@ def start_mainloop():
 
 
 def run_program():
+    # lock_file_path = configure_paths_and_loggers()
+    # lock_file = open(lock_file_path, 'w')
+    #
+    # try:
+    #     fcntl.lockf(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    #     start_mainloop()
+    # except (OSError, IOError):
+    #     logging.error("Another instance of the program is already running.")
+    #     sys.exit(1)
+    # finally:
+    #     fcntl.lockf(lock_file, fcntl.LOCK_UN)
+    #     lock_file.close()
+    #     os.remove(lock_file_path)
+    current_platform = platform.system()
     lock_file_path = configure_paths_and_loggers()
-    lock_file = open(lock_file_path, 'w')
+    if current_platform == 'Windows':
+        import msvcrt
+        lock_file = open(lock_file_path, 'w')
+        try:
+            # lock_file = open(lock_file_path, 'w')
+            msvcrt.locking(lock_file.fileno(), msvcrt.LK_NBLCK, 1)
+            start_mainloop()
+        except IOError:
+            print("Another instance of the program is already running.")
+            sys.exit(1)
+        finally:
+            lock_file.close()
+            os.remove(lock_file_path)
 
-    try:
-        fcntl.lockf(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        start_mainloop()
-    except (OSError, IOError):
-        logging.error("Another instance of the program is already running.")
+    elif current_platform == 'Darwin':
+        import fcntl
+        lock_file = open(lock_file_path, 'w')
+        try:
+            fcntl.lockf(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            start_mainloop()
+        except (OSError, IOError):
+            logging.error("Another instance of the program is already running.")
+            sys.exit(1)
+        finally:
+            fcntl.lockf(lock_file, fcntl.LOCK_UN)
+            lock_file.close()
+            os.remove(lock_file_path)
+    else:
+        logging.error(f"Unsupported operating system: {current_platform}")
         sys.exit(1)
-    finally:
-        fcntl.lockf(lock_file, fcntl.LOCK_UN)
-        lock_file.close()
-        os.remove(lock_file_path)
 
 
 if __name__ == '__main__':

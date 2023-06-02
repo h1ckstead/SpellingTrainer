@@ -1,5 +1,6 @@
 import random
 import tkinter as tk
+import platform
 
 from PIL import Image
 from customtkinter import CTkFrame, CTkLabel, CTkImage, CTkFont
@@ -11,7 +12,7 @@ from util import helpers
 
 
 class WelcomeBlock(BaseFrame):
-    def __init__(self, parent, controller, current_user, saved_data=None, next_page=None):
+    def __init__(self, parent, controller, current_user=None, saved_data=None, next_page=None):
         BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 100, height=config.WINDOW_HEIGHT - 250)
         self.parent = parent
         self.controller = controller
@@ -22,6 +23,8 @@ class WelcomeBlock(BaseFrame):
 
         if self.current_user:
             self.title_text = strings.MAIN_PAGE_TITLE.format(random.choice(strings.GREETING_EMOJI))
+            if platform.system() == 'Windows':  # Don't choose emojis as they are not displayed correctly
+                self.title_text = strings.MAIN_PAGE_TITLE.replace("{}", "")
             self.title = CTkLabel(self, text=self.title_text, font=self.controller.title_font)
             self.cta_button = CTAButton(self, font=CTkFont(family="Arial", size=config.FONT_SIZE),
                                         image=self.button_image(), text=strings.CONTINUE_LEARNING,
