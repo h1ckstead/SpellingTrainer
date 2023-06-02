@@ -54,4 +54,5 @@ class UserRegistrationPage(BaseView):
         from core.gui.views.main_view import MainPage
 
         saved_data = helpers.load_save()
-        return MainPage(parent=self.parent, controller=self.controller, saved_data=saved_data)
+        return MainPage(parent=self.parent, controller=self.controller, current_user=self.current_user,
+                        saved_data=saved_data)

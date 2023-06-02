@@ -1,6 +1,7 @@
 import logging
 import tkinter as tk
 from tkinter import Text, Label, BooleanVar
+import platform
 
 from PIL import Image
 from PIL.ImageTk import PhotoImage
@@ -273,6 +274,8 @@ class SpellingTrainerBlock(BaseFrame):
     def show_empty_vocab_message(self, event=None):
         if self.dialog is None or not self.dialog.winfo_exists():
             self.dialog = CTkToplevel(self)
+            if platform.system() == 'Windows':
+                self.dialog.iconbitmap(helpers.get_path("assets", "favicon.ico"))
             self.dialog.resizable(False, False)
             self.dialog.attributes("-topmost", True)
             self.dialog.transient(self)
@@ -288,6 +291,7 @@ class SpellingTrainerBlock(BaseFrame):
                 switch_value = only_vocab_switch.get()
                 self.current_user.toggle_only_from_vocabulary(switch_value)
                 if not switch_value:
+                    self.word_generator = WordGenerator(self.current_user, self.handle_empty_vocabulary)
                     self.turn_on_play_btn()
                     self.new_word()
 

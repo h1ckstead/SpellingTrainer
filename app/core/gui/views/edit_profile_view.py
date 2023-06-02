@@ -3,6 +3,7 @@ from core.gui.blocks.registration_edit_block import RegistrationEditBlock
 from core.gui.elements import CTAButton, Button
 from core.gui.views.base_view import BaseView
 from util import helpers
+from tkinter import messagebox
 
 
 class EditProfilePage(BaseView):
@@ -10,7 +11,7 @@ class EditProfilePage(BaseView):
         super().__init__(parent, controller)
         self.parent = parent
         self.controller = controller
-        self.previous_page = previous_page
+        self.previous_page = previous_page  # Profile Page
         self.current_user = current_user
 
         self.profile_edit_block = RegistrationEditBlock(parent=self, controller=self.controller,
@@ -26,6 +27,12 @@ class EditProfilePage(BaseView):
         self.cancel_btn.grid(row=1, column=0, pady=(20, 0))
         self.save_btn.grid(row=1, column=2, columnspan=2, pady=(20, 0))
         self.report_bug_btn.grid(row=4, column=0, columnspan=3, pady=(42, 0))
+
+    def edit_user(self):
+        new_username = self.profile_edit_block.get_username()
+        existing_users = helpers.load_save()
+        if new_username in existing_users:
+            messagebox.showerror(f"User {new_username} already exists")
 
     def save_changes(self):
         new_username = self.profile_edit_block.get_username()

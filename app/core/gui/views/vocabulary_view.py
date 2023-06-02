@@ -1,7 +1,7 @@
 import tkinter as tk
 from _tkinter import TclError
 from tkinter import StringVar, Label, BooleanVar, messagebox
-
+import platform
 from PIL import Image, ImageTk
 from customtkinter import CTkFrame, CTkComboBox, CTkFont, CTkImage, CTkLabel, CTkCheckBox, CTkButton, CTkSwitch, \
     CTkProgressBar, CTkToplevel
@@ -116,7 +116,7 @@ class VocabularyBlock(BaseFrame):
 
     def display_sorting_dropdown(self):
         sorting_hint = CTkLabel(self, text=strings.SORT_BY, font=CTkFont("Arial", 10), height=15)
-        self.sorting = CTkComboBox(self, state="readonly", cursor="arrow", width=105, height=20,
+        self.sorting = CTkComboBox(self, state="readonly", cursor="arrow", width=110, height=20,
                                    font=CTkFont("Arial", 10), values=strings.SORTING_OPTIONS,
                                    command=self.on_sorting_change)
         self.sorting.grid(row=2, column=0, columnspan=2, sticky=tk.E)
@@ -181,6 +181,72 @@ class VocabularyBlock(BaseFrame):
         else:
             self.display_vocabulary()
 
+    # def display_vocabulary(self, *args):
+    #     self.clear_data_frame()
+    #     self.checkboxes = []
+    #     self.checkbox_vars = []
+    #
+    #     if len(self.user_vocabulary_copy) == 0:  # Empty vocabulary case
+    #         self.show_empty_vocab_message()
+    #         return
+    #
+    #     search_text = self.search_field.get().lower()
+    #     if not search_text:  # No search prompt, display all vocabulary words
+    #         matched_words = list(self.user_vocabulary_copy)
+    #     else:
+    #         matched_words = self.search_vocabulary(search_text)  # Search for matching words
+    #
+    #     if len(matched_words) == 0:  # No matched words case
+    #         self.show_word_not_found(search_text)
+    #         return
+    #
+    #     start_index = (self.current_page - 1) * self.page_size
+    #     end_index = start_index + self.page_size
+    #     current_page_data = matched_words[start_index:end_index]
+    #
+    #     if self.total_pages <= 1 or self.current_page == 1:
+    #         self.prev_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+    #     else:
+    #         self.prev_button.configure(state=tk.NORMAL, fg_color="#246ba3")
+    #
+    #     if self.current_page >= self.total_pages or len(current_page_data) < self.page_size:
+    #         self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
+    #     else:
+    #         self.next_button.configure(state=tk.NORMAL, fg_color="#246ba3")
+    #
+    #     for row, word in enumerate(current_page_data, start=4):
+    #         checkbox_var = BooleanVar()
+    #         checkbox_var.trace('w', self.update_select_all_checkbox)
+    #         self.checkbox_vars.append(checkbox_var)
+    #
+    #         times_to_spell = self.user_vocabulary_copy[word][constants.TIMES_TO_SPELL]
+    #         label_text = f"{word}"
+    #         checkbox = CTkCheckBox(self, checkbox_width=18, checkbox_height=18, border_width=1, height=15,
+    #                                text=label_text, variable=checkbox_var,
+    #                                command=self.update_delete_button_state)
+    #         checkbox.grid(row=row, column=0, padx=(10, 0), pady=1, sticky=tk.W)
+    #
+    #         times_to_spell_label = CTkLabel(self, text=f"{times_to_spell}", height=15)
+    #         times_to_spell_label.grid(row=row, column=1, padx=(10, 0), pady=1)
+    #
+    #         self.checkboxes.append(checkbox_var)
+    #
+    #     # Add empty rows or placeholder widgets to fill the remaining space
+    #     remaining_rows = self.page_size - len(current_page_data)
+    #     for i in range(remaining_rows):
+    #         placeholder_label = CTkLabel(self, text="0", text_color="#2b2b2b", height=18)
+    #         placeholder_label.grid(row=i + len(current_page_data) + 4, column=0, columnspan=2, pady=1,
+    #                                sticky=tk.EW)
+    #
+    #     # Update the total pages based on the matched words
+    #     self.total_pages = (len(matched_words) + self.page_size - 1) // self.page_size
+    #
+    #     self.page_label.configure(text=f"Page: {self.current_page}/{self.total_pages}")
+    #     self.display_master_checkbox()
+
+    #self.update_delete_button_state()
+    #
+
     def display_vocabulary(self, *args):
         self.clear_data_frame()
         self.checkboxes = []
@@ -199,7 +265,13 @@ class VocabularyBlock(BaseFrame):
         if len(matched_words) == 0:  # No matched words case
             self.show_word_not_found(search_text)
             return
+            # Update the total pages based on the matched words
+        self.total_pages = (len(matched_words) + self.page_size - 1) // self.page_size
 
+        if self.current_page > self.total_pages:
+            self.current_page = self.total_pages  # Adjust current page if it exceeds total pages
+
+        self.update_delete_button_state()
         start_index = (self.current_page - 1) * self.page_size
         end_index = start_index + self.page_size
         current_page_data = matched_words[start_index:end_index]
@@ -209,10 +281,10 @@ class VocabularyBlock(BaseFrame):
         else:
             self.prev_button.configure(state=tk.NORMAL, fg_color="#246ba3")
 
-        if self.current_page >= self.total_pages or len(current_page_data) < self.page_size:
-            self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
-        else:
+        if self.current_page < self.total_pages:
             self.next_button.configure(state=tk.NORMAL, fg_color="#246ba3")
+        else:
+            self.next_button.configure(state=tk.DISABLED, fg_color="#565b5e")
 
         for row, word in enumerate(current_page_data, start=4):
             checkbox_var = BooleanVar()
@@ -237,9 +309,6 @@ class VocabularyBlock(BaseFrame):
             placeholder_label = CTkLabel(self, text="0", text_color="#2b2b2b", height=18)
             placeholder_label.grid(row=i + len(current_page_data) + 4, column=0, columnspan=2, pady=1,
                                    sticky=tk.EW)
-
-        # Update the total pages based on the matched words
-        self.total_pages = (len(matched_words) + self.page_size - 1) // self.page_size
 
         self.page_label.configure(text=f"Page: {self.current_page}/{self.total_pages}")
         self.display_master_checkbox()
@@ -446,6 +515,8 @@ class AddWordsBlock(BaseFrame):
     def add_word_double_spelling(self):
         if self.dialog is None or not self.dialog.winfo_exists():
             self.dialog = CTkToplevel(self)
+            if platform.system() == 'Windows':
+                self.dialog.iconbitmap(helpers.get_path("assets", "favicon.ico"))
             self.dialog.resizable(False, False)
             self.dialog.attributes("-topmost", True)
             self.dialog.transient(self)

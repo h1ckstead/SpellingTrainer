@@ -32,23 +32,25 @@ WELCOME_PAGE_TEXT = "Spelling Trainer is designed to help you improve your spell
 # Main page
 MAIN_PAGE_TITLE = 'Welcome back! {}'
 GREETING_EMOJI = ['😎', '🥰', '🤩', '😺', '🙂', '🥹', '☺️', '🤓', '😸']
-APP_DESCRIPTION = "Praesent elit neque, suscipit ullamcorper iaculis consectetur, " \
-                  "semper at justo. Ut congue velit in diam malesuada, at fermentum erat eleifend. Vestibulum quis " \
-                  "iaculis mauris."
+# APP_DESCRIPTION = "Praesent elit neque, suscipit ullamcorper iaculis consectetur, " \
+#                   "semper at justo. Ut congue velit in diam malesuada, at fermentum erat eleifend. Vestibulum quis " \
+#                   "iaculis mauris."
 CHANGE_USER = "Change user"
 PROFILE_BTN = "Go to my profile"
 
 # Registration Page
-REGISTRATION_TITLE = "Create new user"
-USERNAME_HEADER = "Name"
-USERNAME_PLACEHOLDER = "Enter username"
-AVATAR_HEADER = "Choose your avatar"
-STRICT_SPELLING_HINT = "If selected, you'll be asked to spell specifically British or American variant."
+#REGISTRATION_TITLE = "Create new user"
+# USERNAME_HEADER = "Name"
+#USERNAME_PLACEHOLDER = "Enter username"
+#AVATAR_HEADER = "Choose your avatar"
+#STRICT_SPELLING_HINT = "If selected, you'll be asked to spell specifically British or American variant."
 
-# Edit user page
+# Registration/Edit block
+REGISTRATION_TITLE = "Create new user"
 EDIT_PROFILE_TITLE = "Edit profile"
 USERNAME_FIELD_TITLE = "Name:"
 AVATARS_TITLE = "Choose your avatar:"
+STRICT_SPELLING_HINT = "If selected, you'll be asked to spell specifically British or American variant."
 
 # Change user page
 CHANGE_USER_TITLE = "Choose your user or create a new one"
@@ -83,7 +85,7 @@ ADD = "Add"
 SORT_BY = "Sort by: "
 SELECT_ALL = "Select all"
 TIMES_TO_SPELL = "Times to spell"
-TIMES_TO_SPELL_TOOLTIP = "The number of times you need to spell a word correctly\n for it to be considered learned"
+TIMES_TO_SPELL_TOOLTIP = "The number of times you need to spell a word correctly\nfor it to be considered learned"
 EMPTY_VOCAB_HEADER = "You don't have any words in your vocabulary yet"
 EMPTY_VOCAB_TEXT = "Start practicing spelling and words will automatically appear here. You can also add them manually."
 NOT_FOUND = "The word \"{}\" was not found"
@@ -111,7 +113,7 @@ INCORRECTLY = "Incorrectly"
 # Validation Messages
 CORRECT = "Correct"
 INCORRECT = "Incorrect!"
-CORRECTION = "The word is: "
+# CORRECTION = "The word is: "
 EMPTY = "First, listen to the word"
 UNKNOWN = "Unknown error"
 

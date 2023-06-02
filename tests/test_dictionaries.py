@@ -28,8 +28,8 @@ class LoadDictionaryTest(unittest.TestCase):
 
     def test_dictionary_length(self):
         dictionaries = Dictionaries()
-        self.assertEqual(len(dictionaries.high_priority_words["data"]), 804)  # old: 474
-        self.assertEqual(len(dictionaries.low_priority_words["data"]), 5535)  # old: 6207
+        self.assertEqual(len(dictionaries.high_priority_words["data"]), 803)
+        self.assertEqual(len(dictionaries.low_priority_words["data"]), 5535)
 
 
 class VocabularyTest(unittest.TestCase):

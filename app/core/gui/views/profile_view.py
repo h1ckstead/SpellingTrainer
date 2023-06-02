@@ -58,6 +58,7 @@ class ProfilePage(BaseView):
         if not self.previous_page.spelling_trainer_block.is_play_btn_on and not self.current_user.only_from_vocabulary:
             self.previous_page.spelling_trainer_block.new_word()
             self.previous_page.spelling_trainer_block.turn_on_play_btn()
+        self.previous_page.spelling_trainer_block.update_user(self.current_user)
         self.previous_page.tkraise()
 
 

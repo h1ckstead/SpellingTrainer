@@ -24,10 +24,8 @@ class SpellingTrainerApp(CTk):
         self.font = CTkFont(family="Arial", size=config.FONT_SIZE)
         self.geometry(f'{config.WINDOW_WIDTH}x{config.WINDOW_HEIGHT}+{self.center_x()}+{self.center_y()}')
         customtkinter.set_appearance_mode("dark")
-
         self.create_menu()
 
-        logging.debug("Creating mainframe")
         mainframe = CTkFrame(self)
         mainframe.pack(side="top", fill="both", expand=True)
         mainframe.grid_rowconfigure(0, weight=1)
@@ -38,10 +36,12 @@ class SpellingTrainerApp(CTk):
         if saved_data is None:
             WelcomePage(parent=mainframe, controller=self).tkraise()
         else:
-            updated = helpers.verify_dicts_version(saved_data)
+            last_user = saved_data["users"][saved_data["last_user"]]
+            updated = helpers.verify_dicts_version(users=saved_data["users"], last_user=last_user)
             if updated:
                 saved_data = helpers.load_save()
-            MainPage(parent=mainframe, controller=self, saved_data=saved_data).tkraise()
+            MainPage(parent=mainframe, controller=self, current_user=saved_data["users"][saved_data["last_user"]],
+                     saved_data=saved_data).tkraise()
 
     def center_x(self):
         user_screen_width = self.winfo_screenwidth()

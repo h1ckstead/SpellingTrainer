@@ -14,18 +14,18 @@ from util import helpers
 
 
 class ChangeUserPage(BaseView):
-    def __init__(self, parent, controller, previous_page, saved_data):
+    def __init__(self, parent, controller, current_user, saved_data, previous_page):
         super().__init__(parent, controller)
         self.parent = parent
         self.controller = controller
-        self.previous_page = previous_page
+        self.current_user = current_user
         self.saved_data = saved_data
-        self.current_user = self.get_current_user()
+        self.previous_page = previous_page  # Main Page
 
         # Practice page is initialized here and not in the content block to avoid hover bug on Entry field
         self.practice_page = PracticePage(parent=self.parent, controller=self.controller,
                                           current_user=self.current_user, previous_page=self.previous_page,
-                                          session=Session())
+                                          session=None)
         self.content_block = ContentBlock(self, controller=self.controller, saved_data=self.saved_data,
                                           practice_page=self.practice_page)
         self.back_btn = Button(self, strings.BACK_TO_MAIN_BTN_TEXT, command=lambda: previous_page.tkraise())
@@ -43,10 +43,6 @@ class ChangeUserPage(BaseView):
         self.close_button.grid(row=4, column=2, sticky=tk.E)
         self.report_bug_btn.grid(row=6, column=0, columnspan=4, sticky=tk.S, pady=(0, 5))
 
-    def get_current_user(self):
-        last_user = self.saved_data["last_user"]
-        return self.saved_data[last_user]
-
 
 class ContentBlock(CTkFrame):
     def __init__(self, parent, controller, saved_data, practice_page):
@@ -57,7 +53,7 @@ class ContentBlock(CTkFrame):
         self.practice_page = practice_page
         self.grid_propagate(False)
 
-        users = [k for k in self.saved_data if k != 'last_user']
+        users = [k for k in self.saved_data["users"] if k != 'last_user']
         default_value = StringVar(value=saved_data["last_user"])
         self.title_text = Label(self, text=strings.CHANGE_USER_TITLE, font=self.controller.title_font,
                                 background="#2b2b2b", foreground="#FFFFFF")
@@ -67,7 +63,7 @@ class ContentBlock(CTkFrame):
         self.continue_learning_btn = CTAButton(self, text=strings.CONTINUE_LEARNING, image=self.button_image(),
                                                font=CTkFont(family="Arial", size=config.FONT_SIZE),
                                                command=lambda: [self.update_pages(), self.practice_page.tkraise(),
-                                                                self.saved_data[self.dropdown.get()].save_progress()
+                                                                self.saved_data["users"][self.dropdown.get()].save_progress()
                                                                 ])
         self.horizontal_line = GreyLine(self, height=3, width=config.WINDOW_WIDTH - 450)
         self.create_new_user_btn = Button(self, text=strings.CREATE_NEW,
@@ -84,7 +80,13 @@ class ContentBlock(CTkFrame):
         self.create_new_user_btn.grid(row=4, column=1)
 
     def update_pages(self):
-        user = self.saved_data[self.dropdown.get()]
+        user = self.saved_data["users"][self.dropdown.get()]
+        session = Session()
+        self.saved_data["last_user"] = user.name
+        self.parent.practice_page.session = session
+        self.parent.practice_page.spelling_trainer_block.session = session
+        self.parent.previous_page.current_user = user
+        self.parent.previous_page.session = session
         self.parent.previous_page.welcome_block.change_current_user(user)
         self.practice_page.change_current_user(user)
 
