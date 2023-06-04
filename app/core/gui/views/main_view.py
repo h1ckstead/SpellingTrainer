@@ -21,8 +21,8 @@ class MainPage(BaseView):
         if not session:
             logging.info(f"Creating session from Main Page for user: {self.current_user.name}")
             self.session = Session()
-        # else:
-        #     self.session = session
+        else:
+            self.session = session
 
         # Create widgets
         self.welcome_block = WelcomeBlock(parent=self, controller=self.controller, current_user=self.current_user,

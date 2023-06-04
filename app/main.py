@@ -65,7 +65,7 @@ def configure_paths_and_loggers():
         log_path = os.path.join(log_dir, log_file)
         lock_file_path = os.path.join('/tmp', 'spelling_trainer.lock')
     elif os.name == 'nt':  # Windows
-        log_dir = os.path.join(os.getenv('APPDATA'), 'SpellingTrainer')
+        log_dir = os.path.join(os.getenv('APPDATA'), 'Spelling Trainer')
         log_path = os.path.join(log_dir, log_file)
         lock_file_path = os.path.join(log_dir, 'spelling_trainer.lock')
     else:
@@ -128,7 +128,7 @@ def run_program():
             msvcrt.locking(lock_file.fileno(), msvcrt.LK_NBLCK, 1)
             start_mainloop()
         except IOError:
-            print("Another instance of the program is already running.")
+            logging.error("Another instance of the program is already running.")
             sys.exit(1)
         finally:
             lock_file.close()

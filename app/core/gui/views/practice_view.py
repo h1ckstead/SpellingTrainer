@@ -206,7 +206,7 @@ class SpellingTrainerBlock(BaseFrame):
         elif status == constants.NO_WORD_DICT:
             validation_msg = self.show_empty_word_string_message()
         else:
-            validation_msg = CTkLabel(self, text=strings.UNKNOWN)
+            validation_msg = CTkLabel(self, text=strings.TRY_AGAIN)
         validation_msg.grid(row=5, column=2, padx=(0, 5), sticky=tk.W)
         validation_msg.after(2000, lambda: validation_msg.destroy())
 

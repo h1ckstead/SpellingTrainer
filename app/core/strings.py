@@ -82,7 +82,7 @@ ADD_WORDS_HEADER = "Add words to your vocabulary"
 ADD_WORDS_HINT = "Do you have a word you want to practice spelling? No problem! Add it to your vocabulary."
 ADD_WORD = "Add a new word"
 ADD = "Add"
-SORT_BY = "Sort by: "
+SORT_BY = "Sort by:"
 SELECT_ALL = "Select all"
 TIMES_TO_SPELL = "Times to spell"
 TIMES_TO_SPELL_TOOLTIP = "The number of times you need to spell a word correctly\nfor it to be considered learned"
@@ -115,7 +115,7 @@ CORRECT = "Correct"
 INCORRECT = "Incorrect!"
 # CORRECTION = "The word is: "
 EMPTY = "First, listen to the word"
-UNKNOWN = "Unknown error"
+TRY_AGAIN = "Try again"
 
 # Spelling tips for the Main page
 listen = "Pay attention to word pronunciations: Listen carefully to the pronunciation of each word before attempting " \
