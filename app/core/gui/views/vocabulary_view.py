@@ -475,6 +475,7 @@ class AddWordsBlock(BaseFrame):
             else:
                 self.parent.vocabulary_block.load_vocabulary()
             self.update_practice_page()
+            self.update_user_stats()
             success_message.after(3000, lambda: success_message.destroy())
 
     def show_success_message(self, word):
@@ -542,8 +543,12 @@ class AddWordsBlock(BaseFrame):
             messagebox.showerror(message=f'The word "{word}" is already in your vocabulary')
         else:
             self.current_user.save_progress()
-            self.parent.vocabulary_block.load_vocabulary()
+            if self.parent.vocabulary_block.matched_subset:
+                self.parent.vocabulary_block.display_vocabulary_subset(reset_page=False)
+            else:
+                self.parent.vocabulary_block.load_vocabulary()
             self.update_practice_page()
+            self.update_user_stats()
             success_message = self.show_success_message(word)
             success_message.grid(row=0, column=0, columnspan=2, rowspan=2)
             self.dialog.destroy()
@@ -551,6 +556,11 @@ class AddWordsBlock(BaseFrame):
 
     def update_practice_page(self):
         self.parent.previous_page.previous_page.spelling_trainer_block.turn_on_play_btn()
+
+    def update_user_stats(self):
+        self.parent.previous_page.session.new_words += 1
+        self.parent.previous_page.overall_statistics_block.to_learn.configure(text=len(self.current_user.dictionaries.vocabulary))
+        self.parent.previous_page.session_statistics_block.to_learn.configure(text=self.parent.previous_page.session.new_words)
 
 
 class AboutBlock(BaseFrame):

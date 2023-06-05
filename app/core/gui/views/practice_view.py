@@ -381,11 +381,7 @@ class SessionHistoryBlock(BaseFrame):
 
     def update_user_input(self, word_dict, user_word, status):
         self.statuses.append(status)
-        word = list(word_dict)[0]
-        if constants.SPELLING in word_dict[word] and word_dict[word][constants.SPELLING] == constants.AmE:
-            self.corrections.append(word_dict[word][constants.AmE])
-        else:
-            self.corrections.append(word)
+        self.compose_correction(word_dict)
         self.user_input.append(user_word.title())
         try:
             self.times_to_spell.append(
@@ -410,6 +406,18 @@ class SessionHistoryBlock(BaseFrame):
                     times_to_spell.configure(text=self.times_to_spell[-(i + 1)])
             else:
                 status.configure(text="")
+
+    def compose_correction(self, word_dict):
+        word = list(word_dict)[0]
+        if word_dict.get(word, {}).get(constants.AmE):
+            if self.parent.current_user.strict_spelling and word_dict[word][constants.SPELLING] == constants.AmE:
+                self.corrections.append(word_dict[word][constants.AmE])
+            elif self.parent.current_user.strict_spelling and word_dict[word][constants.SPELLING] == constants.BrE:
+                self.corrections.append(word)
+            else:
+                self.corrections.append(f"{word}/{word_dict[word][constants.AmE]}")
+        else:
+            self.corrections.append(word)
 
 
 class DefinitionBlock(BaseFrame):
