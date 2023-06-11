@@ -1,4 +1,5 @@
 import logging
+import platform
 import tkinter as tk
 from tkinter import Text, Label, BooleanVar
 
@@ -205,7 +206,7 @@ class SpellingTrainerBlock(BaseFrame):
         elif status == constants.NO_WORD_DICT:
             validation_msg = self.show_empty_word_string_message()
         else:
-            validation_msg = CTkLabel(self, text=strings.UNKNOWN)
+            validation_msg = CTkLabel(self, text=strings.TRY_AGAIN)
         validation_msg.grid(row=5, column=2, padx=(0, 5), sticky=tk.W)
         validation_msg.after(2000, lambda: validation_msg.destroy())
 
@@ -246,13 +247,17 @@ class SpellingTrainerBlock(BaseFrame):
         self.spelling_hint.configure(text="", image="")
         self.word_dict = self.word_generator.generate_word()
         word = list(self.word_dict)[0]
-        if constants.SPELLING in self.word_dict[word]:
-            if self.word_dict[word][constants.SPELLING] == constants.AmE:
-                self.spelling_hint.configure(text=strings.AMERICAN_SPELLING, image=self.attention_img)
-            elif self.word_dict[word][constants.SPELLING] == constants.BrE:
-                self.spelling_hint.configure(text=strings.BRITISH_SPELLING, image=self.attention_img)
-            self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
+        if self.current_user.strict_spelling and constants.SPELLING in self.word_dict[word]:
+            self.display_spelling_hint()
         self.on_new_word(self.word_dict)
+
+    def display_spelling_hint(self):
+        word = list(self.word_dict)[0]
+        if self.word_dict[word][constants.SPELLING] == constants.AmE:
+            self.spelling_hint.configure(text=strings.AMERICAN_SPELLING, image=self.attention_img)
+        elif self.word_dict[word][constants.SPELLING] == constants.BrE:
+            self.spelling_hint.configure(text=strings.BRITISH_SPELLING, image=self.attention_img)
+        self.spelling_hint.grid(row=1, column=0, columnspan=2, padx=(15, 0), sticky=tk.W)
 
     def handle_empty_vocabulary(self):
         self.show_empty_vocab_message()
@@ -273,6 +278,8 @@ class SpellingTrainerBlock(BaseFrame):
     def show_empty_vocab_message(self, event=None):
         if self.dialog is None or not self.dialog.winfo_exists():
             self.dialog = CTkToplevel(self)
+            if platform.system() == 'Windows':
+                self.dialog.iconbitmap(helpers.get_path("assets", "favicon.ico"))
             self.dialog.resizable(False, False)
             self.dialog.attributes("-topmost", True)
             self.dialog.transient(self)
@@ -288,6 +295,7 @@ class SpellingTrainerBlock(BaseFrame):
                 switch_value = only_vocab_switch.get()
                 self.current_user.toggle_only_from_vocabulary(switch_value)
                 if not switch_value:
+                    self.word_generator = WordGenerator(self.current_user, self.handle_empty_vocabulary)
                     self.turn_on_play_btn()
                     self.new_word()
 
@@ -373,11 +381,7 @@ class SessionHistoryBlock(BaseFrame):
 
     def update_user_input(self, word_dict, user_word, status):
         self.statuses.append(status)
-        word = list(word_dict)[0]
-        if constants.SPELLING in word_dict[word] and word_dict[word][constants.SPELLING] == constants.AmE:
-            self.corrections.append(word_dict[word][constants.AmE])
-        else:
-            self.corrections.append(word)
+        self.compose_correction(word_dict)
         self.user_input.append(user_word.title())
         try:
             self.times_to_spell.append(
@@ -402,6 +406,18 @@ class SessionHistoryBlock(BaseFrame):
                     times_to_spell.configure(text=self.times_to_spell[-(i + 1)])
             else:
                 status.configure(text="")
+
+    def compose_correction(self, word_dict):
+        word = list(word_dict)[0]
+        if word_dict.get(word, {}).get(constants.AmE):
+            if self.parent.current_user.strict_spelling and word_dict[word][constants.SPELLING] == constants.AmE:
+                self.corrections.append(word_dict[word][constants.AmE])
+            elif self.parent.current_user.strict_spelling and word_dict[word][constants.SPELLING] == constants.BrE:
+                self.corrections.append(word)
+            else:
+                self.corrections.append(f"{word}/{word_dict[word][constants.AmE]}")
+        else:
+            self.corrections.append(word)
 
 
 class DefinitionBlock(BaseFrame):
@@ -464,7 +480,10 @@ class DefinitionBlock(BaseFrame):
 
         word = list(word_dict)[0]
         if constants.DEFINITIONS not in word_dict[word] or word_dict[word][constants.DEFINITIONS] is None:
-            self.definition_field.insert(tk.END, f"{strings.NO_DEFINITION_FOUND}")
+            if platform.system() == 'Windows':
+                self.definition_field.insert(tk.END, f"{strings.NO_DEFINITION_FOUND.replace('☹️', '')}")
+            else:
+                self.definition_field.insert(tk.END, f"{strings.NO_DEFINITION_FOUND}")
         else:
             for part_of_speech in word_dict[word][constants.DEFINITIONS]:
                 self.definition_field.insert(tk.END, f"{part_of_speech}:\n", "bold")

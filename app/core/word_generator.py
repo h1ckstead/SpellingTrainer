@@ -20,7 +20,7 @@ class WordGenerator:
         :return: dictionary containing a word and its definition
         """
         choice_source = self.pick_dictionary()
-        logging.info(f"Randomly picking a word from {choice_source}")
+        logging.info(f"Randomly picking a word from: {choice_source}")
         if choice_source == VOCABULARY:
             try:
                 word = random.choice(list(self.user.dictionaries.vocabulary))
@@ -38,7 +38,7 @@ class WordGenerator:
             word, word_dict = self.generate_random_word()
         if self.user.strict_spelling and word_dict.get(word, {}).get(AmE):
             word_dict = self.pick_which_spelling(word, word_dict)
-        logging.info(word_dict)
+        logging.info(f"Picked word: {word_dict}")
         return word_dict
 
     def generate_random_word(self):

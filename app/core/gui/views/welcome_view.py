@@ -1,7 +1,8 @@
+import tkinter as tk
+
 from core.gui.blocks.welcome_block import WelcomeBlock
 from core.gui.views.base_view import BaseView
 from core.gui.views.user_registration_view import UserRegistrationPage
-import tkinter as tk
 
 
 class WelcomePage(BaseView):

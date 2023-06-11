@@ -12,30 +12,31 @@ from core.session import Session
 
 
 class MainPage(BaseView):
-    def __init__(self, parent, controller, saved_data, session=None):
+    def __init__(self, parent, controller, current_user, saved_data=None, session=None):
         super().__init__(parent, controller)
         self.parent = parent
         self.controller = controller
         self.saved_data = saved_data
-        self.last_user = saved_data['last_user']
+        self.current_user = current_user
         if not session:
-            logging.info(f"Creating session from Main Page for user: {self.last_user}")
+            logging.info(f"Creating session from Main Page for user: {self.current_user.name}")
             self.session = Session()
         else:
             self.session = session
 
         # Create widgets
-        self.welcome_block = WelcomeBlock(self, self.controller, self.last_user, self.saved_data,
+        self.welcome_block = WelcomeBlock(parent=self, controller=self.controller, current_user=self.current_user,
                                           next_page=self.practice_page())
         self.change_user_btn = Button(self, text=strings.CHANGE_USER,
                                       command=lambda: ChangeUserPage(parent=self.parent,
                                                                      controller=self.controller,
-                                                                     previous_page=self,
-                                                                     saved_data=self.saved_data).tkraise())
+                                                                     current_user=self.current_user,
+                                                                     saved_data=self.saved_data,
+                                                                     previous_page=self).tkraise())
         self.user_profile_btn = Button(self, text=strings.PROFILE_BTN,
                                        command=lambda: ProfilePage(parent=self.parent, controller=self.controller,
                                                                    previous_page=self.practice_page(),
-                                                                   current_user=saved_data[self.last_user],
+                                                                   current_user=self.current_user,
                                                                    session=self.session, main_page=self))
 
         # Display widgets and content blocks on the page
@@ -60,4 +61,5 @@ class MainPage(BaseView):
 
     def practice_page(self):
         return PracticePage(parent=self.parent, controller=self.controller,
-                            current_user=self.saved_data[self.last_user], previous_page=self, session=self.session)
+                            current_user=self.current_user,
+                            previous_page=self, session=self.session)

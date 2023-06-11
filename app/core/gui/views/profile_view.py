@@ -1,3 +1,4 @@
+import tkinter as tk
 from tkinter import Label, BooleanVar
 
 from PIL import Image
@@ -9,7 +10,6 @@ from core.gui.elements import Button, CTAButton, HintLabel, GreyLine, StrictSpel
 from core.gui.views.base_view import BaseView, BaseFrame
 from core.gui.views.vocabulary_view import VocabularyPage
 from util import helpers
-import tkinter as tk
 
 
 class ProfilePage(BaseView):
@@ -58,6 +58,7 @@ class ProfilePage(BaseView):
         if not self.previous_page.spelling_trainer_block.is_play_btn_on and not self.current_user.only_from_vocabulary:
             self.previous_page.spelling_trainer_block.new_word()
             self.previous_page.spelling_trainer_block.turn_on_play_btn()
+        self.previous_page.spelling_trainer_block.update_user(self.current_user)
         self.previous_page.tkraise()
 
 
@@ -79,9 +80,7 @@ class UserBlock(BaseFrame):
                                width=30, height=25, corner_radius=10, compound="left",
                                command=lambda: self.edit_page().tkraise())
         self.horizontal_line = GreyLine(self, width=180)
-        self.strict_spelling_switch = StrictSpellingSwitch(self,
-                                                           command=lambda: self.current_user.toggle_strict_spelling(
-                                                               self.strict_spelling_switch.get()))
+        self.strict_spelling_switch = StrictSpellingSwitch(self, command=self.on_toggle_switch)
         self.configure_strict_spelling_switch()
         self.strict_spelling_hint = HintLabel(self, text=strings.STRICT_SPELLING_HINT, image=False)
 
@@ -91,6 +90,20 @@ class UserBlock(BaseFrame):
         self.horizontal_line.grid(row=3, column=0, pady=10)
         self.strict_spelling_switch.grid(row=4, column=0, padx=10, sticky="w")
         self.strict_spelling_hint.grid(row=5, column=0, padx=10, pady=(0, 10), sticky="w")
+
+    def on_toggle_switch(self):
+        state = self.strict_spelling_switch.get()
+        self.current_user.toggle_strict_spelling(state)
+        self.parent.previous_page.spelling_trainer_block.current_user = self.current_user
+        self.parent.previous_page.spelling_trainer_block.spell_checker.user = self.current_user
+        self.parent.previous_page.spelling_trainer_block.word_generator.user = self.current_user
+        if state:
+            try:
+                self.parent.previous_page.spelling_trainer_block.display_spelling_hint()
+            except TypeError:
+                pass
+        else:
+            self.parent.previous_page.spelling_trainer_block.spelling_hint.configure(text="", image="")
 
     def edit_page(self):
         from core.gui.views.edit_profile_view import EditProfilePage
@@ -121,43 +134,43 @@ class StatisticsBlock(BaseFrame):
             self.header_text = CTkLabel(self, text=strings.OVERALL_STATISTICS,
                                         font=CTkFont(None, config.STATISTICS_FONT_SIZE))
             self.attempts = StaticsLabel(self, text=self.current_user.total_attempts)
-            self.attempts_tip = CustomToolTip(self.attempts, text="Overall number of times\n you've spelled words")
+            self.attempts_tip = CustomToolTip(self.attempts, text="Overall number of times\nyou've spelled words")
             self.correctly = StaticsLabel(self, text=self.current_user.attempts_correct)
-            self.correctly_tip = CustomToolTip(self.correctly, text="Number of times you\n correctly spelled words")
+            self.correctly_tip = CustomToolTip(self.correctly, text="Number of times you\ncorrectly spelled words")
             self.learned_words = CTkLabel(self, text=len(current_user.dictionaries.learned_words),
                                           font=CTkFont(family=None, size=config.TITLE_FONT_SIZE, weight="bold"),
                                           text_color="#6bbe66")
-            self.learned_words_tip = CustomToolTip(self.learned_words, text="The number of words you've consistently\n "
-                                                                            "spelled correctly and now you know\n how "
+            self.learned_words_tip = CustomToolTip(self.learned_words, text="The number of words you've consistently\n"
+                                                                            "spelled correctly and now you know\nhow "
                                                                             "to spell them")
             self.to_learn = StaticsLabel(self, text=len(current_user.dictionaries.vocabulary))
-            self.to_learn_tip = CustomToolTip(self.to_learn, text="Words in your vocabulary\n "
+            self.to_learn_tip = CustomToolTip(self.to_learn, text="Words in your vocabulary\n"
                                                                   "which require more practice")
             self.to_learn_label = CTkLabel(self, text=strings.TO_LEARN)
 
             self.incorrectly = StaticsLabel(self, text=self.current_user.attempts_incorrect)
-            self.incorrectly_tip = CustomToolTip(self.incorrectly, text="The number of attempts to spell a word\n "
+            self.incorrectly_tip = CustomToolTip(self.incorrectly, text="The number of attempts to spell a word\n"
                                                                         "resulted in a spelling mistake")
         else:
             self.header_text = CTkLabel(self, text=strings.SESSION_STATISTICS,
                                         font=CTkFont(None, config.STATISTICS_FONT_SIZE))
             self.attempts = StaticsLabel(self, text=self.session.total_attempts)
-            self.session_attempts_tip = CustomToolTip(self.attempts, text="Overall number of times\n "
+            self.session_attempts_tip = CustomToolTip(self.attempts, text="Overall number of times\n"
                                                                           "you've spelled words")
             self.correctly = StaticsLabel(self, text=self.session.attempts_correct)
-            self.session_correctly = CustomToolTip(self.correctly, text="Number of times you\n correctly spelled words")
+            self.session_correctly = CustomToolTip(self.correctly, text="Number of times you\ncorrectly spelled words")
             self.learned_words = CTkLabel(self, text=session.learned_words, text_color="#6bbe66",
                                           font=CTkFont(family=None, size=config.TITLE_FONT_SIZE, weight="bold"))
             self.session_learned_words = CustomToolTip(self.learned_words, text="The number of words that you've\n"
-                                                                                " learned during this learning session")
+                                                                                "learned during this learning session")
             self.to_learn = StaticsLabel(self, text=self.session.new_words)
             self.session_to_learn = CustomToolTip(self.to_learn,
-                                                  text="Words which have been added to your vocabulary\n "
+                                                  text="Words which have been added to your vocabulary\n"
                                                        "and need more practice")
             self.to_learn_label = CTkLabel(self, text=strings.NEW_WORDS)
             self.incorrectly = StaticsLabel(self, text=self.session.attempts_incorrect)
             self.session_incorrectly = CustomToolTip(self.incorrectly, text="The number of spelling mistakes you've\n"
-                                                                            " made during this learning session")
+                                                                            "made during this learning session")
 
         self.blue_line = ThickLine(self, progress_color="#5399cf")
         self.light_green_line = ThickLine(self, progress_color="#1ea689")

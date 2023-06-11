@@ -24,7 +24,8 @@ def say(word, volume):
 
 def get_random_win_voice(engine):
     voices = engine.getProperty('voices')
-    return random.choice(voices).id
+    english_voices = [voice for voice in voices if "EN" in voice.id]
+    return random.choice(english_voices).id
 
 
 def win_say(word, volume, voice, engine, rate=0.8):

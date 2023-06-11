@@ -7,7 +7,7 @@ class Session:
         self.attempts_incorrect = 0
         self.learned_words = 0
         self.new_words = 0
-        logging.info("New session created")
+        logging.debug("New session created")
 
     @property
     def total_attempts(self):

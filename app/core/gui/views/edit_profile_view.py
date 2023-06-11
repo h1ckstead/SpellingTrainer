@@ -1,3 +1,5 @@
+from tkinter import messagebox
+
 from core import strings
 from core.gui.blocks.registration_edit_block import RegistrationEditBlock
 from core.gui.elements import CTAButton, Button
@@ -10,14 +12,13 @@ class EditProfilePage(BaseView):
         super().__init__(parent, controller)
         self.parent = parent
         self.controller = controller
-        self.previous_page = previous_page
+        self.previous_page = previous_page  # Profile Page
         self.current_user = current_user
 
         self.profile_edit_block = RegistrationEditBlock(parent=self, controller=self.controller,
                                                         current_user=self.current_user)
         self.cancel_btn = Button(self, strings.CANCEL, command=lambda: self.previous_page.tkraise())
-        self.save_btn = CTAButton(self, strings.SAVE, command=lambda: [self.save_changes(),
-                                                                       self.previous_page.tkraise()])
+        self.save_btn = CTAButton(self, strings.SAVE, command=self.save_changes)
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(2, weight=1)
@@ -29,10 +30,16 @@ class EditProfilePage(BaseView):
 
     def save_changes(self):
         new_username = self.profile_edit_block.get_username()
-        self.current_user.edit_username(new_username)
-        self.current_user.edit_avatar(self.profile_edit_block.selected_avatar)
+        existing_users = helpers.load_save()
+        if new_username in existing_users["users"] and new_username != self.current_user.name:
+            messagebox.showerror(message=f"User {new_username} already exists")
+        else:
+            self.current_user.edit_username(new_username)
+            self.current_user.edit_avatar(self.profile_edit_block.selected_avatar)
 
-        # Update existing pages
-        self.previous_page.user_block.update_profile()
-        self.previous_page.main_page.saved_data = helpers.load_save()
-        self.previous_page.main_page.welcome_block.change_current_user(self.current_user)
+            # Update existing pages
+            self.previous_page.user_block.update_profile()
+            self.previous_page.main_page.saved_data = helpers.load_save()
+            self.previous_page.main_page.welcome_block.change_current_user(self.current_user)
+
+            self.previous_page.tkraise()

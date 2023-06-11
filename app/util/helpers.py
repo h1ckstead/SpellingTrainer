@@ -1,12 +1,14 @@
 import logging
 import os
 import pickle
+import platform
 import sys
+import urllib
 import webbrowser
-import requests
-from bs4 import BeautifulSoup
 from tkinter import messagebox
 
+import requests
+from bs4 import BeautifulSoup
 
 from core import config
 from core import constants
@@ -18,8 +20,10 @@ def load_save():
     try:
         with open(savefile_path, 'rb') as file:
             data = pickle.load(file)
+            logging.debug(f"Loaded savefile: {data}")
         return data
     except FileNotFoundError:
+        logging.error(f"Save file not found in: {savefile_path}")
         return None
 
 
@@ -39,19 +43,14 @@ def get_savefile_path():
 
 def get_path(*args):
     if getattr(sys, 'frozen', False):
-        # Running as a bundled executable
-        if hasattr(sys, '_MEIPASS'):
-            # macOS and Windows
+        if hasattr(sys, '_MEIPASS'):  # Running as a bundled executable
             base_path = sys._MEIPASS
         else:
-            # macOS
             base_path = os.path.dirname(sys.executable)
     elif 'unittest' in sys.modules:
         base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'app'))
-    else:
-        # Running as a regular Python script
+    else:  # Running as a regular Python script
         base_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-
     return os.path.join(base_path, *args)
 
 
@@ -62,11 +61,20 @@ def get_avatars_list():
 def report_bug():
     email_address = "spellingtrainer@proton.me"
     subject = "[Bug Report] for Spelling Trainer"
+    current_platform = platform.system()
+    newline = '\n'  # Default newline character
+    if current_platform == 'Windows':
+        newline = '\r\n'  # Use Windows newline character sequence
 
-    body = f"Hello,\n\nI wanted to provide feedback for the Spelling Trainer {config.VERSION}.\n\n" \
+    body = f"Hello,{newline}{newline}" \
+           f"I wanted to provide feedback for the Spelling Trainer {config.VERSION}.{newline}{newline}" \
            f"[Your feedback here, include any relevant information, steps to reproduce, screenshots]"
 
-    mailto_url = f"mailto:{email_address}?subject={subject}&body={body}"
+    if current_platform == 'Windows':
+        encoded_body = urllib.parse.quote(body)
+        mailto_url = f"mailto:{email_address}?subject={subject}&body={encoded_body}"
+    else:
+        mailto_url = f"mailto:{email_address}?subject={subject}&body={body}"
     webbrowser.open(mailto_url)
 
 
@@ -81,32 +89,26 @@ def load_dictionary(name):
         return pickle.load(document)
 
 
-def verify_dicts_version(saved_data):
+def verify_dicts_version(users, last_user):
     """
     Checks if dictionaries of existing users are outdated.
 
-    :param saved_data: dict
+    :param users: dict containing usernames and their respective User objects
+    :param last_user User object
     :return:
     """
     updated = False
-    last_user = saved_data["last_user"]
-    if saved_data[last_user].dictionaries.high_priority_words["version"] < config.HIGH_PRIORITY_DICT_VERSION:
+    if last_user.dictionaries.high_priority_words["version"] < config.HIGH_PRIORITY_DICT_VERSION:
         logging.info(f"{HIGH_PRIORITY_WORDS} is stale. Updating from "
-                     f"{saved_data[last_user].dictionaries.high_priority_words['version']} to "
+                     f"{last_user.dictionaries.high_priority_words['version']} to "
                      f"{config.HIGH_PRIORITY_DICT_VERSION}.")
-        saved_data.pop("last_user")
-        users = saved_data
         update_user_dict(users, to_update=HIGH_PRIORITY_WORDS)
-        users["last_user"] = last_user
         updated = True
-    if saved_data[last_user].dictionaries.low_priority_words["version"] < config.LOW_PRIORITY_DICT_VERSION:
+    if last_user.dictionaries.low_priority_words["version"] < config.LOW_PRIORITY_DICT_VERSION:
         logging.info(f"{LOW_PRIORITY_WORDS} is stale. Updating from "
-                     f"{saved_data[last_user].dictionaries.low_priority_words['version']} to "
+                     f"{last_user.dictionaries.low_priority_words['version']} to "
                      f"{config.LOW_PRIORITY_DICT_VERSION}.")
-        saved_data.pop("last_user")
-        users = saved_data
         update_user_dict(users, to_update=LOW_PRIORITY_WORDS)
-        users["last_user"] = last_user
         updated = True
     else:
         logging.info("Users' dictionaries are up to date")
@@ -163,24 +165,24 @@ def remove_duplicates(to_remove_from, model):
     for key, value in to_remove_from.items():
         if key in model and constants.AmE in model[key] and constants.AmE not in value:
             del model[key][constants.AmE]
-            logging.info(f"Removed 'AmE' value for word {key}")
+            logging.debug(f"Removed 'AmE' value for word {key}")
         if key in model and constants.AmE in value:
             model[key][constants.AmE] = value[constants.AmE]
-            logging.info(f"Added/Updated 'AmE' value for word {key}")
+            logging.debug(f"Added/Updated 'AmE' value for word {key}")
         if key in model and value[constants.DEFINITIONS] == model[key]:
             keys_to_remove.append(key)
         elif key in model:
             model[key][constants.DEFINITIONS] = value[constants.DEFINITIONS]
             keys_to_remove.append(key)
-            logging.info(f"Updated value of word {key}")
+            logging.debug(f"Updated value of word {key}")
     for key in keys_to_remove:
         del to_remove_from[key]
-        logging.info(f"Removed {key} from dict")
+        logging.debug(f"Removed {key} from dict")
     return to_remove_from
 
 
 def check_for_updates():
-    page_url = 'https://spellingtrainer.wixsite.com/download'
+    page_url = 'https://spellingtrainer.wixsite.com/index'
 
     response = requests.get(page_url)
     html = response.text

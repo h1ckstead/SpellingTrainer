@@ -29,8 +29,8 @@ class User:
         savefile_path = helpers.get_savefile_path()
         with open(savefile_path, 'rb+') as file:
             loaded_data = pickle.load(file)
-            if self.name in loaded_data:
-                loaded_data[new_name] = loaded_data.pop(self.name)
+            if self.name in loaded_data["users"]:
+                loaded_data["users"][new_name] = loaded_data["users"].pop(self.name)
                 loaded_data['last_user'] = new_name
                 self.name = new_name
                 file.seek(0)
@@ -73,12 +73,16 @@ class User:
         try:
             with open(savefile_path, 'rb+') as file:
                 loaded_data = pickle.load(file)
-                loaded_data.update({self.name: self, 'last_user': self.name})
+                loaded_data["users"].update({self.name: self})
+                loaded_data["last_user"] = self.name
                 file.seek(0)
                 pickle.dump(loaded_data, file)
-                logging.info("Updated savefile")
+                logging.info("Saved progress")
         except FileNotFoundError:
             with open(savefile_path, 'wb') as file:
-                data = {self.name: self, 'last_user': self.name}
+                data = {
+                    "users": {self.name: self},
+                    "last_user": self.name
+                }
                 pickle.dump(data, file)
                 logging.info(f"Created savefile: {data}")
