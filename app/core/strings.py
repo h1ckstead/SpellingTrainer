@@ -32,18 +32,8 @@ WELCOME_PAGE_TEXT = "Spelling Trainer is designed to help you improve your spell
 # Main page
 MAIN_PAGE_TITLE = 'Welcome back! {}'
 GREETING_EMOJI = ['😎', '🥰', '🤩', '😺', '🙂', '🥹', '☺️', '🤓', '😸']
-# APP_DESCRIPTION = "Praesent elit neque, suscipit ullamcorper iaculis consectetur, " \
-#                   "semper at justo. Ut congue velit in diam malesuada, at fermentum erat eleifend. Vestibulum quis " \
-#                   "iaculis mauris."
 CHANGE_USER = "Change user"
 PROFILE_BTN = "Go to my profile"
-
-# Registration Page
-#REGISTRATION_TITLE = "Create new user"
-# USERNAME_HEADER = "Name"
-#USERNAME_PLACEHOLDER = "Enter username"
-#AVATAR_HEADER = "Choose your avatar"
-#STRICT_SPELLING_HINT = "If selected, you'll be asked to spell specifically British or American variant."
 
 # Registration/Edit block
 REGISTRATION_TITLE = "Create new user"
@@ -113,7 +103,6 @@ INCORRECTLY = "Incorrectly"
 # Validation Messages
 CORRECT = "Correct"
 INCORRECT = "Incorrect!"
-# CORRECTION = "The word is: "
 EMPTY = "First, listen to the word"
 TRY_AGAIN = "Try again"
 

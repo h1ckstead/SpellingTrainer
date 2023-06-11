@@ -1,3 +1,4 @@
+import tkinter as tk
 from tkinter import Label, BooleanVar
 
 from PIL import Image
@@ -9,7 +10,6 @@ from core.gui.elements import Button, CTAButton, HintLabel, GreyLine, StrictSpel
 from core.gui.views.base_view import BaseView, BaseFrame
 from core.gui.views.vocabulary_view import VocabularyPage
 from util import helpers
-import tkinter as tk
 
 
 class ProfilePage(BaseView):
@@ -97,7 +97,6 @@ class UserBlock(BaseFrame):
         self.parent.previous_page.spelling_trainer_block.current_user = self.current_user
         self.parent.previous_page.spelling_trainer_block.spell_checker.user = self.current_user
         self.parent.previous_page.spelling_trainer_block.word_generator.user = self.current_user
-        # self.parent.previous_page.spelling_trainer_block.word_dict = None
         if state:
             try:
                 self.parent.previous_page.spelling_trainer_block.display_spelling_hint()

@@ -1,7 +1,8 @@
+import platform
 import tkinter as tk
 from _tkinter import TclError
 from tkinter import StringVar, Label, BooleanVar, messagebox
-import platform
+
 from PIL import Image, ImageTk
 from customtkinter import CTkFrame, CTkComboBox, CTkFont, CTkImage, CTkLabel, CTkCheckBox, CTkButton, CTkSwitch, \
     CTkProgressBar, CTkToplevel
@@ -39,7 +40,6 @@ class VocabularyPage(BaseView):
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(3, weight=1)
-
         self.grid_rowconfigure(4, weight=1)
 
         self.title_text.grid(row=0, column=0, columnspan=4, pady=(20, 15))
@@ -111,7 +111,6 @@ class VocabularyBlock(BaseFrame):
             self.matched_subset = matched_words
             self.total_pages = (len(self.matched_subset) + self.page_size - 1) // self.page_size
         else:
-            # self.user_vocabulary_copy = self.current_user.dictionaries.vocabulary.copy()
             self.total_pages = (len(self.current_user.dictionaries.vocabulary) + self.page_size - 1) // self.page_size
 
         if self.sorting.get():
@@ -373,26 +372,17 @@ class VocabularyBlock(BaseFrame):
 
         response = self.show_delete_conformation(words_to_delete)
         if response == tk.YES:
-            for word in words_to_delete:
-                if self.matched_subset:
-                    del self.matched_subset[word]
-                elif self.user_vocabulary_copy:
-                    del self.user_vocabulary_copy[word]
-                # del self.user_vocabulary_copy[word]
-                del self.current_user.dictionaries.vocabulary[word]
+            self.current_user.dictionaries.delete_words(words_to_delete)
 
             # Remove the associated checkbox variables
             for checkbox_var in checkbox_vars_to_delete:
                 self.checkbox_vars.remove(checkbox_var)
 
-            # self.current_user.dictionaries.vocabulary = self.user_vocabulary_copy
             self.current_user.save_progress()
             if self.matched_subset:
                 self.display_vocabulary_subset(reset_page=False)
             else:
                 self.load_vocabulary()  # Refresh the list
-            # self.load_vocabulary()
-            # self.update_delete_button_state()
 
     @staticmethod
     def show_delete_conformation(words_to_delete):
@@ -559,8 +549,10 @@ class AddWordsBlock(BaseFrame):
 
     def update_user_stats(self):
         self.parent.previous_page.session.new_words += 1
-        self.parent.previous_page.overall_statistics_block.to_learn.configure(text=len(self.current_user.dictionaries.vocabulary))
-        self.parent.previous_page.session_statistics_block.to_learn.configure(text=self.parent.previous_page.session.new_words)
+        self.parent.previous_page.overall_statistics_block.to_learn.configure(
+            text=len(self.current_user.dictionaries.vocabulary))
+        self.parent.previous_page.session_statistics_block.to_learn.configure(
+            text=self.parent.previous_page.session.new_words)
 
 
 class AboutBlock(BaseFrame):

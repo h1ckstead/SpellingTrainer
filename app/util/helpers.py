@@ -5,10 +5,10 @@ import platform
 import sys
 import urllib
 import webbrowser
-import requests
-from bs4 import BeautifulSoup
 from tkinter import messagebox
 
+import requests
+from bs4 import BeautifulSoup
 
 from core import config
 from core import constants
@@ -182,7 +182,7 @@ def remove_duplicates(to_remove_from, model):
 
 
 def check_for_updates():
-    page_url = 'https://spellingtrainer.wixsite.com/download'
+    page_url = 'https://spellingtrainer.wixsite.com/index'
 
     response = requests.get(page_url)
     html = response.text

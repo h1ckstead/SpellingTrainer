@@ -63,7 +63,8 @@ class ContentBlock(CTkFrame):
         self.continue_learning_btn = CTAButton(self, text=strings.CONTINUE_LEARNING, image=self.button_image(),
                                                font=CTkFont(family="Arial", size=config.FONT_SIZE),
                                                command=lambda: [self.update_pages(), self.practice_page.tkraise(),
-                                                                self.saved_data["users"][self.dropdown.get()].save_progress()
+                                                                self.saved_data["users"][
+                                                                    self.dropdown.get()].save_progress()
                                                                 ])
         self.horizontal_line = GreyLine(self, height=3, width=config.WINDOW_WIDTH - 450)
         self.create_new_user_btn = Button(self, text=strings.CREATE_NEW,

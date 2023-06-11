@@ -51,12 +51,6 @@ class UserRegistrationPage(BaseView):
             main_page = self.main_page()
             main_page.welcome_block.next_page.tkraise()
 
-    # def create_and_raise_practice_page(self):
-    #     PracticePage(parent=self.parent, controller=self.controller,
-    #                  current_user=self.current_user,
-    #                  previous_page=self.main_page(),
-    #                  session=self.session).tkraise()
-
     def main_page(self):
         from core.gui.views.main_view import MainPage
 

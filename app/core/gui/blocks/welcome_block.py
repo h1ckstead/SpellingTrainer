@@ -1,6 +1,6 @@
+import platform
 import random
 import tkinter as tk
-import platform
 
 from PIL import Image
 from customtkinter import CTkFrame, CTkLabel, CTkImage, CTkFont
@@ -12,12 +12,11 @@ from util import helpers
 
 
 class WelcomeBlock(BaseFrame):
-    def __init__(self, parent, controller, current_user=None, saved_data=None, next_page=None):
+    def __init__(self, parent, controller, current_user=None, next_page=None):
         BaseFrame.__init__(self, parent, controller, width=config.WINDOW_WIDTH - 100, height=config.WINDOW_HEIGHT - 250)
         self.parent = parent
         self.controller = controller
         self.current_user = current_user
-        # self.saved_data = saved_data
         self.next_page = next_page
         self.grid_propagate(False)
 

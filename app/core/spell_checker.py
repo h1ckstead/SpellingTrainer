@@ -40,29 +40,6 @@ class SpellChecker:
         user_word = user_word.title()
         return word, user_word
 
-    # def strict_spellcheck(self, word, word_dict, user_word, session):
-    #     """
-    #     Based on the spelling prompt "BrE/AmE" compares if user word
-    #     matches the appropriate spelling.
-    #
-    #     :param session: Session object
-    #     :param word: str reference word
-    #     :param word_dict: dict containing reference word, definition,
-    #     AmE version of the word and Spelling which was asked from the user
-    #     :param user_word: str a word user has typed
-    #     :return: str status "Correct" or "Incorrect"
-    #     """
-    #     if word_dict[word][SPELLING] == BrE and user_word == word:
-    #         status = CORRECT
-    #         self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
-    #     elif word_dict[word][SPELLING] == AmE and user_word == word_dict[word][AmE]:
-    #         status = CORRECT
-    #         self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
-    #     else:
-    #         status = INCORRECT
-    #         self.vocab_builder.manage_vocabulary_based_on_word_status(word, word_dict, status, session)
-    #     return status
-
     def strict_spellcheck(self, word, word_dict, user_word, session):
         """
         Based on the spelling prompt "BrE/AmE" compares if user word

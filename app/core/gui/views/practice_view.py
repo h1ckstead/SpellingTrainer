@@ -1,7 +1,7 @@
 import logging
+import platform
 import tkinter as tk
 from tkinter import Text, Label, BooleanVar
-import platform
 
 from PIL import Image
 from PIL.ImageTk import PhotoImage
